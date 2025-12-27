@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Background & Surfaces */
+    --background: 0 0% 100%;
+    --background-subtle: 195 30% 98%;
+    --foreground: 200 15% 15%;
+
+    /* Cards & Elevated Surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 200 15% 15%;
+    --card-hover: 195 30% 98%;
+
+    /* Popovers & Overlays */
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 15% 15%;
+
+    /* Primary Brand - Deep Teal */
+    --primary: 195 75% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 195 75% 45%;
+    --primary-dark: 195 75% 25%;
+
+    /* Secondary/CTA - Warm Coral */
+    --secondary: 15 85% 60%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 15 85% 70%;
+    --secondary-dark: 15 85% 50%;
+
+    /* Muted - Neutral Grays */
+    --muted: 200 15% 95%;
+    --muted-foreground: 200 10% 45%;
+
+    /* Accent - Complementary */
+    --accent: 195 45% 92%;
+    --accent-foreground: 195 75% 35%;
+
+    /* Destructive */
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Borders & Inputs */
+    --border: 200 15% 88%;
+    --input: 200 15% 88%;
+    --ring: 195 75% 45%;
+
+    /* Success State */
+    --success: 150 75% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning State */
+    --warning: 45 95% 55%;
+    --warning-foreground: 200 15% 15%;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    
+    /* Radius */
+    --radius: 0.75rem;
+    --radius-sm: 0.5rem;
+    --radius-lg: 1rem;
+
+    /* Transitions */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 200 20% 8%;
+    --background-subtle: 200 20% 12%;
+    --foreground: 0 0% 98%;
+
+    --card: 200 20% 10%;
+    --card-foreground: 0 0% 98%;
+    --card-hover: 200 20% 14%;
+
+    --popover: 200 20% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 195 75% 50%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 195 75% 60%;
+    --primary-dark: 195 75% 40%;
+
+    --secondary: 15 85% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 15 85% 75%;
+    --secondary-dark: 15 85% 55%;
+
+    --muted: 200 15% 20%;
+    --muted-foreground: 200 10% 65%;
+
+    --accent: 195 45% 18%;
+    --accent-foreground: 195 75% 65%;
+
+    --destructive: 0 85% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 200 15% 22%;
+    --input: 200 15% 22%;
+    --ring: 195 75% 55%;
+
+    --success: 150 75% 50%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 95% 60%;
+    --warning-foreground: 200 15% 15%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
