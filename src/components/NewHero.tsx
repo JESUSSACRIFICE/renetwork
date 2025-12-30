@@ -1400,7 +1400,7 @@ const NewHero = () => {
 
           {/* Second Column - Search Form */}
           <div className="w-full flex justify-center lg:justify-start">
-            <div className="bg-muted/30 overflow-y-auto w-full sm:w-[90%] md:w-[70%] lg:w-[400px] xl:w-[450px] 2xl:w-[500px] border border-border rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px]">
+            <div className="bg-muted/30 overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[500px] border border-border rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px]">
               <div className="space-y-1">
                 {/* Find */}
                 <MultiSelect
