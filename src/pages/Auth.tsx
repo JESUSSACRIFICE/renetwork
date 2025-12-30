@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +16,7 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number");
 
 const Auth = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
@@ -48,9 +49,9 @@ const Auth = () => {
         .maybeSingle();
 
       if (!profile) {
-        navigate(`/profile/${data.user.id}/edit`);
+        router.push(`/profile/${data.user.id}/edit`);
       } else {
-        navigate(`/profile/${data.user.id}`);
+        router.push(`/profile/${data.user.id}`);
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
@@ -93,7 +94,7 @@ const Auth = () => {
       
       // Redirect to profile setup
       if (data.user) {
-        navigate(`/profile/${data.user.id}/edit`);
+        router.push(`/profile/${data.user.id}/edit`);
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
@@ -106,7 +107,7 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/5 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 mb-6">
+          <Link href="/" className="inline-flex items-center space-x-2 mb-6">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-xl">
               RE
             </div>

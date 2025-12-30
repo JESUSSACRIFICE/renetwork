@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import Header from "@/components/Header";
@@ -10,7 +11,7 @@ import { Star, MapPin, Heart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const DashboardFavorites = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +23,7 @@ const DashboardFavorites = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      navigate("/auth");
+      router.push("/auth");
       return;
     }
 
@@ -110,7 +111,7 @@ const DashboardFavorites = () => {
               <Card className="p-12 text-center">
                 <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">No favorites yet</p>
-                <Button onClick={() => navigate("/browse")}>
+                <Button onClick={() => router.push("/browse")}>
                   Browse Professionals
                 </Button>
               </Card>
@@ -123,7 +124,7 @@ const DashboardFavorites = () => {
                   return (
                     <Card key={favorite.id} className="p-6 hover:shadow-lg transition-shadow">
                       <div className="flex items-start justify-between mb-4">
-                        <Link to={`/profile/${prof.id}`} className="flex-1">
+                        <Link href={`/profile/${prof.id}`} className="flex-1">
                           <h3 className="font-bold text-lg hover:text-primary transition-colors line-clamp-1">
                             {prof.company_name || prof.full_name}
                           </h3>
@@ -178,7 +179,7 @@ const DashboardFavorites = () => {
                         </p>
                       </div>
 
-                      <Link to={`/profile/${prof.id}`}>
+                      <Link href={`/profile/${prof.id}`}>
                         <Button className="w-full mt-4">View Profile</Button>
                       </Link>
                     </Card>

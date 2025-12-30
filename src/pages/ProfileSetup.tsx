@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -51,7 +51,7 @@ const LANGUAGES = ["English", "Spanish", "Chinese", "French", "German", "Italian
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const ProfileSetup = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -87,7 +87,7 @@ const ProfileSetup = () => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        navigate("/auth");
+        router.push("/auth");
         return;
       }
       setUserId(user.id);
@@ -151,7 +151,7 @@ const ProfileSetup = () => {
       }
     };
     getUser();
-  }, [navigate, form]);
+  }, [router, form]);
 
   const onSubmit = async (values: ProfileFormValues) => {
     if (!userId) return;
@@ -232,7 +232,7 @@ const ProfileSetup = () => {
       if (paymentError) throw paymentError;
 
       toast.success("Profile updated successfully!");
-      navigate(`/profile/${userId}`);
+      router.push(`/profile/${userId}`);
     } catch (error: any) {
       toast.error(error.message || "Failed to update profile");
       console.error(error);
@@ -588,7 +588,7 @@ const ProfileSetup = () => {
                       <div className="space-y-1 leading-none">
                         <FormLabel>Willing to train referred parties</FormLabel>
                         <FormDescription>
-                          Indicate if you're willing to provide training to professionals you refer or receive
+                          Indicate if you&apos;re willing to provide training to professionals you refer or receive
                           referrals from.
                         </FormDescription>
                       </div>
@@ -724,7 +724,7 @@ const ProfileSetup = () => {
             </Card>
 
             <div className="flex justify-end gap-4">
-              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+              <Button type="button" variant="outline" onClick={() => router.back()}>
                 Cancel
               </Button>
               <Button type="submit" disabled={loading}>

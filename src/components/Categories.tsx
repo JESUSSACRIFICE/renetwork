@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import designImg from "@/assets/category-design.jpg";
@@ -75,9 +76,11 @@ const Categories = () => {
             >
               <div className="bg-card rounded-2xl overflow-hidden border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/50">
                 <div className="aspect-square bg-accent/50 p-8 flex items-center justify-center">
-                  <img
+                  <Image
                     src={category.image}
                     alt={category.name}
+                    width={128}
+                    height={128}
                     className="w-32 h-32 object-contain transition-transform group-hover:scale-110"
                   />
                 </div>

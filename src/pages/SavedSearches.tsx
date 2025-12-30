@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import Header from "@/components/Header";
@@ -10,7 +10,7 @@ import { Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const SavedSearches = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [searches, setSearches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -21,7 +21,7 @@ const SavedSearches = () => {
   const checkAuthAndFetch = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate("/auth");
+      router.push("/auth");
       return;
     }
     fetchSearches(user.id);
@@ -75,7 +75,7 @@ const SavedSearches = () => {
               <Card className="p-12 text-center">
                 <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">No saved searches yet</p>
-                <Button onClick={() => navigate("/browse")}>Start Searching</Button>
+                <Button onClick={() => router.push("/browse")}>Start Searching</Button>
               </Card>
             ) : (
               <div className="grid gap-4">
@@ -91,7 +91,7 @@ const SavedSearches = () => {
                       <div className="flex gap-2">
                         <Button variant="outline" onClick={() => {
                           const params = new URLSearchParams(search.search_params);
-                          navigate(`/browse?${params.toString()}`);
+                          router.push(`/browse?${params.toString()}`);
                         }}>
                           Apply Search
                         </Button>

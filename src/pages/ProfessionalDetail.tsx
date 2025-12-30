@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { Star, MapPin, Phone, Globe, Mail, Heart, MessageSquare, DollarSign, Award, Briefcase } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -15,7 +16,8 @@ import ReviewsList from "@/components/professional/ReviewsList";
 import { Separator } from "@/components/ui/separator";
 
 const ProfessionalDetail = () => {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string;
   const [professional, setProfessional] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -128,7 +130,7 @@ const ProfessionalDetail = () => {
         <main className="flex-1 bg-background flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">Professional Not Found</h1>
-            <Link to="/browse">
+            <Link href="/browse">
               <Button>Browse Professionals</Button>
             </Link>
           </div>

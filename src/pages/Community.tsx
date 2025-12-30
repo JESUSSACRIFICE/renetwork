@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,7 +36,7 @@ const Community = () => {
     category: "",
     privacy: "public"
   });
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -222,7 +222,7 @@ const Community = () => {
               <Card
                 key={group.id}
                 className="hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => navigate(`/community/${group.id}`)}
+                onClick={() => router.push(`/community/${group.id}`)}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">

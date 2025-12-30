@@ -69,7 +69,7 @@ const Testimonials = () => {
 
                 {/* Testimonial Text */}
                 <p className="text-foreground leading-relaxed">
-                  "{testimonial.content}"
+                  &ldquo;{testimonial.content}&rdquo;
                 </p>
 
                 {/* Author */}

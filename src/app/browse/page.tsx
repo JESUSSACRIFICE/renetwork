@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, DollarSign, Map, Grid } from "lucide-react";
@@ -34,7 +34,7 @@ interface ServiceListing {
   }>;
 }
 
-export default function Browse() {
+function BrowseContent() {
   const searchParams = useSearchParams();
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
@@ -363,6 +363,26 @@ export default function Browse() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function Browse() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 bg-background">
+          <div className="container py-8">
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Loading...</p>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    }>
+      <BrowseContent />
+    </Suspense>
   );
 }
 

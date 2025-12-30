@@ -31,6 +31,7 @@ interface FilterValues {
   flooringIndoorTypes: string[];
   flooringOutdoorTypes: string[];
   fields: string[];
+  commercialTypes: string[];
   commercialRetailTypes: string[];
   commercialRecreationalTypes: string[];
   commercialHospitalityTypes: string[];
@@ -175,19 +176,27 @@ const buyingOptions = ["Buying", "Cash", "Owner Finance", "Credit", "Others"];
 const institutionOptions = ["Mortgage", "Bank", "Already have"];
 const creditOptions = ["Already acquired loan", "Need Loan"];
 // Fields options with nested structure
-const fieldsOptions = ["Commercial", "Multi-Unit 4+ Unit's with FCRED because of higher and best use", "Industrial", "Agriculture", "Residential", "Other", "All of the above"];
+const fieldsOptions = ["Commercial", "Multi-Unit", "Industrial", "Agriculture", "Residential", "Other", "All of the above"];
 
-// Commercial nested options
+// Commercial sub-options (first level under Commercial)
+const commercialOptions = [
+  "Retail",
+  "Sky-Scraper's",
+  "Office",
+  "Living",
+  "Hospitality",
+  "Mobile Home Park",
+  "All of the above",
+];
+
+// Retail nested options (under Commercial > Retail)
 const commercialRetailOptions = [
   "Single",
-  "Anchor",
-  "Mall",
   "Strip",
-  "Out-door",
+  "Mall",
+  "Anchor",
   "In-door",
-  "Recreational",
-  "Business'es",
-  "All of the above",
+  "Out-door",
 ];
 
 const commercialRecreationalOptions = [
@@ -202,6 +211,7 @@ const commercialHospitalityOptions = [
 
 // Multi-Unit 4+ Unit's nested options
 const multiUnitOptions = [
+  "4+ Unit's",
   "Sky-Scraper's",
   "Office",
   "Living",
@@ -891,6 +901,9 @@ interface FieldsMultiSelectProps {
   options: string[];
   value: string[];
   onChange: (value: string[]) => void;
+  commercialValue: string[];
+  onCommercialChange: (value: string[]) => void;
+  commercialOptions: string[];
   commercialRetailValue: string[];
   onCommercialRetailChange: (value: string[]) => void;
   commercialRetailOptions: string[];
@@ -928,6 +941,9 @@ const FieldsMultiSelect = ({
   options,
   value,
   onChange,
+  commercialValue,
+  onCommercialChange,
+  commercialOptions,
   commercialRetailValue,
   onCommercialRetailChange,
   commercialRetailOptions,
@@ -982,11 +998,12 @@ const FieldsMultiSelect = ({
       onChange(value.filter((item) => item !== option));
       // Clear nested selections if parent is deselected
       if (option === "Commercial") {
+        onCommercialChange([]);
         onCommercialRetailChange([]);
         onCommercialRecreationalChange([]);
         onCommercialHospitalityChange([]);
         onCommercialOtherChange([]);
-      } else if (option === "Multi-Unit 4+ Unit's with FCRED because of higher and best use") {
+      } else if (option === "Multi-Unit 4+ Unit's") {
         onMultiUnitChange([]);
         onMultiUnitHospitalityChange([]);
       } else if (option === "Industrial") {
@@ -1043,62 +1060,88 @@ const FieldsMultiSelect = ({
                 {/* Nested Commercial options - always visible */}
                 {option === "Commercial" && (
                   <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
-                    {/* Retail */}
-                    <div>
-                      <div className="text-xs font-semibold text-muted-foreground mb-1">Retail:</div>
-                      {commercialRetailOptions.map((retailOption) => (
-                        <div key={retailOption}>
-                          <label
-                            className={cn(
-                              "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                              commercialRetailValue.includes(retailOption) && "bg-accent/50"
-                            )}
-                          >
-                            <Checkbox
-                              checked={commercialRetailValue.includes(retailOption)}
-                              onCheckedChange={() => {
-                                if (commercialRetailValue.includes(retailOption)) {
-                                  onCommercialRetailChange(commercialRetailValue.filter((item) => item !== retailOption));
-                                } else {
-                                  onCommercialRetailChange([...commercialRetailValue, retailOption]);
-                                }
-                              }}
-                            />
-                            <span className="text-sm">{retailOption}</span>
-                          </label>
-                          {/* Nested Recreational options under Retail > Recreational */}
-                          {retailOption === "Recreational" && (
-                            <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
-                              {commercialRecreationalOptions.map((recOption) => (
-                                <label
-                                  key={recOption}
-                                  className={cn(
-                                    "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                                    commercialRecreationalValue.includes(recOption) && "bg-accent/50"
-                                  )}
-                                >
-                                  <Checkbox
-                                    checked={commercialRecreationalValue.includes(recOption)}
-                                    onCheckedChange={() => {
-                                      if (commercialRecreationalValue.includes(recOption)) {
-                                        onCommercialRecreationalChange(commercialRecreationalValue.filter((item) => item !== recOption));
-                                      } else {
-                                        onCommercialRecreationalChange([...commercialRecreationalValue, recOption]);
-                                      }
-                                    }}
-                                  />
-                                  <span className="text-sm">{recOption}</span>
-                                </label>
-                              ))}
-                            </div>
+                    {commercialOptions.map((commercialOption) => (
+                      <div key={commercialOption}>
+                        <label
+                          className={cn(
+                            "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                            commercialValue.includes(commercialOption) && "bg-accent/50"
                           )}
-                        </div>
-                      ))}
-                    </div>
+                        >
+                          <Checkbox
+                            checked={commercialValue.includes(commercialOption)}
+                            onCheckedChange={() => {
+                              if (commercialValue.includes(commercialOption)) {
+                                onCommercialChange(commercialValue.filter((item) => item !== commercialOption));
+                                // Clear retail selections if Retail is deselected
+                                if (commercialOption === "Retail") {
+                                  onCommercialRetailChange([]);
+                                }
+                              } else {
+                                onCommercialChange([...commercialValue, commercialOption]);
+                              }
+                            }}
+                          />
+                          <span className="text-sm">{commercialOption}</span>
+                        </label>
+                        {/* Nested Retail options under Commercial > Retail */}
+                        {commercialOption === "Retail" && (
+                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
+                            {commercialRetailOptions.map((retailOption) => (
+                              <label
+                                key={retailOption}
+                                className={cn(
+                                  "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                  commercialRetailValue.includes(retailOption) && "bg-accent/50"
+                                )}
+                              >
+                                <Checkbox
+                                  checked={commercialRetailValue.includes(retailOption)}
+                                  onCheckedChange={() => {
+                                    if (commercialRetailValue.includes(retailOption)) {
+                                      onCommercialRetailChange(commercialRetailValue.filter((item) => item !== retailOption));
+                                    } else {
+                                      onCommercialRetailChange([...commercialRetailValue, retailOption]);
+                                    }
+                                  }}
+                                />
+                                <span className="text-sm">{retailOption}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                        {/* Nested Hospitality options under Commercial > Hospitality */}
+                        {commercialOption === "Hospitality" && (
+                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
+                            {commercialHospitalityOptions.map((hospOption) => (
+                              <label
+                                key={hospOption}
+                                className={cn(
+                                  "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                  commercialHospitalityValue.includes(hospOption) && "bg-accent/50"
+                                )}
+                              >
+                                <Checkbox
+                                  checked={commercialHospitalityValue.includes(hospOption)}
+                                  onCheckedChange={() => {
+                                    if (commercialHospitalityValue.includes(hospOption)) {
+                                      onCommercialHospitalityChange(commercialHospitalityValue.filter((item) => item !== hospOption));
+                                    } else {
+                                      onCommercialHospitalityChange([...commercialHospitalityValue, hospOption]);
+                                    }
+                                  }}
+                                />
+                                <span className="text-sm">{hospOption}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
                 {/* Nested Multi-Unit 4+ Unit's options - always visible */}
-                {option === "Multi-Unit 4+ Unit's with FCRED because of higher and best use" && (
+                {option === "Multi-Unit 4+ Unit's" && (
                   <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
                     {multiUnitOptions.map((muOption) => (
                       <div key={muOption}>
@@ -1282,6 +1325,7 @@ const NewHero = () => {
     flooringIndoorTypes: [],
     flooringOutdoorTypes: [],
     fields: [],
+    commercialTypes: [],
     commercialRetailTypes: [],
     commercialRecreationalTypes: [],
     commercialHospitalityTypes: [],
@@ -1418,6 +1462,9 @@ const NewHero = () => {
                   options={fieldsOptions}
                   value={filters.fields}
                   onChange={(value) => setFilters({ ...filters, fields: value })}
+                  commercialValue={filters.commercialTypes}
+                  onCommercialChange={(value) => setFilters({ ...filters, commercialTypes: value })}
+                  commercialOptions={commercialOptions}
                   commercialRetailValue={filters.commercialRetailTypes}
                   onCommercialRetailChange={(value) => setFilters({ ...filters, commercialRetailTypes: value })}
                   commercialRetailOptions={commercialRetailOptions}

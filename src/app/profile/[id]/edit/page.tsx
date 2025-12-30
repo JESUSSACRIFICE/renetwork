@@ -592,7 +592,7 @@ export default function ProfileSetup() {
                       <div className="space-y-1 leading-none">
                         <FormLabel>Willing to train referred parties</FormLabel>
                         <FormDescription>
-                          Indicate if you're willing to provide training to professionals you refer or receive
+                          Indicate if you&apos;re willing to provide training to professionals you refer or receive
                           referrals from.
                         </FormDescription>
                       </div>

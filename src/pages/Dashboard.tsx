@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import Header from "@/components/Header";
@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FileText, MessageSquare, Heart, TrendingUp } from "lucide-react";
 
 const Dashboard = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [stats, setStats] = useState({
@@ -26,7 +26,7 @@ const Dashboard = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      navigate("/auth");
+      router.push("/auth");
       return;
     }
 
@@ -176,7 +176,7 @@ const Dashboard = () => {
                 {userType === "agent" ? (
                   <>
                     <button
-                      onClick={() => navigate("/dashboard/leads")}
+                      onClick={() => router.push("/dashboard/leads")}
                       className="p-4 text-left border rounded-lg hover:bg-muted transition-colors"
                     >
                       <FileText className="h-6 w-6 text-primary mb-2" />
@@ -184,7 +184,7 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground">Manage incoming inquiries</p>
                     </button>
                     <button
-                      onClick={() => navigate("/profile")}
+                      onClick={() => router.push("/profile")}
                       className="p-4 text-left border rounded-lg hover:bg-muted transition-colors"
                     >
                       <FileText className="h-6 w-6 text-primary mb-2" />
@@ -195,7 +195,7 @@ const Dashboard = () => {
                 ) : (
                   <>
                     <button
-                      onClick={() => navigate("/browse")}
+                      onClick={() => router.push("/browse")}
                       className="p-4 text-left border rounded-lg hover:bg-muted transition-colors"
                     >
                       <TrendingUp className="h-6 w-6 text-primary mb-2" />
@@ -203,7 +203,7 @@ const Dashboard = () => {
                       <p className="text-sm text-muted-foreground">Find real estate experts</p>
                     </button>
                     <button
-                      onClick={() => navigate("/dashboard/favorites")}
+                      onClick={() => router.push("/dashboard/favorites")}
                       className="p-4 text-left border rounded-lg hover:bg-muted transition-colors"
                     >
                       <Heart className="h-6 w-6 text-primary mb-2" />

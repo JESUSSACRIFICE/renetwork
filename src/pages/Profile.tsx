@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +46,8 @@ interface PaymentPreference {
 }
 
 const Profile = () => {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams();
+  const id = params?.id as string;
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
@@ -124,7 +126,7 @@ const Profile = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
-          <Link to="/browse">
+          <Link href="/browse">
             <Button>Browse Professionals</Button>
           </Link>
         </div>
@@ -167,7 +169,7 @@ const Profile = () => {
                     )}
                   </div>
                   {isOwnProfile && (
-                    <Link to={`/profile/${id}/edit`}>
+                    <Link href={`/profile/${id}/edit`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4 mr-2" />
                         Edit Profile

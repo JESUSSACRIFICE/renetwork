@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Star, MapPin, DollarSign, Map, Grid } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -32,7 +33,7 @@ interface ServiceListing {
 }
 
 const Browse = () => {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
@@ -40,15 +41,15 @@ const Browse = () => {
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
-  const category = searchParams.get("category");
-  const searchQuery = searchParams.get("q");
-  const zipCode = searchParams.get("zip");
-  const serviceCategory = searchParams.get("service_category");
-  const serviceType = searchParams.get("service_type");
-  const fields = searchParams.get("fields")?.split(",") || [];
-  const conditions = searchParams.get("conditions")?.split(",") || [];
-  const priceMin = Number(searchParams.get("price_min")) || 0;
-  const priceMax = Number(searchParams.get("price_max")) || 5000;
+  const category = searchParams?.get("category") || null;
+  const searchQuery = searchParams?.get("q") || null;
+  const zipCode = searchParams?.get("zip") || null;
+  const serviceCategory = searchParams?.get("service_category") || null;
+  const serviceType = searchParams?.get("service_type") || null;
+  const fields = searchParams?.get("fields")?.split(",") || [];
+  const conditions = searchParams?.get("conditions")?.split(",") || [];
+  const priceMin = Number(searchParams?.get("price_min")) || 0;
+  const priceMax = Number(searchParams?.get("price_max")) || 5000;
 
   useEffect(() => {
     fetchServices();
@@ -292,7 +293,7 @@ const Browse = () => {
                   {filteredServices.map((service) => (
                     <Link
                       key={service.id}
-                      to={`/profile/${service.id}`}
+                      href={`/profile/${service.id}`}
                       className="group block"
                     >
                       <div className="bg-card rounded-xl border p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-primary/50">

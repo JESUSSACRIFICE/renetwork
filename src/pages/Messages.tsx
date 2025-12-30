@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import Header from "@/components/Header";
@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 const Messages = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const Messages = () => {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate("/auth");
+      router.push("/auth");
       return;
     }
     setUser(user);
@@ -89,7 +89,7 @@ const Messages = () => {
               <Card className="p-12 text-center">
                 <Mail className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">No messages yet</p>
-                <Button onClick={() => navigate("/browse")}>Find Professionals</Button>
+                <Button onClick={() => router.push("/browse")}>Find Professionals</Button>
               </Card>
             ) : (
               <div className="space-y-4">

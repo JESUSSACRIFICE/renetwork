@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import Header from "@/components/Header";
@@ -12,7 +12,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 
 const DashboardLeads = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +24,7 @@ const DashboardLeads = () => {
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
-      navigate("/auth");
+      router.push("/auth");
       return;
     }
 
