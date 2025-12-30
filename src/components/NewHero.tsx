@@ -33,11 +33,11 @@ interface FilterValues {
   fields: string[];
   commercialTypes: string[];
   commercialRetailTypes: string[];
+  commercialMallTypes: string[];
   commercialRecreationalTypes: string[];
   commercialHospitalityTypes: string[];
   commercialOtherTypes: string[];
   multiUnitTypes: string[];
-  multiUnitHospitalityTypes: string[];
   industrialTypes: string[];
   agricultureTypes: string[];
   residentialTypes: string[];
@@ -181,22 +181,23 @@ const fieldsOptions = ["Commercial", "Multi-Unit", "Industrial", "Agriculture", 
 // Commercial sub-options (first level under Commercial)
 const commercialOptions = [
   "Retail",
-  "Sky-Scraper's",
-  "Office",
-  "Living",
-  "Hospitality",
-  "Mobile Home Park",
+  "Recreational",
+  "Business'es",
   "All of the above",
 ];
 
 // Retail nested options (under Commercial > Retail)
 const commercialRetailOptions = [
   "Single",
-  "Strip",
   "Mall",
   "Anchor",
-  "In-door",
+];
+
+// Mall nested options (under Commercial > Retail > Mall)
+const commercialMallOptions = [
+  "Strip",
   "Out-door",
+  "In-door",
 ];
 
 const commercialRecreationalOptions = [
@@ -215,14 +216,10 @@ const multiUnitOptions = [
   "Sky-Scraper's",
   "Office",
   "Living",
-  "Hospitality",
-  "Mobile Home Park",
-  "All of the above",
-];
-
-const multiUnitHospitalityOptions = [
   "Hotel's",
   "Motel's",
+  "Mobile Home Park",
+  "All of the above",
 ];
 
 // Industrial nested options
@@ -907,6 +904,9 @@ interface FieldsMultiSelectProps {
   commercialRetailValue: string[];
   onCommercialRetailChange: (value: string[]) => void;
   commercialRetailOptions: string[];
+  commercialMallValue: string[];
+  onCommercialMallChange: (value: string[]) => void;
+  commercialMallOptions: string[];
   commercialRecreationalValue: string[];
   onCommercialRecreationalChange: (value: string[]) => void;
   commercialRecreationalOptions: string[];
@@ -918,9 +918,6 @@ interface FieldsMultiSelectProps {
   multiUnitValue: string[];
   onMultiUnitChange: (value: string[]) => void;
   multiUnitOptions: string[];
-  multiUnitHospitalityValue: string[];
-  onMultiUnitHospitalityChange: (value: string[]) => void;
-  multiUnitHospitalityOptions: string[];
   industrialValue: string[];
   onIndustrialChange: (value: string[]) => void;
   industrialOptions: string[];
@@ -947,6 +944,9 @@ const FieldsMultiSelect = ({
   commercialRetailValue,
   onCommercialRetailChange,
   commercialRetailOptions,
+  commercialMallValue,
+  onCommercialMallChange,
+  commercialMallOptions,
   commercialRecreationalValue,
   onCommercialRecreationalChange,
   commercialRecreationalOptions,
@@ -958,9 +958,6 @@ const FieldsMultiSelect = ({
   multiUnitValue,
   onMultiUnitChange,
   multiUnitOptions,
-  multiUnitHospitalityValue,
-  onMultiUnitHospitalityChange,
-  multiUnitHospitalityOptions,
   industrialValue,
   onIndustrialChange,
   industrialOptions,
@@ -1000,12 +997,12 @@ const FieldsMultiSelect = ({
       if (option === "Commercial") {
         onCommercialChange([]);
         onCommercialRetailChange([]);
+        onCommercialMallChange([]);
         onCommercialRecreationalChange([]);
         onCommercialHospitalityChange([]);
         onCommercialOtherChange([]);
       } else if (option === "Multi-Unit") {
         onMultiUnitChange([]);
-        onMultiUnitHospitalityChange([]);
       } else if (option === "Industrial") {
         onIndustrialChange([]);
       } else if (option === "Agriculture") {
@@ -1076,6 +1073,11 @@ const FieldsMultiSelect = ({
                                 // Clear retail selections if Retail is deselected
                                 if (commercialOption === "Retail") {
                                   onCommercialRetailChange([]);
+                                  onCommercialMallChange([]);
+                                }
+                                // Clear recreational selections if Recreational is deselected
+                                if (commercialOption === "Recreational") {
+                                  onCommercialRecreationalChange([]);
                                 }
                               } else {
                                 onCommercialChange([...commercialValue, commercialOption]);
@@ -1088,24 +1090,81 @@ const FieldsMultiSelect = ({
                         {commercialOption === "Retail" && (
                           <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
                             {commercialRetailOptions.map((retailOption) => (
+                              <div key={retailOption}>
+                                <label
+                                  className={cn(
+                                    "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                    commercialRetailValue.includes(retailOption) && "bg-accent/50"
+                                  )}
+                                >
+                                  <Checkbox
+                                    checked={commercialRetailValue.includes(retailOption)}
+                                    onCheckedChange={() => {
+                                      if (commercialRetailValue.includes(retailOption)) {
+                                        onCommercialRetailChange(commercialRetailValue.filter((item) => item !== retailOption));
+                                        // Clear mall selections if Mall is deselected
+                                        if (retailOption === "Mall") {
+                                          onCommercialMallChange([]);
+                                        }
+                                      } else {
+                                        onCommercialRetailChange([...commercialRetailValue, retailOption]);
+                                      }
+                                    }}
+                                  />
+                                  <span className="text-sm">{retailOption}</span>
+                                </label>
+                                {/* Nested Mall options under Commercial > Retail > Mall */}
+                                {retailOption === "Mall" && (
+                                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/10 pl-2">
+                                    {commercialMallOptions.map((mallOption) => (
+                                      <label
+                                        key={mallOption}
+                                        className={cn(
+                                          "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                          commercialMallValue.includes(mallOption) && "bg-accent/50"
+                                        )}
+                                      >
+                                        <Checkbox
+                                          checked={commercialMallValue.includes(mallOption)}
+                                          onCheckedChange={() => {
+                                            if (commercialMallValue.includes(mallOption)) {
+                                              onCommercialMallChange(commercialMallValue.filter((item) => item !== mallOption));
+                                            } else {
+                                              onCommercialMallChange([...commercialMallValue, mallOption]);
+                                            }
+                                          }}
+                                        />
+                                        <span className="text-sm">{mallOption}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        {/* Nested Recreational options under Commercial > Recreational */}
+                        {commercialOption === "Recreational" && (
+                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
+                            {commercialRecreationalOptions.map((recOption) => (
                               <label
-                                key={retailOption}
+                                key={recOption}
                                 className={cn(
                                   "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                                  commercialRetailValue.includes(retailOption) && "bg-accent/50"
+                                  commercialRecreationalValue.includes(recOption) && "bg-accent/50"
                                 )}
                               >
                                 <Checkbox
-                                  checked={commercialRetailValue.includes(retailOption)}
+                                  checked={commercialRecreationalValue.includes(recOption)}
                                   onCheckedChange={() => {
-                                    if (commercialRetailValue.includes(retailOption)) {
-                                      onCommercialRetailChange(commercialRetailValue.filter((item) => item !== retailOption));
+                                    if (commercialRecreationalValue.includes(recOption)) {
+                                      onCommercialRecreationalChange(commercialRecreationalValue.filter((item) => item !== recOption));
                                     } else {
-                                      onCommercialRetailChange([...commercialRetailValue, retailOption]);
+                                      onCommercialRecreationalChange([...commercialRecreationalValue, recOption]);
                                     }
                                   }}
                                 />
-                                <span className="text-sm">{retailOption}</span>
+                                <span className="text-sm">{recOption}</span>
                               </label>
                             ))}
                           </div>
@@ -1144,56 +1203,25 @@ const FieldsMultiSelect = ({
                 {option === "Multi-Unit" && (
                   <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
                     {multiUnitOptions.map((muOption) => (
-                      <div key={muOption}>
-                        <label
-                          className={cn(
-                            "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                            multiUnitValue.includes(muOption) && "bg-accent/50"
-                          )}
-                        >
-                          <Checkbox
-                            checked={multiUnitValue.includes(muOption)}
-                            onCheckedChange={() => {
-                              if (multiUnitValue.includes(muOption)) {
-                                onMultiUnitChange(multiUnitValue.filter((item) => item !== muOption));
-                                // Clear hospitality selections if Hospitality is deselected
-                                if (muOption === "Hospitality") {
-                                  onMultiUnitHospitalityChange([]);
-                                }
-                              } else {
-                                onMultiUnitChange([...multiUnitValue, muOption]);
-                              }
-                            }}
-                          />
-                          <span className="text-sm">{muOption}</span>
-                        </label>
-                        {/* Nested Hospitality options under Multi-Unit > Hospitality */}
-                        {muOption === "Hospitality" && (
-                          <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/20 pl-2">
-                            {multiUnitHospitalityOptions.map((hospOption) => (
-                              <label
-                                key={hospOption}
-                                className={cn(
-                                  "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                                  multiUnitHospitalityValue.includes(hospOption) && "bg-accent/50"
-                                )}
-                              >
-                                <Checkbox
-                                  checked={multiUnitHospitalityValue.includes(hospOption)}
-                                  onCheckedChange={() => {
-                                    if (multiUnitHospitalityValue.includes(hospOption)) {
-                                      onMultiUnitHospitalityChange(multiUnitHospitalityValue.filter((item) => item !== hospOption));
-                                    } else {
-                                      onMultiUnitHospitalityChange([...multiUnitHospitalityValue, hospOption]);
-                                    }
-                                  }}
-                                />
-                                <span className="text-sm">{hospOption}</span>
-                              </label>
-                            ))}
-                          </div>
+                      <label
+                        key={muOption}
+                        className={cn(
+                          "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                          multiUnitValue.includes(muOption) && "bg-accent/50"
                         )}
-                      </div>
+                      >
+                        <Checkbox
+                          checked={multiUnitValue.includes(muOption)}
+                          onCheckedChange={() => {
+                            if (multiUnitValue.includes(muOption)) {
+                              onMultiUnitChange(multiUnitValue.filter((item) => item !== muOption));
+                            } else {
+                              onMultiUnitChange([...multiUnitValue, muOption]);
+                            }
+                          }}
+                        />
+                        <span className="text-sm">{muOption}</span>
+                      </label>
                     ))}
                   </div>
                 )}
@@ -1327,11 +1355,11 @@ const NewHero = () => {
     fields: [],
     commercialTypes: [],
     commercialRetailTypes: [],
+    commercialMallTypes: [],
     commercialRecreationalTypes: [],
     commercialHospitalityTypes: [],
     commercialOtherTypes: [],
     multiUnitTypes: [],
-    multiUnitHospitalityTypes: [],
     industrialTypes: [],
     agricultureTypes: [],
     residentialTypes: [],
@@ -1468,6 +1496,9 @@ const NewHero = () => {
                   commercialRetailValue={filters.commercialRetailTypes}
                   onCommercialRetailChange={(value) => setFilters({ ...filters, commercialRetailTypes: value })}
                   commercialRetailOptions={commercialRetailOptions}
+                  commercialMallValue={filters.commercialMallTypes}
+                  onCommercialMallChange={(value) => setFilters({ ...filters, commercialMallTypes: value })}
+                  commercialMallOptions={commercialMallOptions}
                   commercialRecreationalValue={filters.commercialRecreationalTypes}
                   onCommercialRecreationalChange={(value) => setFilters({ ...filters, commercialRecreationalTypes: value })}
                   commercialRecreationalOptions={commercialRecreationalOptions}
@@ -1479,9 +1510,6 @@ const NewHero = () => {
                   multiUnitValue={filters.multiUnitTypes}
                   onMultiUnitChange={(value) => setFilters({ ...filters, multiUnitTypes: value })}
                   multiUnitOptions={multiUnitOptions}
-                  multiUnitHospitalityValue={filters.multiUnitHospitalityTypes}
-                  onMultiUnitHospitalityChange={(value) => setFilters({ ...filters, multiUnitHospitalityTypes: value })}
-                  multiUnitHospitalityOptions={multiUnitHospitalityOptions}
                   industrialValue={filters.industrialTypes}
                   onIndustrialChange={(value) => setFilters({ ...filters, industrialTypes: value })}
                   industrialOptions={industrialOptions}
