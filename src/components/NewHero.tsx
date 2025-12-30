@@ -387,7 +387,7 @@ const MultiSelect = ({ label, placeholder, options, value, onChange }: MultiSele
         )}
       </button>
       {isOpen && (
-        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md">
+        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md z-50">
           <div className="max-h-60 overflow-y-auto p-1">
             {options.map((option) => (
               <label
@@ -535,7 +535,7 @@ const PSPMultiSelect = ({
         )}
       </button>
       {isOpen && (
-        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md">
+        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md z-50">
           <div className="max-h-60 overflow-y-auto p-1">
             {Object.entries(optionsByLetter).map(([letter, options]) => (
               <div key={letter}>
@@ -805,7 +805,7 @@ const RepresentationMultiSelect = ({
         )}
       </button>
       {isOpen && (
-        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md">
+        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md z-50">
           <div className="max-h-60 overflow-y-auto p-1">
             {options.map((option) => (
               <div key={option}>
@@ -1041,7 +1041,7 @@ const FieldsMultiSelect = ({
         )}
       </button>
       {isOpen && (
-        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md">
+        <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md z-50">
           <div className="max-h-60 overflow-y-auto p-1">
             {options.map((option) => (
               <div key={option}>
@@ -1356,13 +1356,13 @@ const NewHero = () => {
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-background via-primary/5 to-secondary/5 overflow-hidden w-full py-6">
+    <section className="relative bg-gradient-to-br from-background via-primary/5 to-secondary/5 overflow-hidden w-full py-4 sm:py-6">
       <div className="w-full">
-        <div className="flex gap-4 w-full px-4 overflow-hidden">
+        <div className="flex flex-col lg:flex-row gap-4 w-full px-2 sm:px-4 overflow-hidden">
           {/* First Column - Advertisement Blocks */}
-          <div className="space-y-4 w-[180px]">
+          <div className="hidden lg:flex flex-col space-y-4 w-full lg:w-[180px] shrink-0">
             {/* Top Ad Block */}
-            <div className="relative w-[180px] h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/20 z-0">
                 {/* Placeholder for ad image - replace with actual image */}
                 <div className="w-full h-full bg-muted/50 flex items-center justify-center">
@@ -1380,7 +1380,7 @@ const NewHero = () => {
             </div>
 
             {/* Bottom Ad Block */}
-            <div className="relative w-[180px] h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 via-secondary/20 to-primary/20 z-0">
                 {/* Placeholder for ad image - replace with actual image */}
                 <div className="w-full h-full bg-muted/50 flex items-center justify-center">
@@ -1399,8 +1399,8 @@ const NewHero = () => {
           </div>
 
           {/* Second Column - Search Form */}
-          <div className="w-full">
-            <div className="bg-muted/30 overflow-y-auto w-[30%] border border-border rounded-lg shadow-lg px-4 py-2 space-y-3 h-[520px]">
+          <div className="w-full flex justify-center lg:justify-start">
+            <div className="bg-muted/30 overflow-y-auto w-full sm:w-[90%] md:w-[70%] lg:w-[400px] xl:w-[450px] 2xl:w-[500px] border border-border rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px]">
               <div className="space-y-1">
                 {/* Find */}
                 <MultiSelect
@@ -1540,9 +1540,9 @@ const NewHero = () => {
           </div>
           
           {/* Third Column - Advertisement Blocks */}
-          <div className="place-items-end space-y-4 w-[180px]">
+          <div className="hidden lg:flex flex-col space-y-4 w-full lg:w-[180px] shrink-0">
             {/* Top Ad Block */}
-            <div className="relative w-[180px] h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/20 z-0">
                 {/* Placeholder for ad image - replace with actual image */}
                 <div className="w-full h-full bg-muted/50 flex items-center justify-center">
@@ -1560,7 +1560,7 @@ const NewHero = () => {
             </div>
 
             {/* Bottom Ad Block */}
-            <div className="relative w-[180px] h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
               <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 via-secondary/20 to-primary/20 z-0">
                 {/* Placeholder for ad image - replace with actual image */}
                 <div className="w-full h-full bg-muted/50 flex items-center justify-center">
