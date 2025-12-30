@@ -209,7 +209,7 @@ const commercialHospitalityOptions = [
   "Motel's",
 ];
 
-// Multi-Unit 4+ Unit's nested options
+// Multi-Unit nested options
 const multiUnitOptions = [
   "4+ Unit's",
   "Sky-Scraper's",
@@ -1003,7 +1003,7 @@ const FieldsMultiSelect = ({
         onCommercialRecreationalChange([]);
         onCommercialHospitalityChange([]);
         onCommercialOtherChange([]);
-      } else if (option === "Multi-Unit 4+ Unit's") {
+      } else if (option === "Multi-Unit") {
         onMultiUnitChange([]);
         onMultiUnitHospitalityChange([]);
       } else if (option === "Industrial") {
@@ -1140,8 +1140,8 @@ const FieldsMultiSelect = ({
                     ))}
                   </div>
                 )}
-                {/* Nested Multi-Unit 4+ Unit's options - always visible */}
-                {option === "Multi-Unit 4+ Unit's" && (
+                {/* Nested Multi-Unit options - always visible */}
+                {option === "Multi-Unit" && (
                   <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
                     {multiUnitOptions.map((muOption) => (
                       <div key={muOption}>
