@@ -1117,13 +1117,13 @@ const FieldsMultiSelect = ({
                                 {retailOption === "Mall" && (
                                   <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/10 pl-2">
                                     {commercialMallOptions.map((mallOption) => (
-                                      <label
-                                        key={mallOption}
-                                        className={cn(
-                                          "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                                          commercialMallValue.includes(mallOption) && "bg-accent/50"
-                                        )}
-                                      >
+                                    <label
+                                      key={mallOption}
+                                      className={cn(
+                                        "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                                        commercialMallValue.includes(mallOption) && "bg-accent/50"
+                                      )}
+                                    >
                                         <Checkbox
                                           checked={commercialMallValue.includes(mallOption)}
                                           onCheckedChange={() => {
@@ -1384,43 +1384,53 @@ const NewHero = () => {
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-background via-primary/5 to-secondary/5 overflow-hidden w-full py-4 sm:py-6">
-      <div className="w-full">
+    <section className="relative overflow-hidden w-full py-4 sm:py-6 bg-gradient-to-r from-[#8B4513] via-[#A0522D] to-[#DEB887]">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-200/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+      </div>
+      
+      <div className="w-full relative z-10">
         <div className="flex flex-col lg:flex-row gap-4 w-full px-2 sm:px-4 overflow-hidden">
           {/* First Column - Advertisement Blocks */}
           <div className="hidden lg:flex flex-col space-y-4 w-full lg:w-[180px] shrink-0">
             {/* Top Ad Block */}
-            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/20 z-0">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 z-0">
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
                 {/* Placeholder for ad image - replace with actual image */}
-                <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-4xl">📊</span>
                     </div>
-                    <span className="text-muted-foreground text-sm">Advertisement Space</span>
+                    <span className="text-white/90 text-xs font-medium">Advertisement Space</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded z-10">
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
                 Advertise Here
               </div>
             </div>
 
             {/* Bottom Ad Block */}
-            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 via-secondary/20 to-primary/20 z-0">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-pink-600 to-rose-600 z-0">
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
                 {/* Placeholder for ad image - replace with actual image */}
-                <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="w-24 h-24 mx-auto bg-secondary/20 rounded-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-4xl">💼</span>
                     </div>
-                    <span className="text-muted-foreground text-sm">Advertisement Space</span>
+                    <span className="text-white/90 text-xs font-medium">Advertisement Space</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded z-10">
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-purple-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
                 Advertise Here
               </div>
             </div>
@@ -1428,8 +1438,8 @@ const NewHero = () => {
 
           {/* Second Column - Search Form */}
           <div className="w-full flex justify-center lg:justify-start">
-            <div className="bg-muted/30 overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[500px] border border-border rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px]">
-              <div className="space-y-1">
+            <div className="bg-mute/10 overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[500px] border-2 border-black rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px]">
+              <div className="space-y-1 ">
                 {/* Find */}
                 <MultiSelect
                   label="Find"
@@ -1570,37 +1580,41 @@ const NewHero = () => {
           {/* Third Column - Advertisement Blocks */}
           <div className="hidden lg:flex flex-col space-y-4 w-full lg:w-[180px] shrink-0">
             {/* Top Ad Block */}
-            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-secondary/20 z-0">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 z-0">
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
                 {/* Placeholder for ad image - replace with actual image */}
-                <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="w-24 h-24 mx-auto bg-primary/20 rounded-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-4xl">📊</span>
                     </div>
-                    <span className="text-muted-foreground text-sm">Advertisement Space</span>
+                    <span className="text-white/90 text-xs font-medium">Advertisement Space</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded z-10">
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
                 Advertise Here
               </div>
             </div>
 
             {/* Bottom Ad Block */}
-            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-lg overflow-hidden group cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/30 via-secondary/20 to-primary/20 z-0">
+            <div className="relative w-full lg:w-[180px] h-[200px] sm:h-[250px] rounded-xl overflow-hidden group cursor-pointer shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-600 via-orange-600 to-red-600 z-0">
+                {/* Pattern overlay */}
+                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30"></div>
                 {/* Placeholder for ad image - replace with actual image */}
-                <div className="w-full h-full bg-muted/50 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="w-24 h-24 mx-auto bg-secondary/20 rounded-full flex items-center justify-center">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div className="text-center space-y-3">
+                    <div className="w-20 h-20 mx-auto bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg">
                       <span className="text-4xl">💼</span>
                     </div>
-                    <span className="text-muted-foreground text-sm">Advertisement Space</span>
+                    <span className="text-white/90 text-xs font-medium">Advertisement Space</span>
                   </div>
                 </div>
               </div>
-              <div className="absolute top-2 left-2 bg-black/70 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1.5 rounded z-10">
+              <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md text-orange-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg z-10">
                 Advertise Here
               </div>
             </div>

@@ -1,4 +1,5 @@
 import FreeioHeader from "./FreeioHeader";
+import NewHero from "../NewHero";
 import FreeioHero from "./FreeioHero";
 import TrustedBy from "./TrustedBy";
 import BrowseTalentCategory from "./BrowseTalentCategory";
@@ -15,6 +16,7 @@ export default function FreeioLandingPage() {
     <div className="min-h-screen flex flex-col bg-white overflow-x-hidden">
       <FreeioHeader />
       <main className="flex-1 overflow-x-hidden">
+        <NewHero />
         <FreeioHero />
         <TrustedBy />
         <BrowseTalentCategory />
