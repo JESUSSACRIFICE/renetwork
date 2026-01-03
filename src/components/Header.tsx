@@ -184,6 +184,15 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+
+              {/* Referral Platform */}
+              <NavigationMenuItem>
+                <Link href="/referral">
+                  <Button variant="ghost" className="h-10 px-4">
+                    Referral Platform
+                  </Button>
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
         </nav>
