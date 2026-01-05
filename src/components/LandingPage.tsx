@@ -12,24 +12,26 @@ import Sponsors from "@/components/Sponsors";
 import HotTopics from "@/components/HotTopics";
 import Footer from "@/components/Footer";
 import NewHero from "@/components/NewHero";
+import NewHeader from "@/components/NewHeader";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
-      <Header />
+      {/* <Header /> */}
+      <NewHeader />
       <main className="flex-1">
         <NewHero />
-        <Hero />
-        <Categories />
-        <TalentedFreelancers />
-        <TopRatedFreelancers />
-        <TrendingServices />
-        <Sponsors />
-        <HotTopics />
-        <HowItWorks />
-        <Features />
-        <StatsAndAwards />
-        <Testimonials />
+        {/* <He/ro /> */}
+        {/* <Categories /> */}
+        {/* <TalentedFreelancers /> */}
+        {/* <TopRatedFreelancers /> */}
+        {/* <TrendingServices /> */}
+        {/* <Sponsors /> */}
+        {/* <HotTopics /> */}
+        {/* <HowItWorks /> */}
+        {/* <Features /> */}
+        {/* <StatsAndAwards /> */}
+        {/* <Testimonials /> */}
       </main>
       <Footer />
     </div>
