@@ -49,7 +49,7 @@ interface FilterValues {
 }
 
 // Options for dropdowns
-const findOptions = ["Service", "Profile", "Agency", "Real Estate Agent", "Mortgage Consultant"];
+const findOptions = ["Service", "Profile", "Agency"];
 
 // A-Z Psp Options organized alphabetically
 const pspOptionsByLetter: Record<string, string[]> = {
