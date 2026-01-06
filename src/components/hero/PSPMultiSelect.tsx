@@ -138,45 +138,71 @@ export const PSPMultiSelect = ({
                   {letter}...
                 </div>
                 {options.map((option) => (
-                  <div key={option}>
-                    <label
+                  <div key={option} className="relative">
+                    <div
                       className={cn(
                         "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
                         value.includes(option) && "bg-accent/50"
                       )}
                       onClick={(e) => {
-                        // Prevent nested clicks from bubbling up to parent label
-                        if ((e.target as HTMLElement).closest('.nested-options')) {
+                        // Only handle clicks on the label text, not checkbox or nested options
+                        const target = e.target as HTMLElement;
+                        // Don't handle if clicking on nested options
+                        if (target.closest('.nested-options') || target.closest('[data-nested]')) {
                           e.stopPropagation();
+                          return;
+                        }
+                        // Don't handle if clicking on checkbox (it handles itself)
+                        if (target.closest('button[role="checkbox"]') || target.closest('[data-state]')) {
+                          return;
+                        }
+                        // Only handle clicks on the label text area
+                        const isChecked = value.includes(option);
+                        if (isChecked) {
+                          onChange(value.filter((item) => item !== option));
+                          // Clear nested selections if parent is deselected
+                          if (option === "Agent") {
+                            onAgentChange([]);
+                            onRealEstateChange([]);
+                          } else if (option === "Crowdfunding") {
+                            onCrowdfundingChange([]);
+                          } else if (option === "Flooring") {
+                            onFlooringIndoorChange([]);
+                            onFlooringOutdoorChange([]);
+                          }
+                        } else {
+                          onChange([...value, option]);
                         }
                       }}
                     >
-                      <Checkbox
-                        checked={value.includes(option)}
-                        onCheckedChange={(checked) => {
-                          // Ensure we can toggle even when nested options exist
-                          if (checked) {
-                            onChange([...value, option]);
-                          } else {
-                            onChange(value.filter((item) => item !== option));
-                            // Clear nested selections if parent is deselected
-                            if (option === "Agent") {
-                              onAgentChange([]);
-                              onRealEstateChange([]);
-                            } else if (option === "Crowdfunding") {
-                              onCrowdfundingChange([]);
-                            } else if (option === "Flooring") {
-                              onFlooringIndoorChange([]);
-                              onFlooringOutdoorChange([]);
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Checkbox
+                          checked={value.includes(option)}
+                          onCheckedChange={(checked) => {
+                            // Ensure we can toggle even when nested options exist
+                            if (checked) {
+                              onChange([...value, option]);
+                            } else {
+                              onChange(value.filter((item) => item !== option));
+                              // Clear nested selections if parent is deselected
+                              if (option === "Agent") {
+                                onAgentChange([]);
+                                onRealEstateChange([]);
+                              } else if (option === "Crowdfunding") {
+                                onCrowdfundingChange([]);
+                              } else if (option === "Flooring") {
+                                onFlooringIndoorChange([]);
+                                onFlooringOutdoorChange([]);
+                              }
                             }
-                          }
-                        }}
-                      />
-                      <span className="text-sm">{option}</span>
-                    </label>
+                          }}
+                        />
+                      </div>
+                      <span className="text-sm flex-1">{option}</span>
+                    </div>
                     {/* Nested Agent options - always visible */}
                     {option === "Agent" && (
-                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                         {agentOptions.map((agentOption) => (
                           <div key={agentOption}>
                             <label
@@ -217,7 +243,7 @@ export const PSPMultiSelect = ({
                     )}
                     {/* Nested Crowdfunding options - always visible */}
                     {option === "Crowdfunding" && (
-                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                         <div className="text-xs font-semibold text-muted-foreground mb-1">Fields:</div>
                         {crowdfundingOptions.map((cfOption) => (
                           <label
@@ -244,7 +270,7 @@ export const PSPMultiSelect = ({
                     )}
                     {/* Nested Flooring options - always visible */}
                     {option === "Flooring" && (
-                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                      <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                         <div className="text-xs font-semibold text-muted-foreground mb-1">Indoor:</div>
                         {flooringIndoorOptions.map((indoorOption) => (
                           <label
