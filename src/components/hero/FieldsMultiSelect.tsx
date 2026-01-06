@@ -155,54 +155,89 @@ export const FieldsMultiSelect = ({
         <div className="w-full mt-1 rounded-md border border-input bg-popover shadow-md z-50">
           <div className="max-h-60 overflow-y-auto p-1">
             {options.map((option) => (
-              <div key={option}>
-                <label
+              <div key={option} className="relative">
+                <div
                   className={cn(
                     "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
                     value.includes(option) && "bg-accent/50"
                   )}
                   onClick={(e) => {
-                    // Prevent nested clicks from bubbling up to parent label
-                    if ((e.target as HTMLElement).closest('.nested-options')) {
+                    // Only handle clicks on the label text, not checkbox or nested options
+                    const target = e.target as HTMLElement;
+                    // Don't handle if clicking on nested options
+                    if (target.closest('.nested-options') || target.closest('[data-nested]')) {
                       e.stopPropagation();
+                      return;
+                    }
+                    // Don't handle if clicking on checkbox (it handles itself)
+                    if (target.closest('button[role="checkbox"]') || target.closest('[data-state]')) {
+                      return;
+                    }
+                    // Only handle clicks on the label text area
+                    const isChecked = value.includes(option);
+                    if (isChecked) {
+                      onChange(value.filter((item) => item !== option));
+                      // Clear nested selections if parent is deselected
+                      if (option === "Commercial") {
+                        onCommercialChange([]);
+                        onCommercialRetailChange([]);
+                        onCommercialMallChange([]);
+                        onCommercialRecreationalChange([]);
+                        onCommercialHospitalityChange([]);
+                        onCommercialOtherChange([]);
+                      } else if (option === "Multi-Unit") {
+                        onMultiUnitChange([]);
+                      } else if (option === "Industrial") {
+                        onIndustrialChange([]);
+                      } else if (option === "Agriculture") {
+                        onAgricultureChange([]);
+                      } else if (option === "Residential") {
+                        onResidentialChange([]);
+                      } else if (option === "Other") {
+                        onOtherChange([]);
+                      }
+                    } else {
+                      onChange([...value, option]);
                     }
                   }}
                 >
-                  <Checkbox
-                    checked={value.includes(option)}
-                    onCheckedChange={(checked) => {
-                      // Ensure we can toggle even when nested options exist
-                      if (checked) {
-                        onChange([...value, option]);
-                      } else {
-                        onChange(value.filter((item) => item !== option));
-                        // Clear nested selections if parent is deselected
-                        if (option === "Commercial") {
-                          onCommercialChange([]);
-                          onCommercialRetailChange([]);
-                          onCommercialMallChange([]);
-                          onCommercialRecreationalChange([]);
-                          onCommercialHospitalityChange([]);
-                          onCommercialOtherChange([]);
-                        } else if (option === "Multi-Unit") {
-                          onMultiUnitChange([]);
-                        } else if (option === "Industrial") {
-                          onIndustrialChange([]);
-                        } else if (option === "Agriculture") {
-                          onAgricultureChange([]);
-                        } else if (option === "Residential") {
-                          onResidentialChange([]);
-                        } else if (option === "Other") {
-                          onOtherChange([]);
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={value.includes(option)}
+                      onCheckedChange={(checked) => {
+                        // Ensure we can toggle even when nested options exist
+                        if (checked) {
+                          onChange([...value, option]);
+                        } else {
+                          onChange(value.filter((item) => item !== option));
+                          // Clear nested selections if parent is deselected
+                          if (option === "Commercial") {
+                            onCommercialChange([]);
+                            onCommercialRetailChange([]);
+                            onCommercialMallChange([]);
+                            onCommercialRecreationalChange([]);
+                            onCommercialHospitalityChange([]);
+                            onCommercialOtherChange([]);
+                          } else if (option === "Multi-Unit") {
+                            onMultiUnitChange([]);
+                          } else if (option === "Industrial") {
+                            onIndustrialChange([]);
+                          } else if (option === "Agriculture") {
+                            onAgricultureChange([]);
+                          } else if (option === "Residential") {
+                            onResidentialChange([]);
+                          } else if (option === "Other") {
+                            onOtherChange([]);
+                          }
                         }
-                      }
-                    }}
-                  />
-                  <span className="text-sm">{option}</span>
-                </label>
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm flex-1">{option}</span>
+                </div>
                 {/* Nested Commercial options - always visible */}
                 {option === "Commercial" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {commercialOptions.map((commercialOption) => (
                       <div key={commercialOption}>
                         <label
@@ -347,7 +382,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Multi-Unit options - always visible */}
                 {option === "Multi-Unit" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {multiUnitOptions.map((muOption) => (
                       <label
                         key={muOption}
@@ -373,7 +408,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Industrial options - always visible */}
                 {option === "Industrial" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {industrialOptions.map((indOption) => (
                       <label
                         key={indOption}
@@ -399,7 +434,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Agriculture options - always visible */}
                 {option === "Agriculture" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {agricultureOptions.map((agOption) => (
                       <label
                         key={agOption}
@@ -425,7 +460,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Residential options - always visible */}
                 {option === "Residential" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {residentialOptions.map((resOption) => (
                       <label
                         key={resOption}
@@ -451,7 +486,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Other options - always visible */}
                 {option === "Other" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options" data-nested onClick={(e) => e.stopPropagation()}>
                     {otherOptions.map((othOption) => (
                       <label
                         key={othOption}
