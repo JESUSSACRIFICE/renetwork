@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, DollarSign, ArrowRight, Filter, Heart } from "lucide-react";
-import Header from "@/components/Header";
+import NewHeader from "@/components/NewHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import SearchFiltersSidebar from "@/components/search/SearchFiltersSidebar";
 
 // Dynamically import ServiceMapView to avoid SSR issues with Leaflet
 const ServiceMapView = dynamic(() => import("@/components/services/ServiceMapView"), {
@@ -56,6 +57,7 @@ function ServicesSearchContent() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [hoveredServiceId, setHoveredServiceId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("default");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   useEffect(() => {
     fetchServices();
@@ -272,9 +274,20 @@ function ServicesSearchContent() {
     }
   };
 
+  const handleApplyFilters = (filters: any) => {
+    // Apply filters logic here
+    console.log("Applied filters:", filters);
+    toast.success("Filters applied");
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <NewHeader />
+      <SearchFiltersSidebar 
+        isOpen={isFiltersOpen} 
+        onClose={() => setIsFiltersOpen(false)}
+        onApplyFilters={handleApplyFilters}
+      />
       <main className="flex-1">
         <div className="container py-6">
           {/* Header */}
@@ -283,7 +296,11 @@ function ServicesSearchContent() {
               <h1 className="text-2xl font-bold">Showing all {services.length} results</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" className="bg-primary/10 text-primary border-primary/20">
+              <Button 
+                variant="outline" 
+                className="bg-primary/10 text-primary border-primary/20"
+                onClick={() => setIsFiltersOpen(true)}
+              >
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>

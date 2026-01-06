@@ -161,16 +161,48 @@ export const FieldsMultiSelect = ({
                     "flex items-center space-x-2 px-2 py-1.5 rounded-sm cursor-pointer hover:bg-accent hover:text-accent-foreground",
                     value.includes(option) && "bg-accent/50"
                   )}
+                  onClick={(e) => {
+                    // Prevent nested clicks from bubbling up to parent label
+                    if ((e.target as HTMLElement).closest('.nested-options')) {
+                      e.stopPropagation();
+                    }
+                  }}
                 >
                   <Checkbox
                     checked={value.includes(option)}
-                    onCheckedChange={() => toggleOption(option)}
+                    onCheckedChange={(checked) => {
+                      // Ensure we can toggle even when nested options exist
+                      if (checked) {
+                        onChange([...value, option]);
+                      } else {
+                        onChange(value.filter((item) => item !== option));
+                        // Clear nested selections if parent is deselected
+                        if (option === "Commercial") {
+                          onCommercialChange([]);
+                          onCommercialRetailChange([]);
+                          onCommercialMallChange([]);
+                          onCommercialRecreationalChange([]);
+                          onCommercialHospitalityChange([]);
+                          onCommercialOtherChange([]);
+                        } else if (option === "Multi-Unit") {
+                          onMultiUnitChange([]);
+                        } else if (option === "Industrial") {
+                          onIndustrialChange([]);
+                        } else if (option === "Agriculture") {
+                          onAgricultureChange([]);
+                        } else if (option === "Residential") {
+                          onResidentialChange([]);
+                        } else if (option === "Other") {
+                          onOtherChange([]);
+                        }
+                      }
+                    }}
                   />
                   <span className="text-sm">{option}</span>
                 </label>
                 {/* Nested Commercial options - always visible */}
                 {option === "Commercial" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {commercialOptions.map((commercialOption) => (
                       <div key={commercialOption}>
                         <label
@@ -315,7 +347,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Multi-Unit options - always visible */}
                 {option === "Multi-Unit" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {multiUnitOptions.map((muOption) => (
                       <label
                         key={muOption}
@@ -341,7 +373,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Industrial options - always visible */}
                 {option === "Industrial" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {industrialOptions.map((indOption) => (
                       <label
                         key={indOption}
@@ -367,7 +399,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Agriculture options - always visible */}
                 {option === "Agriculture" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {agricultureOptions.map((agOption) => (
                       <label
                         key={agOption}
@@ -393,7 +425,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Residential options - always visible */}
                 {option === "Residential" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {residentialOptions.map((resOption) => (
                       <label
                         key={resOption}
@@ -419,7 +451,7 @@ export const FieldsMultiSelect = ({
                 )}
                 {/* Nested Other options - always visible */}
                 {option === "Other" && (
-                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2">
+                  <div className="ml-6 mt-1 space-y-1 border-l-2 border-primary/30 pl-2 nested-options">
                     {otherOptions.map((othOption) => (
                       <label
                         key={othOption}
