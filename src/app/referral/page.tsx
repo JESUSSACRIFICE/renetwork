@@ -7,14 +7,17 @@ import AdSpace from "@/components/referral/AdSpace";
 import { Button } from "@/components/ui/button";
 import { Search, ArrowRight, Users, Handshake, Shield, Target, BookOpen, MapPin, Gift } from "lucide-react";
 import Link from "next/link";
+import NewHeader from "@/components/NewHeader";
+import { SearchForm } from "@/components/hero/SearchForm";
 
 export default function ReferralLandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      <ReferralHeader />
+      {/* <ReferralHeader /> */}
+      <NewHeader />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative w-full bg-gradient-to-r from-[#8B4513] via-[#A0522D] to-[#DEB887] py-12 sm:py-16 lg:py-20 overflow-hidden">
+        <section className="relative w-full bg-gradient-to-r from-[#8B4513] via-[#A0522D] to-[#DEB887] py-12 sm:py-16 lg:py-8 overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Left Ad Space - Desktop Only */}
@@ -26,13 +29,14 @@ export default function ReferralLandingPage() {
               {/* Main Content */}
               <div className="flex-1 flex flex-col lg:flex-row gap-6">
                 {/* Vertical Menu */}
-                <div className="w-full lg:w-[320px] xl:w-[400px] shrink-0">
-                  <ReferralVerticalMenu />
+                <div>
+                  {/* <ReferralVerticalMenu /> */}
+                  <SearchForm />
                 </div>
 
                 {/* Hero Content */}
-                <div className="flex-1 text-white space-y-6 lg:pl-8">
-                  <div className="space-y-4">
+                <div className="flex-1 text-white space-y-10 lg:pl-8">
+                  <div className="space-y-10">
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
                       Real Estate Referral Platform
                     </h1>
@@ -50,7 +54,7 @@ export default function ReferralLandingPage() {
                       </Button>
                     </Link>
                     <Link href="/referral/about">
-                      <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                      <Button size="lg" variant="outline" className="border-white text-black bg-white hover:text-white hover:bg-white/10">
                         Learn More
                       </Button>
                     </Link>
