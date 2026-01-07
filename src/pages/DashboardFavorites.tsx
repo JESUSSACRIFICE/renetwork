@@ -14,6 +14,7 @@ const DashboardFavorites = () => {
   const router = useRouter();
   const [favorites, setFavorites] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -27,7 +28,17 @@ const DashboardFavorites = () => {
       return;
     }
 
+    await fetchProfile(user.id);
     fetchFavorites(user.id);
+  };
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*, user_roles(role)")
+      .eq("id", userId)
+      .maybeSingle();
+    setProfile(data);
   };
 
   const fetchFavorites = async (userId: string) => {
@@ -95,7 +106,7 @@ const DashboardFavorites = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType="buyer" />
+          <DashboardSidebar userType="buyer" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />

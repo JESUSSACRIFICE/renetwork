@@ -66,14 +66,14 @@ const Messages = () => {
     }
   };
 
-  const userType = profile?.user_roles?.length > 0 ? "agent" : "buyer";
+  const userType: "buyer" | "agent" = profile?.user_roles?.length > 0 ? "agent" : "buyer";
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType={userType} />
+          <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />

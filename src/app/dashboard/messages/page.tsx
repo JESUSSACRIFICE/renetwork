@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import Header from "@/components/Header";
+import { FreeioDashboardHeader } from "@/components/dashboard/FreeioDashboardHeader";
+import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,12 +13,15 @@ import { Mail } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
+type UserType = "buyer" | "agent";
+
 export default function Messages() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
+  const [userType, setUserType] = useState<UserType>("buyer");
 
   useEffect(() => {
     checkAuth();
@@ -40,7 +44,22 @@ export default function Messages() {
       .select("*, user_roles(role)")
       .eq("id", userId)
       .maybeSingle();
+    
     setProfile(data);
+    
+    // Check for URL parameter to override user type (for testing)
+    const urlParams = new URLSearchParams(window.location.search);
+    const overrideTypeParam = urlParams.get('type');
+    
+    if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
+      setUserType(overrideTypeParam as UserType);
+      return;
+    }
+    
+    // Determine user type: if they have roles, they're an agent (service provider)
+    // Otherwise, they're a buyer
+    const hasRoles = data?.user_roles && data.user_roles.length > 0;
+    setUserType((hasRoles ? "agent" : "buyer") as UserType);
   };
 
   const fetchMessages = async (userId: string) => {
@@ -65,15 +84,13 @@ export default function Messages() {
     }
   };
 
-  const userType = profile?.user_roles?.length > 0 ? "agent" : "buyer";
-
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full">
-        <Header />
-        <div className="flex flex-1 w-full">
-          <DashboardSidebar userType={userType} />
-          <main className="flex-1 p-8 bg-background">
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+        <div className="flex flex-1">
+          <DashboardSidebar userType={userType} profile={profile} />
+          <main className="flex-1 p-8 bg-gray-50">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />
               <div>
@@ -112,10 +129,12 @@ export default function Messages() {
             )}
           </main>
         </div>
+        <FreeioFooter />
       </div>
     </SidebarProvider>
   );
 }
+
 
 
 

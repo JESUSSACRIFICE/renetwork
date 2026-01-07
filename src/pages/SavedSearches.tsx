@@ -13,6 +13,7 @@ const SavedSearches = () => {
   const router = useRouter();
   const [searches, setSearches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -24,7 +25,17 @@ const SavedSearches = () => {
       router.push("/auth");
       return;
     }
+    await fetchProfile(user.id);
     fetchSearches(user.id);
+  };
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*, user_roles(role)")
+      .eq("id", userId)
+      .maybeSingle();
+    setProfile(data);
   };
 
   const fetchSearches = async (userId: string) => {
@@ -59,7 +70,7 @@ const SavedSearches = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType="buyer" />
+          <DashboardSidebar userType="buyer" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />

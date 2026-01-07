@@ -15,6 +15,7 @@ const DashboardLeads = () => {
   const router = useRouter();
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -28,7 +29,17 @@ const DashboardLeads = () => {
       return;
     }
 
+    await fetchProfile(user.id);
     fetchLeads(user.id);
+  };
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*, user_roles(role)")
+      .eq("id", userId)
+      .maybeSingle();
+    setProfile(data);
   };
 
   const fetchLeads = async (userId: string) => {
@@ -83,7 +94,7 @@ const DashboardLeads = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType="agent" />
+          <DashboardSidebar userType="agent" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />
