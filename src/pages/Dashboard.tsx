@@ -7,10 +7,13 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { FileText, MessageSquare, Heart, TrendingUp } from "lucide-react";
 
+type UserType = "buyer" | "agent";
+
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [userType, setUserType] = useState<UserType>("buyer");
   const [stats, setStats] = useState({
     leads: 0,
     messages: 0,
@@ -44,6 +47,11 @@ const Dashboard = () => {
       .maybeSingle();
     
     setProfile(data);
+    
+    // Determine user type: if they have roles, they're an agent (service provider)
+    // Otherwise, they're a buyer
+    const hasRoles = data?.user_roles && data.user_roles.length > 0;
+    setUserType(hasRoles ? "agent" : "buyer");
   };
 
   const fetchStats = async (userId: string) => {
@@ -73,8 +81,6 @@ const Dashboard = () => {
     });
   };
 
-  const userType = profile?.user_roles?.length > 0 ? "agent" : "buyer";
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -88,7 +94,7 @@ const Dashboard = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType={userType} />
+          <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />

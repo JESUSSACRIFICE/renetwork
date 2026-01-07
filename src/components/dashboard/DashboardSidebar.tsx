@@ -1,74 +1,128 @@
 "use client";
 
-import { LayoutDashboard, Heart, Search, MessageSquare, User, FileText, Settings } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger,
-  useSidebar,
-} from "@/components/ui/sidebar";
+  LayoutDashboard,
+  Briefcase,
+  Hourglass,
+  DollarSign,
+  Heart,
+  Target,
+  Printer,
+  FileText,
+  MessageSquare,
+  Bell,
+  Calendar,
+  Layers,
+  Settings,
+  User,
+  Wallet,
+  TrendingUp,
+  CreditCard,
+  HelpCircle,
+  LogOut,
+  Star,
+  BarChart3,
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DashboardSidebarProps {
-  userType: "agent" | "buyer";
+  userType: "buyer" | "agent";
+  profile?: any;
 }
 
-export function DashboardSidebar({ userType }: DashboardSidebarProps) {
-  const { open } = useSidebar();
+export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
   const pathname = usePathname();
 
-  const agentItems = [
+  const buyerMenuItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "My Profile", url: "/profile", icon: User },
-    { title: "Leads", url: "/dashboard/leads", icon: FileText },
-    { title: "Messages", url: "/dashboard/messages", icon: MessageSquare },
+    { title: "My Jobs", url: "/dashboard/jobs", icon: Briefcase },
+    { title: "My Projects", url: "/dashboard/projects", icon: Briefcase },
+    { title: "Jobs Applicants", url: "/dashboard/applicants", icon: Hourglass },
+    { title: "Bought Services", url: "/dashboard/services", icon: DollarSign },
+    { title: "Favorite", url: "/dashboard/favorites", icon: Heart },
+    { title: "Meetings", url: "/dashboard/meetings", icon: Target },
+    { title: "Messages", url: "/dashboard/messages", icon: Printer },
+    { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+    { title: "Payments", url: "/dashboard/payments", icon: CreditCard },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
-  const buyerItems = [
+  const agentMenuItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Favorites", url: "/dashboard/favorites", icon: Heart },
-    { title: "Saved Searches", url: "/dashboard/searches", icon: Search },
-    { title: "Messages", url: "/dashboard/messages", icon: MessageSquare },
+    { title: "My Services", url: "/dashboard/services", icon: Briefcase },
+    { title: "Proposals", url: "/dashboard/proposals", icon: FileText },
+    { title: "Jobs Applied", url: "/dashboard/jobs-applied", icon: Hourglass },
+    { title: "Jobs Alerts", url: "/dashboard/alerts", icon: Bell },
+    { title: "Favorite", url: "/dashboard/favorites", icon: Heart },
+    { title: "Meetings", url: "/dashboard/meetings", icon: Calendar },
+    { title: "Messages", url: "/dashboard/messages", icon: Printer },
+    { title: "Statements", url: "/dashboard/statements", icon: Layers },
+    { title: "Earnings", url: "/dashboard/earnings", icon: TrendingUp },
+    { title: "Wallet", url: "/dashboard/wallet", icon: Wallet },
+    { title: "Reviews", url: "/dashboard/reviews", icon: Star },
+    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
-  const items = userType === "agent" ? agentItems : buyerItems;
+  const menuItems = userType === "buyer" ? buyerMenuItems : agentMenuItems;
 
   return (
-    <Sidebar className={open ? "w-60" : "w-14"} collapsible="icon">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>{userType === "agent" ? "Professional" : "Buyer"} Dashboard</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => {
-                const isActive = pathname === item.url;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link 
-                        href={item.url}
-                        className={`hover:bg-muted/50 ${isActive ? "bg-muted text-primary font-medium" : ""}`}
-                      >
-                        <item.icon className="h-4 w-4" />
-                        {open && <span>{item.title}</span>}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+    <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-[calc(100vh-5rem)]">
+      {/* Profile Section */}
+      <div className="p-6 border-b border-gray-200 flex-shrink-0">
+        <div className="flex items-center space-x-3">
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={profile?.avatar_url} />
+            <AvatarFallback className="bg-primary text-white">
+              {profile?.full_name?.charAt(0) || userType.charAt(0).toUpperCase() || "U"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-gray-900 capitalize truncate">
+              {profile?.full_name || (userType === "buyer" ? "Buyer" : "Agent")}
+            </div>
+            <Link
+              href={`/profile/${profile?.id || ""}`}
+              className="text-sm text-primary hover:underline"
+            >
+              View Profile
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Menu with Scroll */}
+      <ScrollArea className="flex-1">
+        <nav className="p-4">
+          <ul className="space-y-1">
+            {menuItems.map((item) => {
+              const isActive = pathname === item.url || (pathname.startsWith(item.url) && item.url !== "/dashboard");
+              return (
+                <li key={item.title}>
+                  <Link
+                    href={item.url}
+                    className={cn(
+                      "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors w-full",
+                      isActive
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    )}
+                  >
+                    <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-white" : "text-gray-600")} />
+                    <span className="font-medium text-sm">{item.title}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </ScrollArea>
+    </aside>
   );
 }
