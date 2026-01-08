@@ -24,6 +24,7 @@ import {
   LogOut,
   Star,
   BarChart3,
+  KeyRound,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,7 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
     { title: "Payments", url: "/dashboard/payments", icon: CreditCard },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Reset Password", url: "/dashboard/reset-password", icon: KeyRound },
     { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
@@ -67,6 +69,7 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Reset Password", url: "/dashboard/reset-password", icon: KeyRound },
     { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
