@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -21,6 +22,9 @@ export default function Auth() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [resetEmail, setResetEmail] = useState("");
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const [registerData, setRegisterData] = useState({
     firstName: "",
     lastName: "",
@@ -62,6 +66,27 @@ export default function Auth() {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetting(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/dashboard/reset-password`,
+      });
+
+      if (error) throw error;
+
+      toast.success("Password reset email sent! Check your inbox.");
+      setIsResetDialogOpen(false);
+      setResetEmail("");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -92,11 +117,11 @@ export default function Auth() {
 
       if (error) throw error;
 
-      toast.success("Account created! Please complete your profile.");
+      toast.success("Account created! Please choose your registration type.");
       
-      // Redirect to profile setup
+      // Redirect to registration type selection
       if (data.user) {
-        router.push(`/profile/${data.user.id}/edit`);
+        router.push("/register");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
@@ -159,6 +184,37 @@ export default function Auth() {
                 >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
+                <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="link" className="w-full text-sm text-muted-foreground">
+                      Forgot your password?
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Reset Password</DialogTitle>
+                      <DialogDescription>
+                        Enter your email address and we&apos;ll send you a link to reset your password.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleResetPassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="reset-email">Email</Label>
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={isResetting}>
+                        {isResetting ? "Sending..." : "Send Reset Link"}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </form>
             </div>
           </TabsContent>
