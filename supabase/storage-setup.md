@@ -128,3 +128,6 @@ After creating the bucket, test it by:
 - Verify file type is allowed (images or PDFs)
 - Check browser console for detailed error messages
 
+
+
+
