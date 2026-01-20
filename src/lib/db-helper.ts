@@ -13,15 +13,19 @@ export const db = {
 
   async insert(table: string, data: any) {
     if (isMockDBMode()) {
+      console.log(`[DB] Using MOCK mode for insert into ${table}`);
       return mockDB.insert(table, data);
     }
+    console.log(`[DB] Using SUPABASE for insert into ${table}`);
     return (supabase as any).from(table).insert(data);
   },
 
   async upsert(table: string, data: any) {
     if (isMockDBMode()) {
+      console.log(`[DB] Using MOCK mode for upsert into ${table}`);
       return mockDB.upsert(table, data);
     }
+    console.log(`[DB] Using SUPABASE for upsert into ${table}`);
     return (supabase as any).from(table).upsert(data);
   },
 
