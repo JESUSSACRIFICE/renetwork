@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +34,16 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
   });
+
+  // Check if user just verified their email
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verified') === 'true') {
+      toast.success("Email verified successfully! Please log in to continue.");
+      // Clean up URL
+      window.history.replaceState({}, '', '/auth');
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,20 +106,32 @@ export default function Auth() {
       
       // Check if email is verified
       if (data.user && !data.user.email_confirmed_at) {
-        toast.info("Your email is not yet verified. You can verify it later from your dashboard.");
+        toast.warning("Please verify your email to access all features.");
+        setUnverifiedEmail(data.user.email || loginData.email);
+        return;
       }
       
-      // Check if profile exists, if not redirect to setup
+      // Check if profile/registration data is complete
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, user_type, registration_status")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      if (!profile) {
+      // Check if user has completed their role-specific registration
+      // Use type assertion since user_type may not be in TypeScript types yet
+      const profileData = profile as any;
+      const hasCompletedRegistration = profileData && 
+        profileData.user_type && 
+        (profileData.user_type === 'service_provider' || profileData.user_type === 'business_buyer');
+
+      if (!hasCompletedRegistration) {
+        // User hasn't filled their registration details yet
+        toast.info("Please complete your registration to continue.");
         router.push("/register");
       } else {
-        router.push(`/profile/${data.user.id}`);
+        // User has completed registration, go to dashboard
+        router.push("/dashboard");
       }
     } catch (error: any) {
       // If it's still an email confirmation error, show resend option on this page
@@ -215,40 +237,15 @@ export default function Auth() {
         session: data.session 
       });
 
-      // If session was created, user is logged in
-      if (data.session) {
-        toast.success("Account created! You can verify your email later from your dashboard.");
-        router.push("/register");
-        return;
-      }
-
-      // If no session but user exists, email confirmation might be required
+      // After signup, always redirect to verify-email page
+      // User must verify email before accessing the platform
       if (data.user) {
-        if (!data.user.email_confirmed_at) {
-          toast.success("Account created! A verification email has been sent. You can verify it later - continuing to registration now.");
-          console.log('Verification email should have been sent to:', registerData.email);
-          console.log('Redirect URL configured:', redirectUrl);
-        } else {
-          toast.success("Account created! Please choose your registration type.");
-        }
+        toast.success("Account created! Please check your email to verify your account.");
+        console.log('Verification email should have been sent to:', registerData.email);
+        console.log('Redirect URL configured:', redirectUrl);
         
-        // Try to sign in automatically to create a session
-        // This works if email confirmation is disabled in Supabase settings
-        try {
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: registerData.email,
-            password: registerData.password,
-          });
-          
-          if (!signInError && signInData.session) {
-            console.log('Auto sign-in successful, session created');
-          }
-        } catch (autoSignInError) {
-          console.log('Auto sign-in failed (email confirmation may be required):', autoSignInError);
-          // Continue anyway - user can verify email later
-        }
-        
-        router.push("/register");
+        // Redirect to verify-email notification page
+        router.push("/auth/verify-email");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
