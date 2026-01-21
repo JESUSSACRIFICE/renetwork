@@ -283,3 +283,6 @@ ORDER BY tablename;
 - Look for `profiles` table in Table Editor
 - If it exists, your migrations worked! ✅
 
+
+
+

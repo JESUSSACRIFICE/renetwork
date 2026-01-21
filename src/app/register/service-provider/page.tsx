@@ -115,67 +115,20 @@ export default function ServiceProviderRegistration() {
   }, [form, currentStep]);
 
   const onSubmit = async (values: RegistrationFormValues) => {
-    // If not on the last step, this shouldn't be called, but handle it anyway
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
       return;
     }
 
-    // Validate all required fields before submission
-    console.log("Validating form before submission...");
-    const isValid = await form.trigger();
-    if (!isValid) {
-      const errors = form.formState.errors;
-      console.error("Form validation errors:", errors);
-      const firstError = Object.values(errors)[0];
-      if (firstError?.message) {
-        toast.error(firstError.message as string);
-      } else {
-        toast.error("Please fill in all required fields");
-      }
-      
-      // Scroll to first error field
-      const firstErrorField = Object.keys(errors)[0];
-      if (firstErrorField) {
-        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-        if (errorElement) {
-          errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-      }
-      return;
-    }
-
-    // Additional validation checks
-    if (identityFiles.length === 0) {
-      toast.error("Please upload at least one identity document");
-      setCurrentStep(1);
-      return;
-    }
-
-    const paymentMethods = values.payment_methods || [];
-    if (paymentMethods.length === 0) {
-      toast.error("Please select at least one payment method");
-      setCurrentStep(7);
-      return;
-    }
-
-    console.log("Form validation passed, submitting...");
     setLoading(true);
     try {
-      // First try to get session (more reliable)
-      const { data: sessionData } = await supabase.auth.getSession();
-      let user: any = sessionData?.session?.user;
+      let {
+        data: { user },
+      } = await db.getUser();
 
-      // If no session, try to get user directly
-      if (!user) {
-        const { data: userData } = await db.getUser();
-        user = userData?.user || undefined;
-      }
-
-      // If still no user, check if we're in mock mode
       if (!user) {
         if (!isMockMode()) {
-          toast.error("Please sign in first. If you just created an account, try logging in.");
+          toast.error("Please sign in first");
           router.push("/auth");
           return;
         }
@@ -1032,104 +985,7 @@ export default function ServiceProviderRegistration() {
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button 
-                  type="button"
-                  disabled={loading}
-                  onClick={async (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Log button click for debugging
-                    console.log("Submit button clicked", {
-                      currentStep,
-                      totalSteps: STEPS.length,
-                      loading,
-                      isValid: form.formState.isValid,
-                      errors: form.formState.errors
-                    });
-                    
-                    if (loading) return;
-                    
-                    // Manually trigger validation for all fields
-                    console.log("Triggering full form validation...");
-                    const isValid = await form.trigger();
-                    const errors = form.formState.errors;
-                    
-                    console.log("Validation result:", { isValid, errors });
-                    
-                    if (!isValid) {
-                      // Show all validation errors
-                      const errorMessages: string[] = [];
-                      
-                      // Extract all error messages
-                      const extractErrors = (err: any, prefix = ""): void => {
-                        if (err?.message) {
-                          errorMessages.push(`${prefix}${err.message}`);
-                        }
-                        if (err && typeof err === 'object') {
-                          Object.entries(err).forEach(([key, value]) => {
-                            if (key !== 'message' && value) {
-                              extractErrors(value, `${prefix}${key}: `);
-                            }
-                          });
-                        }
-                      };
-                      
-                      Object.entries(errors).forEach(([field, error]) => {
-                        extractErrors(error, `${field}: `);
-                      });
-                      
-                      // Show first error or all errors
-                      if (errorMessages.length > 0) {
-                        console.error("Validation errors:", errorMessages);
-                        toast.error(errorMessages[0] || "Please fill in all required fields");
-                        
-                        // Show additional errors if there are more
-                        if (errorMessages.length > 1) {
-                          setTimeout(() => {
-                            toast.error(`${errorMessages.length - 1} more error(s). Check the form.`);
-                          }, 2000);
-                        }
-                        
-                        // Scroll to first error field
-                        const firstErrorField = Object.keys(errors)[0];
-                        if (firstErrorField) {
-                          const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-                          if (errorElement) {
-                            errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
-                            // Highlight the field
-                            (errorElement as HTMLElement).focus();
-                          }
-                        }
-                      } else {
-                        toast.error("Please fill in all required fields");
-                      }
-                      return;
-                    }
-                    
-                    // Additional validation checks
-                    const values = form.getValues();
-                    
-                    // Check for identity documents
-                    if (identityFiles.length === 0) {
-                      toast.error("Please upload at least one identity document");
-                      setCurrentStep(1);
-                      return;
-                    }
-                    
-                    // Check for payment methods
-                    const paymentMethods = values.payment_methods || [];
-                    if (paymentMethods.length === 0) {
-                      toast.error("Please select at least one payment method");
-                      setCurrentStep(7);
-                      return;
-                    }
-                    
-                    // All validation passed, submit the form
-                    console.log("All validations passed, calling onSubmit...");
-                    await onSubmit(values);
-                  }}
-                >
+                <Button type="submit" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Submit Registration
                 </Button>

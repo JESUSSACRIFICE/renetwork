@@ -917,3 +917,6 @@ This will automatically apply all migrations in the `supabase/migrations` folder
 
 After running all migrations, your Supabase database will have all the required tables, and your registration forms will work properly!
 
+
+
+

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Bell, ChevronDown, User } from "lucide-react";
+import { Search, Bell, ChevronDown, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,6 +18,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FreeioDashboardHeaderProps {
   user: any;
@@ -26,6 +29,17 @@ interface FreeioDashboardHeaderProps {
 
 export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboardHeaderProps) {
   const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      toast.success("Logged out successfully");
+      router.push("/auth");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to logout");
+    }
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
@@ -128,6 +142,11 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

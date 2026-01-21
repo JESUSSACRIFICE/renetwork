@@ -83,16 +83,8 @@ export default function BusinessBuyerRegistration() {
     defaultValues: {
       payment_methods: ["cash"], // Default to cash
       languages_spoken: ["English"],
-      business_name: "",
-      contact_person: "",
-      email: "",
-      phone: "",
-      location_zip_code: "",
     },
     mode: "onChange", // Validate on change for better UX
-    shouldUnregister: false, // Keep form values when navigating between steps
-    shouldFocusError: true,
-    criteriaMode: "all",
   });
 
   // Ensure payment_methods always has a value on mount
@@ -103,84 +95,21 @@ export default function BusinessBuyerRegistration() {
     }
   }, [form, currentStep]);
 
-  // Sync selectedLanguages with form state
-  useEffect(() => {
-    form.setValue("languages_spoken", selectedLanguages, { shouldValidate: false });
-  }, [selectedLanguages, form]);
-
   const onSubmit = async (values: RegistrationFormValues) => {
-    // If not on the last step, this shouldn't be called, but handle it anyway
     if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1);
       return;
     }
 
-    // Validate all required fields before submission
-    const isValid = await form.trigger();
-    if (!isValid) {
-      const errors = form.formState.errors;
-      const firstErrorField = Object.keys(errors)[0] as keyof RegistrationFormValues;
-      
-      // Determine which step contains the first error field
-      let stepWithError = 1;
-      if (["business_name", "contact_person", "email", "phone", "location_zip_code"].includes(firstErrorField)) {
-        stepWithError = 1;
-      } else if (["payment_methods"].includes(firstErrorField)) {
-        stepWithError = 2;
-      }
-      
-      // Navigate to the step with the error
-      if (stepWithError !== currentStep) {
-        setCurrentStep(stepWithError);
-        toast.error(errors[firstErrorField]?.message as string || "Please fill in all required fields");
-        
-        // Wait for step to render, then scroll to field
-        setTimeout(() => {
-          const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-          if (errorElement) {
-            errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
-            (errorElement as HTMLElement).focus();
-          }
-        }, 300);
-      } else {
-        const firstError = errors[firstErrorField];
-        toast.error(firstError?.message as string || "Please fill in all required fields");
-        
-        // Scroll to first error field if on the same step
-        const errorElement = document.querySelector(`[name="${firstErrorField}"]`);
-        if (errorElement) {
-          errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
-          (errorElement as HTMLElement).focus();
-        }
-      }
-      return;
-    }
-
-    // Additional validation checks
-    const paymentMethods = values.payment_methods || [];
-    if (paymentMethods.length === 0) {
-      toast.error("Please select at least one payment method");
-      setCurrentStep(2);
-      return;
-    }
-
-    console.log("Form validation passed, submitting...");
     setLoading(true);
     try {
-      // First try to get session (more reliable)
-      const { data: sessionData } = await supabase.auth.getSession();
-      let user: any = sessionData?.session?.user;
+      let {
+        data: { user },
+      } = await db.getUser();
 
-      // If no session, try to get user directly
-      if (!user) {
-        const { data: userData } = await db.getUser();
-        user = userData?.user || undefined;
-      }
-
-      // If still no user, check if we're in mock mode
       if (!user) {
         if (!isMockMode()) {
-          toast.error("Please sign in first. If you just created an account, try logging in.");
+          toast.error("Please sign in first");
           router.push("/auth");
           return;
         }
@@ -346,8 +275,81 @@ export default function BusinessBuyerRegistration() {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        // Step 1 is now rendered separately to keep fields always mounted
-        return null;
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Basic Information</h2>
+              <p className="text-muted-foreground">Enter your business details</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="business_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Business Name *</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contact_person"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Person *</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone *</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="tel" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="location_zip_code"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location / ZIP Code *</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="90210" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        );
 
       case 2:
         return (
@@ -794,93 +796,9 @@ export default function BusinessBuyerRegistration() {
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            {/* Step 1 Fields - Always rendered but conditionally shown */}
-            <div style={{ display: currentStep === 1 ? 'block' : 'none' }}>
-              <Card className="p-6 mb-6">
-                <CardContent className="pt-6">
-                  <div className="space-y-6">
-                    <div>
-                      <h2 className="text-2xl font-bold mb-2">Basic Information</h2>
-                      <p className="text-muted-foreground">Enter your business details</p>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="business_name"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Business Name *</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="contact_person"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Contact Person *</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email *</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="email" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="phone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Phone *</FormLabel>
-                            <FormControl>
-                              <Input {...field} type="tel" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="location_zip_code"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Location / ZIP Code *</FormLabel>
-                            <FormControl>
-                              <Input {...field} placeholder="90210" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Other steps - conditionally render */}
-            {currentStep !== 1 && (
-              <Card className="p-6 mb-6">
-                <CardContent className="pt-6">{renderStepContent()}</CardContent>
-              </Card>
-            )}
+            <Card className="p-6 mb-6">
+              <CardContent className="pt-6">{renderStepContent()}</CardContent>
+            </Card>
 
             <div className="flex justify-between">
               <Button
@@ -898,10 +816,7 @@ export default function BusinessBuyerRegistration() {
                   <ChevronRight className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
-                <Button 
-                  type="submit"
-                  disabled={loading}
-                >
+                <Button type="submit" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Submit Registration
                 </Button>
