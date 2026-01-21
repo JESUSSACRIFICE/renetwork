@@ -41,17 +41,21 @@ const Auth = () => {
 
       toast.success("Welcome back!");
       
-      // Check if profile exists, if not redirect to setup
+      // Check if profile exists and is complete
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, user_type, first_name, last_name")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      if (!profile) {
-        router.push(`/profile/${data.user.id}/edit`);
+      // Redirect to register if profile doesn't exist or is incomplete
+      // Use type assertion to handle columns that may not be in generated types yet
+      const profileData = profile as any;
+      if (!profile || !profileData?.user_type || !profileData?.first_name || !profileData?.last_name) {
+        router.push("/register");
       } else {
-        router.push(`/profile/${data.user.id}`);
+        // Redirect to dashboard if profile is complete
+        router.push("/dashboard");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
@@ -90,11 +94,11 @@ const Auth = () => {
 
       if (error) throw error;
 
-      toast.success("Account created! Please complete your profile.");
+      toast.success("Account created! Please choose your registration type.");
       
-      // Redirect to profile setup
+      // Redirect to registration type selection
       if (data.user) {
-        router.push(`/profile/${data.user.id}/edit`);
+        router.push("/register");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");

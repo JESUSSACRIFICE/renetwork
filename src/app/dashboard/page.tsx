@@ -46,6 +46,14 @@ export default function Dashboard() {
       .eq("id", userId)
       .maybeSingle();
     
+    // If profile doesn't exist or is incomplete, redirect to register
+    // Use type assertion to handle columns that may not be in generated types yet
+    const profileData = data as any;
+    if (!data || !profileData?.user_type || !profileData?.first_name || !profileData?.last_name) {
+      router.push("/register");
+      return;
+    }
+    
     setProfile(data);
     
     // Check for URL parameter to override user type (for testing)

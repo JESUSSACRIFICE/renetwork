@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Eye, EyeOff } from "lucide-react";
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -22,11 +23,10 @@ export default function Auth() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
-  const [isResendingVerification, setIsResendingVerification] = useState(false);
   const [registerData, setRegisterData] = useState({
     firstName: "",
     lastName: "",
@@ -34,16 +34,8 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
   });
-
-  // Check if user just verified their email
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('verified') === 'true') {
-      toast.success("Email verified successfully! Please log in to continue.");
-      // Clean up URL
-      window.history.replaceState({}, '', '/auth');
-    }
-  }, []);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,122 +47,30 @@ export default function Auth() {
         password: loginData.password,
       });
 
-      // Handle email not confirmed error - allow login anyway
-      if (error) {
-        // Check if error is about email confirmation
-        if (error.message?.includes("Email not confirmed") || 
-            error.message?.includes("email_not_confirmed") ||
-            error.message?.toLowerCase().includes("email") && error.message?.toLowerCase().includes("confirm")) {
-          
-          // Try to sign in anyway by using a workaround
-          // First, try to get user by email to verify credentials
-          try {
-            // Attempt to create a session by signing in again with a different approach
-            // Or redirect to dashboard where they can resend verification
-            toast.warning("Email not verified. Redirecting to dashboard where you can verify your email.");
-            
-            // Try to get user info if possible
-            const { data: userData } = await supabase.auth.getUser();
-            const userId = userData?.user?.id;
-            
-            if (userId) {
-              // Check if profile exists to determine redirect
-              const { data: profile } = await supabase
-                .from("profiles")
-                .select("id")
-                .eq("id", userId)
-                .maybeSingle();
-
-              if (!profile) {
-                router.push("/register");
-              } else {
-                router.push("/dashboard/settings");
-              }
-            } else {
-              // No user session, show resend option on auth page
-              setUnverifiedEmail(loginData.email);
-            }
-            return;
-          } catch (innerError) {
-            // If we can't get user, show resend option on auth page
-            console.error("Error handling unverified email:", innerError);
-            setUnverifiedEmail(loginData.email);
-            toast.warning("Email not verified. Please verify your email to continue.");
-            return;
-          }
-        }
-        throw error;
-      }
+      if (error) throw error;
 
       toast.success("Welcome back!");
       
-      // Check if email is verified
-      if (data.user && !data.user.email_confirmed_at) {
-        toast.warning("Please verify your email to access all features.");
-        setUnverifiedEmail(data.user.email || loginData.email);
-        return;
-      }
-      
-      // Check if profile/registration data is complete
+      // Check if profile exists and is complete
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, user_type, registration_status")
+        .select("id, user_type, first_name, last_name")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      // Check if user has completed their role-specific registration
-      // Use type assertion since user_type may not be in TypeScript types yet
+      // Redirect to register if profile doesn't exist or is incomplete
+      // Use type assertion to handle columns that may not be in generated types yet
       const profileData = profile as any;
-      const hasCompletedRegistration = profileData && 
-        profileData.user_type && 
-        (profileData.user_type === 'service_provider' || profileData.user_type === 'business_buyer');
-
-      if (!hasCompletedRegistration) {
-        // User hasn't filled their registration details yet
-        toast.info("Please complete your registration to continue.");
+      if (!profile || !profileData?.user_type || !profileData?.first_name || !profileData?.last_name) {
         router.push("/register");
       } else {
-        // User has completed registration, go to dashboard
+        // Redirect to dashboard if profile is complete
         router.push("/dashboard");
       }
     } catch (error: any) {
-      // If it's still an email confirmation error, show resend option on this page
-      if (error.message?.includes("Email not confirmed") || 
-          error.message?.includes("email_not_confirmed") ||
-          (error.message?.toLowerCase().includes("email") && error.message?.toLowerCase().includes("confirm"))) {
-        setUnverifiedEmail(loginData.email);
-        toast.warning("Email not verified. Please verify your email to continue.");
-      } else {
-        toast.error(error.message || "Failed to sign in");
-      }
+      toast.error(error.message || "Failed to sign in");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleResendVerification = async () => {
-    if (!unverifiedEmail) return;
-    
-    setIsResendingVerification(true);
-    try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: unverifiedEmail,
-        options: {
-          emailRedirectTo: redirectUrl,
-        },
-      });
-
-      if (error) throw error;
-
-      toast.success("Verification email sent! Please check your inbox (and spam folder).");
-      setUnverifiedEmail(null);
-    } catch (error: any) {
-      console.error("Error resending verification email:", error);
-      toast.error(error.message || "Failed to send verification email");
-    } finally {
-      setIsResendingVerification(false);
     }
   };
 
@@ -179,8 +79,10 @@ export default function Auth() {
     setIsResetting(true);
 
     try {
+      // Use environment variable for production URL, fallback to window.location.origin for development
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/dashboard/reset-password`,
+        redirectTo: `${baseUrl}/dashboard/reset-password`,
       });
 
       if (error) throw error;
@@ -212,13 +114,10 @@ export default function Auth() {
     setIsLoading(true);
 
     try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
-      
       const { data, error } = await supabase.auth.signUp({
         email: registerData.email,
         password: registerData.password,
         options: {
-          emailRedirectTo: redirectUrl,
           data: {
             first_name: registerData.firstName,
             last_name: registerData.lastName,
@@ -226,26 +125,13 @@ export default function Auth() {
         },
       });
 
-      if (error) {
-        console.error('Sign up error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
-      console.log('Sign up response:', { 
-        user: data.user?.id, 
-        emailConfirmed: data.user?.email_confirmed_at,
-        session: data.session 
-      });
-
-      // After signup, always redirect to verify-email page
-      // User must verify email before accessing the platform
+      toast.success("Account created! Please choose your registration type.");
+      
+      // Redirect to registration type selection
       if (data.user) {
-        toast.success("Account created! Please check your email to verify your account.");
-        console.log('Verification email should have been sent to:', registerData.email);
-        console.log('Redirect URL configured:', redirectUrl);
-        
-        // Redirect to verify-email notification page
-        router.push("/auth/verify-email");
+        router.push("/register");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to create account");
@@ -292,14 +178,28 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={loginData.password}
+                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button
                   type="submit"
@@ -339,39 +239,6 @@ export default function Auth() {
                     </form>
                   </DialogContent>
                 </Dialog>
-                
-                {/* Email Verification Alert */}
-                {unverifiedEmail && (
-                  <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-                          Email Not Verified
-                        </h3>
-                        <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
-                          Your email address ({unverifiedEmail}) has not been verified yet. Please check your inbox for the verification email.
-                        </p>
-                        <div className="mt-3">
-                          <Button
-                            type="button"
-                            onClick={handleResendVerification}
-                            disabled={isResendingVerification}
-                            variant="outline"
-                            size="sm"
-                            className="w-full"
-                          >
-                            {isResendingVerification ? "Sending..." : "Resend Verification Email"}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </form>
             </div>
           </TabsContent>
@@ -414,25 +281,53 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-password">Password</Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="register-password"
+                      type={showRegisterPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={registerData.password}
+                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showRegisterPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={registerData.confirmPassword}
+                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button
                   type="submit"
