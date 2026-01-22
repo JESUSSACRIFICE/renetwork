@@ -19,6 +19,60 @@ const passwordSchema = z.string()
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(/[0-9]/, "Password must contain at least one number");
 
+// Helper function to check if user has completed registration
+async function checkRegistrationCompletion(userId: string): Promise<boolean> {
+  try {
+    console.log("[REGISTRATION CHECK] Checking registration for user:", userId);
+    
+    // Check if profile exists with user_type
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, user_type, first_name, last_name, full_name, registration_status, email, phone")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("[REGISTRATION CHECK] Profile error:", profileError);
+    }
+
+    if (!profile) {
+      console.log("[REGISTRATION CHECK] No profile found");
+      return false;
+    }
+
+    const profileData = profile as any;
+    console.log("[REGISTRATION CHECK] Profile data:", {
+      user_type: profileData?.user_type,
+      registration_status: profileData?.registration_status,
+      has_first_name: !!profileData?.first_name,
+      has_last_name: !!profileData?.last_name,
+      has_full_name: !!profileData?.full_name,
+      has_email: !!profileData?.email,
+      has_phone: !!profileData?.phone,
+    });
+
+    // SIMPLIFIED VALIDATION: If registration_status OR user_type exists, allow access
+    // PRIMARY CHECK: registration_status means form was submitted
+    if (profileData?.registration_status) {
+      console.log("[REGISTRATION CHECK] ✅ Registration status found:", profileData.registration_status);
+      return true;
+    }
+    
+    // SECONDARY CHECK: user_type means they've started registration
+    if (profileData?.user_type) {
+      console.log("[REGISTRATION CHECK] ✅ User type found:", profileData.user_type);
+      return true;
+    }
+    
+    // If neither exists, registration not started
+    console.log("[REGISTRATION CHECK] ❌ No user_type or registration_status found");
+    return false;
+  } catch (error) {
+    console.error("[REGISTRATION CHECK] Error checking registration completion:", error);
+    return false;
+  }
+}
+
 export default function Auth() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -51,20 +105,17 @@ export default function Auth() {
 
       toast.success("Welcome back!");
       
-      // Check if profile exists and is complete
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, user_type, first_name, last_name")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      // Redirect to register if profile doesn't exist or is incomplete
-      // Use type assertion to handle columns that may not be in generated types yet
-      const profileData = profile as any;
-      if (!profile || !profileData?.user_type || !profileData?.first_name || !profileData?.last_name) {
+      // Check if user has completed registration
+      const hasCompletedRegistration = await checkRegistrationCompletion(data.user.id);
+      
+      console.log("[LOGIN] Registration completion check result:", hasCompletedRegistration);
+      
+      if (!hasCompletedRegistration) {
+        console.log("[LOGIN] Redirecting to /register - registration incomplete");
         router.push("/register");
       } else {
-        // Redirect to dashboard if profile is complete
+        console.log("[LOGIN] Redirecting to /dashboard - registration complete");
+        // Redirect to dashboard if registration is complete
         router.push("/dashboard");
       }
     } catch (error: any) {
@@ -79,10 +130,23 @@ export default function Auth() {
     setIsResetting(true);
 
     try {
-      // Use environment variable for production URL, fallback to window.location.origin for development
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      // Get the correct base URL - prioritize environment variable, then check if we're in production
+      let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+      
+      // If no environment variable, detect production vs development
+      if (!baseUrl) {
+        const currentOrigin = window.location.origin;
+        // If we're on localhost, use it; otherwise use the current origin (production)
+        if (currentOrigin.includes("localhost") || currentOrigin.includes("127.0.0.1")) {
+          baseUrl = currentOrigin;
+        } else {
+          // In production, use the current origin
+          baseUrl = currentOrigin;
+        }
+      }
+      
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${baseUrl}/dashboard/reset-password`,
+        redirectTo: `${baseUrl}/reset-password`,
       });
 
       if (error) throw error;

@@ -55,20 +55,92 @@ export default function ProfessionalDetail() {
     if (!id) return;
     
     try {
+      // Fetch profile with all related registration data
       const { data, error } = await supabase
         .from("profiles")
         .select(`
           *,
           user_roles(role),
           service_areas(zip_code, radius_miles),
-          payment_preferences(*),
-          reviews:reviews(rating, comment, created_at, reviewer:reviewer_id(full_name))
+          payment_preferences(*)
         `)
         .eq("id", id)
         .single();
 
       if (error) throw error;
-      setProfessional(data);
+      
+      // Fetch additional registration data based on user_type
+      const profileData = data as any;
+      const supabaseClient = supabase as any;
+      
+      // Fetch registration-specific data
+      if (profileData.user_type === "service_provider") {
+        // Fetch licenses/credentials
+        const { data: licenses } = await supabaseClient
+          .from("licenses_credentials")
+          .select("*")
+          .eq("user_id", id);
+        
+        // Fetch identity documents
+        const { data: identityDocs } = await supabaseClient
+          .from("identity_documents")
+          .select("*")
+          .eq("user_id", id);
+        
+        // Fetch bonds/insurance
+        const { data: insurance } = await supabaseClient
+          .from("bonds_insurance")
+          .select("*")
+          .eq("user_id", id);
+        
+        // Fetch preference rankings
+        const { data: rankings } = await supabaseClient
+          .from("preference_rankings")
+          .select("*")
+          .eq("user_id", id);
+        
+        // Attach registration data to profile
+        profileData.licenses_credentials = licenses || [];
+        profileData.identity_documents = identityDocs || [];
+        profileData.bonds_insurance = insurance || [];
+        profileData.preference_rankings = rankings || [];
+      } else if (profileData.user_type === "business_buyer") {
+        // Fetch buyer basic info
+        const { data: buyerInfo } = await supabaseClient
+          .from("buyer_basic_info")
+          .select("*")
+          .eq("user_id", id)
+          .maybeSingle();
+        
+        // Fetch buyer preferences
+        const { data: buyerPrefs } = await supabaseClient
+          .from("buyer_preferences")
+          .select("*")
+          .eq("user_id", id)
+          .maybeSingle();
+        
+        // Fetch demography maintenance plans
+        const { data: maintenancePlans } = await supabaseClient
+          .from("demography_maintenance_plans")
+          .select("*")
+          .eq("user_id", id)
+          .maybeSingle();
+        
+        // Attach registration data to profile
+        profileData.buyer_basic_info = buyerInfo;
+        profileData.buyer_preferences = buyerPrefs;
+        profileData.demography_maintenance_plans = maintenancePlans;
+      }
+      
+      // Fetch reviews separately
+      const { data: reviewsData } = await supabase
+        .from("reviews")
+        .select("*, reviewer:reviewer_id(full_name)")
+        .eq("profile_id", id);
+      
+      profileData.reviews = reviewsData || [];
+      
+      setProfessional(profileData);
     } catch (error: any) {
       toast.error("Failed to load professional");
       console.error(error);
@@ -269,8 +341,182 @@ export default function ProfessionalDetail() {
                   <Card className="p-6">
                     <h2 className="text-xl font-bold mb-4">About</h2>
                     <p className="text-muted-foreground leading-relaxed mb-6">
-                      {professional.bio || "No bio available."}
+                      {professional.bio || professional.full_name ? `Professional profile for ${professional.full_name}` : "No bio available."}
                     </p>
+
+                    {/* Display registration data based on user type */}
+                    {(professional as any).user_type === "service_provider" && (
+                      <div className="space-y-6 mb-6">
+                        {/* Personal Information */}
+                        {(professional as any).first_name && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Personal Information</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {(professional as any).first_name && (
+                                <div>
+                                  <span className="text-muted-foreground">First Name:</span>
+                                  <p className="font-medium">{(professional as any).first_name}</p>
+                                </div>
+                              )}
+                              {(professional as any).last_name && (
+                                <div>
+                                  <span className="text-muted-foreground">Last Name:</span>
+                                  <p className="font-medium">{(professional as any).last_name}</p>
+                                </div>
+                              )}
+                              {(professional as any).email && (
+                                <div>
+                                  <span className="text-muted-foreground">Email:</span>
+                                  <p className="font-medium">{(professional as any).email}</p>
+                                </div>
+                              )}
+                              {(professional as any).phone && (
+                                <div>
+                                  <span className="text-muted-foreground">Phone:</span>
+                                  <p className="font-medium">{(professional as any).phone}</p>
+                                </div>
+                              )}
+                              {(professional as any).mailing_address && (
+                                <div className="col-span-2">
+                                  <span className="text-muted-foreground">Mailing Address:</span>
+                                  <p className="font-medium">{(professional as any).mailing_address}</p>
+                                </div>
+                              )}
+                              {(professional as any).birthday && (
+                                <div>
+                                  <span className="text-muted-foreground">Birthday:</span>
+                                  <p className="font-medium">{(professional as any).birthday}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Business Information */}
+                        {(professional as any).business_name && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Business Information</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Business Name:</span>
+                                <p className="font-medium">{(professional as any).business_name}</p>
+                              </div>
+                              {(professional as any).business_address && (
+                                <div className="col-span-2">
+                                  <span className="text-muted-foreground">Business Address:</span>
+                                  <p className="font-medium">{(professional as any).business_address}</p>
+                                </div>
+                              )}
+                              {(professional as any).business_hours && (
+                                <div>
+                                  <span className="text-muted-foreground">Business Hours:</span>
+                                  <p className="font-medium">{(professional as any).business_hours}</p>
+                                </div>
+                              )}
+                              {(professional as any).number_of_employees && (
+                                <div>
+                                  <span className="text-muted-foreground">Number of Employees:</span>
+                                  <p className="font-medium">{(professional as any).number_of_employees}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Licenses & Credentials */}
+                        {(professional as any).licenses_credentials && (professional as any).licenses_credentials.length > 0 && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Licenses & Credentials</h3>
+                            <div className="space-y-2">
+                              {(professional as any).licenses_credentials.map((license: any, idx: number) => (
+                                <div key={idx} className="p-3 bg-muted/50 rounded-lg text-sm">
+                                  <p className="font-medium">License #{license.number}</p>
+                                  <p className="text-muted-foreground">{license.country} {license.state && `- ${license.state}`}</p>
+                                  {license.expiration_date && (
+                                    <p className="text-muted-foreground">Expires: {license.expiration_date}</p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Experience */}
+                        {(professional as any).years_of_experience && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Experience</h3>
+                            <p className="text-sm">
+                              <span className="text-muted-foreground">Years of Experience:</span>{" "}
+                              <span className="font-medium">{(professional as any).years_of_experience}</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Business Buyer Information */}
+                    {(professional as any).user_type === "business_buyer" && (professional as any).buyer_basic_info && (
+                      <div className="space-y-6 mb-6">
+                        <div>
+                          <h3 className="font-semibold mb-2">Business Information</h3>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            {(professional as any).buyer_basic_info.business_name && (
+                              <div>
+                                <span className="text-muted-foreground">Business Name:</span>
+                                <p className="font-medium">{(professional as any).buyer_basic_info.business_name}</p>
+                              </div>
+                            )}
+                            {(professional as any).buyer_basic_info.contact_person && (
+                              <div>
+                                <span className="text-muted-foreground">Contact Person:</span>
+                                <p className="font-medium">{(professional as any).buyer_basic_info.contact_person}</p>
+                              </div>
+                            )}
+                            {(professional as any).buyer_basic_info.email && (
+                              <div>
+                                <span className="text-muted-foreground">Email:</span>
+                                <p className="font-medium">{(professional as any).buyer_basic_info.email}</p>
+                              </div>
+                            )}
+                            {(professional as any).buyer_basic_info.phone && (
+                              <div>
+                                <span className="text-muted-foreground">Phone:</span>
+                                <p className="font-medium">{(professional as any).buyer_basic_info.phone}</p>
+                              </div>
+                            )}
+                            {(professional as any).buyer_basic_info.location_zip_code && (
+                              <div>
+                                <span className="text-muted-foreground">Location ZIP Code:</span>
+                                <p className="font-medium">{(professional as any).buyer_basic_info.location_zip_code}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Buyer Preferences */}
+                        {(professional as any).buyer_preferences && (
+                          <div>
+                            <h3 className="font-semibold mb-2">Preferences</h3>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              {(professional as any).buyer_preferences.property_type && (
+                                <div>
+                                  <span className="text-muted-foreground">Property Type:</span>
+                                  <p className="font-medium">{(professional as any).buyer_preferences.property_type}</p>
+                                </div>
+                              )}
+                              {((professional as any).buyer_preferences.budget_min || (professional as any).buyer_preferences.budget_max) && (
+                                <div>
+                                  <span className="text-muted-foreground">Budget:</span>
+                                  <p className="font-medium">
+                                    ${(professional as any).buyer_preferences.budget_min || "0"} - ${(professional as any).buyer_preferences.budget_max || "N/A"}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
                     {professional.languages && professional.languages.length > 0 && (
                       <div className="mb-4">

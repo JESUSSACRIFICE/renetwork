@@ -7,18 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Building2, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/integrations/supabase/client";
-import { isMockMode } from "@/lib/db-helper";
 
 export default function RegisterPage() {
   const router = useRouter();
 
   useEffect(() => {
     const checkConnection = async () => {
-      const mockMode = isMockMode();
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
-      if (mockMode || !supabaseUrl) {
-        console.log("🔶 Supabase Status: Mock Mode - Forms will use localStorage");
+      if (!supabaseUrl) {
+        console.error("❌ NEXT_PUBLIC_SUPABASE_URL is not set. Please configure Supabase.");
         return;
       }
 
@@ -38,14 +36,14 @@ export default function RegisterPage() {
             console.log("✅ Supabase Status: Connected");
             console.log("⚠️ Note: 'profiles' table may need to be created. Run migrations if needed.");
           } else {
-            console.log("❌ Supabase Status: Connection failed -", error.message);
+            console.error("❌ Supabase Status: Connection failed -", error.message);
           }
         } else {
           console.log("✅ Supabase Status: Connected");
           console.log("✅ Forms will submit to Supabase database");
         }
       } catch (err: any) {
-        console.log("❌ Supabase Status: Connection error -", err.message || "Failed to connect");
+        console.error("❌ Supabase Status: Connection error -", err.message || "Failed to connect");
       }
     };
 

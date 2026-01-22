@@ -48,9 +48,9 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-white font-bold text-lg">
-              R
+              RE
             </div>
-            <span className="text-xl font-bold text-gray-900">Freeio.</span>
+            <span className="text-xl font-bold text-gray-900">RE Network</span>
           </Link>
 
           {/* Navigation */}
@@ -58,7 +58,7 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
             <NavigationMenu>
               <NavigationMenuList className="space-x-1">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -69,31 +69,31 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Home
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Browse Jobs
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Users
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Blog
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
                     Pages
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
@@ -134,7 +134,7 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 <DropdownMenuItem onClick={() => router.push("/dashboard")}>
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push(`/profile/${user?.id}`)}>
+                <DropdownMenuItem onClick={() => router.push("/dashboard/profile")}>
                   View Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/dashboard/messages")}>
