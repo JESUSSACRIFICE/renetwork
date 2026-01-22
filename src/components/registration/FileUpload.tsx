@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { mockStorage, isMockMode } from "@/lib/mock-storage";
+// Removed mock storage - always use Supabase
 
 interface UploadedFile {
   id: string;
@@ -69,44 +69,15 @@ export function FileUpload({
   }, [uploadedFiles, onFilesChange]);
 
   const uploadFile = async (file: File): Promise<string> => {
-    // Check if we should use mock storage
-    // Always use mock storage if Supabase URL is not set
+    // Always use Supabase Storage - no mock mode fallback
     const supabaseUrl = typeof window !== "undefined" 
       ? (window as any).__ENV__?.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
       : process.env.NEXT_PUBLIC_SUPABASE_URL;
     
-    const useMockMode = !supabaseUrl || 
-                        supabaseUrl === '' || 
-                        isMockMode() ||
-                        process.env.NEXT_PUBLIC_USE_MOCK_STORAGE === 'true';
-    
-    // Always try mock storage first if Supabase is not configured
-    if (useMockMode) {
-      // Get mock user ID from localStorage or create one
-      let userId = "mock-user-default";
-      if (typeof window !== "undefined") {
-        userId = localStorage.getItem("mock_user_id") || "mock-user-default";
-      }
-      
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${userId}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-
-      try {
-        const { data, error } = await mockStorage.upload(bucket, fileName, file);
-        
-        if (error) throw error;
-        if (!data) throw new Error("Upload failed");
-
-        const url = mockStorage.getPublicUrl(bucket, data.path);
-        console.log("[MOCK STORAGE] File uploaded successfully:", url);
-        return url;
-      } catch (error: any) {
-        console.error("[MOCK STORAGE] Upload error:", error);
-        throw error;
-      }
+    if (!supabaseUrl || supabaseUrl === '') {
+      throw new Error("Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL in your environment variables.");
     }
 
-    // Real Supabase upload - only if Supabase is properly configured
     try {
       const {
         data: { user },
@@ -114,7 +85,6 @@ export function FileUpload({
       } = await supabase.auth.getUser();
       
       if (authError || !user) {
-        // In production, we should not fallback to mock storage - throw error instead
         const errorMsg = authError?.message || "Not authenticated. Please sign in to upload files.";
         console.error("[SUPABASE] Authentication error:", errorMsg);
         throw new Error(errorMsg);
@@ -186,7 +156,6 @@ export function FileUpload({
       console.log("[SUPABASE] File uploaded successfully:", publicUrl);
       return publicUrl;
     } catch (error: any) {
-      // In production, don't fallback to mock storage - throw the error
       console.error("[SUPABASE] Upload error:", error);
       throw error;
     }
