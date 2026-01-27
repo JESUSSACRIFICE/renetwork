@@ -40,7 +40,6 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
 
   const buyerMenuItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "My Profile", url: "/dashboard/profile", icon: User },
     { title: "My Jobs", url: "/dashboard/jobs", icon: Briefcase },
     { title: "My Projects", url: "/dashboard/projects", icon: Briefcase },
     { title: "Jobs Applicants", url: "/dashboard/applicants", icon: Hourglass },
@@ -57,7 +56,6 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
 
   const agentMenuItems = [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { title: "My Profile", url: "/dashboard/profile", icon: User },
     { title: "My Services", url: "/dashboard/services", icon: Briefcase },
     { title: "Proposals", url: "/dashboard/proposals", icon: FileText },
     { title: "Jobs Applied", url: "/dashboard/jobs-applied", icon: Hourglass },
@@ -93,7 +91,7 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
               {profile?.full_name || (userType === "buyer" ? "Buyer" : "Agent")}
             </div>
             <Link
-              href="/dashboard/profile"
+              href={`/profile/${profile?.id || ""}`}
               className="text-sm text-primary hover:underline"
             >
               View Profile

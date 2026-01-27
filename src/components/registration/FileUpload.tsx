@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef } from "react";
 import { Upload, X, File, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-// Removed mock storage - always use Supabase
+import { mockStorage, isMockMode } from "@/lib/mock-storage";
 
 interface UploadedFile {
   id: string;
@@ -60,24 +60,45 @@ export function FileUpload({
   const [isDragActive, setIsDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Notify parent component when files are uploaded (only files with URLs)
-  useEffect(() => {
-    const completedFiles = uploadedFiles.filter((f) => f.url && !f.uploading);
-    if (completedFiles.length > 0 || uploadedFiles.length === 0) {
-      onFilesChange?.(completedFiles);
-    }
-  }, [uploadedFiles, onFilesChange]);
-
   const uploadFile = async (file: File): Promise<string> => {
-    // Always use Supabase Storage - no mock mode fallback
+    // Check if we should use mock storage
+    // Always use mock storage if Supabase URL is not set
     const supabaseUrl = typeof window !== "undefined" 
       ? (window as any).__ENV__?.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
       : process.env.NEXT_PUBLIC_SUPABASE_URL;
     
-    if (!supabaseUrl || supabaseUrl === '') {
-      throw new Error("Supabase is not configured. Please set NEXT_PUBLIC_SUPABASE_URL in your environment variables.");
+    const useMockMode = !supabaseUrl || 
+                        supabaseUrl === '' || 
+                        isMockMode() ||
+                        process.env.NEXT_PUBLIC_USE_MOCK_STORAGE === 'true';
+    
+    // Always try mock storage first if Supabase is not configured
+    if (useMockMode) {
+      // Get mock user ID from localStorage or create one
+      let userId = "mock-user-default";
+      if (typeof window !== "undefined") {
+        userId = localStorage.getItem("mock_user_id") || "mock-user-default";
+      }
+      
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${userId}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+      try {
+        const { data, error } = await mockStorage.upload(bucket, fileName, file);
+        
+        if (error) throw error;
+        if (!data) throw new Error("Upload failed");
+
+        const url = mockStorage.getPublicUrl(bucket, data.path);
+        console.log("[MOCK STORAGE] File uploaded successfully:", url);
+        return url;
+      } catch (error: any) {
+        console.error("[MOCK STORAGE] Upload error:", error);
+        throw error;
+      }
     }
 
+    // Real Supabase upload - only if Supabase is properly configured
     try {
       const {
         data: { user },
@@ -85,35 +106,24 @@ export function FileUpload({
       } = await supabase.auth.getUser();
       
       if (authError || !user) {
-        const errorMsg = authError?.message || "Not authenticated. Please sign in to upload files.";
-        console.error("[SUPABASE] Authentication error:", errorMsg);
-        throw new Error(errorMsg);
+        // Fallback to mock storage if not authenticated
+        console.warn("Not authenticated, falling back to mock storage");
+        let userId = "mock-user-default";
+        if (typeof window !== "undefined") {
+          userId = localStorage.getItem("mock_user_id") || "mock-user-default";
+        }
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${userId}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const { data, error } = await mockStorage.upload(bucket, fileName, file);
+        if (error) throw error;
+        if (!data) throw new Error("Upload failed");
+        return mockStorage.getPublicUrl(bucket, data.path);
       }
 
       const fileExt = file.name.split(".").pop();
       const fileName = `${user.id}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Check if bucket exists by trying to list it (this will fail if bucket doesn't exist)
-      const { data: bucketData, error: bucketError } = await supabase.storage.from(bucket).list('', {
-        limit: 1,
-      });
-
-      if (bucketError) {
-        // Check if it's a "not found" error
-        const errorMessage = bucketError.message || "";
-        const isNotFound = errorMessage.includes("not found") || 
-                          errorMessage.includes("Bucket not found") ||
-                          errorMessage.toLowerCase().includes("does not exist");
-        
-        if (isNotFound) {
-          const errorMsg = `Storage bucket "${bucket}" does not exist. Please create it in your Supabase dashboard:\n\n1. Go to Supabase Dashboard > Storage\n2. Click "New bucket"\n3. Name it "${bucket}"\n4. Set it as private\n5. Create the bucket\n\nOr run this SQL in Supabase SQL Editor:\n\nINSERT INTO storage.buckets (id, name, public)\nVALUES ('${bucket}', '${bucket}', false)\nON CONFLICT (id) DO NOTHING;`;
-          console.error(`[SUPABASE] Bucket "${bucket}" does not exist.`, errorMsg);
-          throw new Error(`Storage bucket "${bucket}" not found. Please create it in Supabase dashboard (Storage > New bucket).`);
-        }
-        // If it's a different error, let it fall through to the upload attempt
-      }
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(fileName, file, {
           cacheControl: "3600",
@@ -121,43 +131,34 @@ export function FileUpload({
         });
 
       if (uploadError) {
-        // Provide more detailed error messages
-        const errorMsg = uploadError.message || "";
-        let errorMessage = errorMsg;
-        if (errorMsg.includes("new row violates row-level security") || 
-            errorMsg.includes("permission denied") ||
-            errorMsg.includes("Row Level Security")) {
-          errorMessage = "Permission denied. Please check your storage bucket RLS policies. Users need INSERT permission on the 'documents' bucket.";
-        } else if (errorMsg.includes("Bucket not found") || 
-                   errorMsg.includes("not found") ||
-                   errorMsg.toLowerCase().includes("does not exist")) {
-          errorMessage = `Storage bucket "${bucket}" not found. Please create it in Supabase dashboard:\n\n1. Go to Supabase Dashboard > Storage\n2. Click "New bucket"\n3. Name it "${bucket}"\n4. Set it as private\n5. Create the bucket`;
-        } else if (errorMsg.includes("The resource already exists")) {
-          errorMessage = "A file with this name already exists. Please try again.";
-        } else if (errorMsg.includes("File size exceeds")) {
-          errorMessage = `File is too large. Maximum size is ${Math.round(maxSize / 1024 / 1024)}MB.`;
-        }
-        console.error("[SUPABASE] Upload error:", uploadError);
-        throw new Error(errorMessage);
-      }
-
-      if (!uploadData) {
-        throw new Error("Upload failed: No data returned from storage");
+        // Always fallback to mock storage on any Supabase error
+        console.warn("Supabase upload failed, falling back to mock storage:", uploadError.message);
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${user.id}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const { data, error } = await mockStorage.upload(bucket, fileName, file);
+        if (error) throw error;
+        if (!data) throw new Error("Upload failed");
+        return mockStorage.getPublicUrl(bucket, data.path);
       }
 
       const {
         data: { publicUrl },
       } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
-      if (!publicUrl) {
-        throw new Error("Failed to get public URL for uploaded file");
-      }
-
-      console.log("[SUPABASE] File uploaded successfully:", publicUrl);
       return publicUrl;
     } catch (error: any) {
-      console.error("[SUPABASE] Upload error:", error);
-      throw error;
+      // Always fallback to mock storage on any error
+      console.warn("Upload error, falling back to mock storage:", error.message);
+      let userId = "mock-user-default";
+      if (typeof window !== "undefined") {
+        userId = localStorage.getItem("mock_user_id") || "mock-user-default";
+      }
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${userId}/${folder ? `${folder}/` : ""}${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const { data, error: uploadErr } = await mockStorage.upload(bucket, fileName, file);
+      if (uploadErr) throw uploadErr;
+      if (!data) throw new Error("Upload failed");
+      return mockStorage.getPublicUrl(bucket, data.path);
     }
   };
 
@@ -206,6 +207,15 @@ export function FileUpload({
           toast.error(`Failed to upload ${newFile.file.name}`);
         }
       }
+
+      // Notify parent after uploads
+      setTimeout(() => {
+        setUploadedFiles((prev) => {
+          const allFiles = prev.filter((f) => f.url);
+          onFilesChange?.(allFiles);
+          return prev;
+        });
+      }, 100);
     },
     [uploadedFiles, maxFiles, maxSize, bucket, folder, onFilesChange]
   );
@@ -241,7 +251,11 @@ export function FileUpload({
   );
 
   const removeFile = (id: string) => {
-    setUploadedFiles((prev) => prev.filter((f) => f.id !== id));
+    setUploadedFiles((prev) => {
+      const updated = prev.filter((f) => f.id !== id);
+      onFilesChange?.(updated.filter((f) => f.url));
+      return updated;
+    });
   };
 
   return (

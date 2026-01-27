@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
-import { db } from "@/lib/db-helper";
+import { db, isMockMode } from "@/lib/db-helper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -122,14 +122,23 @@ export default function ServiceProviderRegistration() {
 
     setLoading(true);
     try {
-      const {
+      let {
         data: { user },
       } = await db.getUser();
 
       if (!user) {
-        toast.error("Please sign in first");
-        router.push("/auth");
-        return;
+        if (!isMockMode()) {
+          toast.error("Please sign in first");
+          router.push("/auth");
+          return;
+        }
+        // In mock mode, create a user automatically
+        const { data: mockUser } = await db.getUser();
+        if (!mockUser?.user) {
+          toast.error("Failed to create mock user");
+          return;
+        }
+        user = mockUser.user;
       }
 
       // Create/Update profile

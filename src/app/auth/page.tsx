@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Eye, EyeOff } from "lucide-react";
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -19,65 +18,10 @@ const passwordSchema = z.string()
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(/[0-9]/, "Password must contain at least one number");
 
-// Helper function to check if user has completed registration
-async function checkRegistrationCompletion(userId: string): Promise<boolean> {
-  try {
-    console.log("[REGISTRATION CHECK] Checking registration for user:", userId);
-    
-    // Check if profile exists with user_type
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("id, user_type, first_name, last_name, full_name, registration_status, email, phone")
-      .eq("id", userId)
-      .maybeSingle();
-
-    if (profileError) {
-      console.error("[REGISTRATION CHECK] Profile error:", profileError);
-    }
-
-    if (!profile) {
-      console.log("[REGISTRATION CHECK] No profile found");
-      return false;
-    }
-
-    const profileData = profile as any;
-    console.log("[REGISTRATION CHECK] Profile data:", {
-      user_type: profileData?.user_type,
-      registration_status: profileData?.registration_status,
-      has_first_name: !!profileData?.first_name,
-      has_last_name: !!profileData?.last_name,
-      has_full_name: !!profileData?.full_name,
-      has_email: !!profileData?.email,
-      has_phone: !!profileData?.phone,
-    });
-
-    // SIMPLIFIED VALIDATION: If registration_status OR user_type exists, allow access
-    // PRIMARY CHECK: registration_status means form was submitted
-    if (profileData?.registration_status) {
-      console.log("[REGISTRATION CHECK] ✅ Registration status found:", profileData.registration_status);
-      return true;
-    }
-    
-    // SECONDARY CHECK: user_type means they've started registration
-    if (profileData?.user_type) {
-      console.log("[REGISTRATION CHECK] ✅ User type found:", profileData.user_type);
-      return true;
-    }
-    
-    // If neither exists, registration not started
-    console.log("[REGISTRATION CHECK] ❌ No user_type or registration_status found");
-    return false;
-  } catch (error) {
-    console.error("[REGISTRATION CHECK] Error checking registration completion:", error);
-    return false;
-  }
-}
-
 export default function Auth() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
-  const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -88,8 +32,6 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
   });
-  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,18 +47,17 @@ export default function Auth() {
 
       toast.success("Welcome back!");
       
-      // Check if user has completed registration
-      const hasCompletedRegistration = await checkRegistrationCompletion(data.user.id);
-      
-      console.log("[LOGIN] Registration completion check result:", hasCompletedRegistration);
-      
-      if (!hasCompletedRegistration) {
-        console.log("[LOGIN] Redirecting to /register - registration incomplete");
-        router.push("/register");
+      // Check if profile exists, if not redirect to setup
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", data.user.id)
+        .maybeSingle();
+
+      if (!profile) {
+        router.push(`/profile/${data.user.id}/edit`);
       } else {
-        console.log("[LOGIN] Redirecting to /dashboard - registration complete");
-        // Redirect to dashboard if registration is complete
-        router.push("/dashboard");
+        router.push(`/profile/${data.user.id}`);
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
@@ -130,23 +71,8 @@ export default function Auth() {
     setIsResetting(true);
 
     try {
-      // Get the correct base URL - prioritize environment variable, then check if we're in production
-      let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-      
-      // If no environment variable, detect production vs development
-      if (!baseUrl) {
-        const currentOrigin = window.location.origin;
-        // If we're on localhost, use it; otherwise use the current origin (production)
-        if (currentOrigin.includes("localhost") || currentOrigin.includes("127.0.0.1")) {
-          baseUrl = currentOrigin;
-        } else {
-          // In production, use the current origin
-          baseUrl = currentOrigin;
-        }
-      }
-      
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${baseUrl}/reset-password`,
+        redirectTo: `${window.location.origin}/dashboard/reset-password`,
       });
 
       if (error) throw error;
@@ -242,28 +168,14 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="login-password"
-                      type={showLoginPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      required
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowLoginPassword(!showLoginPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showLoginPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                  <Input
+                    id="login-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={loginData.password}
+                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                    required
+                  />
                 </div>
                 <Button
                   type="submit"
@@ -345,53 +257,25 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="register-password"
-                      type={showRegisterPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                      required
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showRegisterPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                  <Input
+                    id="register-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={registerData.password}
+                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                      required
-                      className="pr-10"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </button>
-                  </div>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={registerData.confirmPassword}
+                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                    required
+                  />
                 </div>
                 <Button
                   type="submit"

@@ -1,54 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building2, User, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/integrations/supabase/client";
 
 export default function RegisterPage() {
   const router = useRouter();
-
-  useEffect(() => {
-    const checkConnection = async () => {
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-
-      if (!supabaseUrl) {
-        console.error("❌ NEXT_PUBLIC_SUPABASE_URL is not set. Please configure Supabase.");
-        return;
-      }
-
-      try {
-        const { data: authData } = await supabase.auth.getSession();
-        const { data, error } = await supabase.from("profiles").select("count").limit(1).maybeSingle();
-
-        if (error) {
-          const isTableError = 
-            error.code === "PGRST116" || 
-            error.message.includes("relation") || 
-            error.message.includes("does not exist") ||
-            error.message.includes("schema cache") ||
-            error.message.includes("Could not find the table");
-
-          if (isTableError) {
-            console.log("✅ Supabase Status: Connected");
-            console.log("⚠️ Note: 'profiles' table may need to be created. Run migrations if needed.");
-          } else {
-            console.error("❌ Supabase Status: Connection failed -", error.message);
-          }
-        } else {
-          console.log("✅ Supabase Status: Connected");
-          console.log("✅ Forms will submit to Supabase database");
-        }
-      } catch (err: any) {
-        console.error("❌ Supabase Status: Connection error -", err.message || "Failed to connect");
-      }
-    };
-
-    checkConnection();
-  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/5 p-4">

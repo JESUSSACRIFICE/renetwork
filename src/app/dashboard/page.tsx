@@ -10,6 +10,7 @@ import { PageViewsChart } from "@/components/dashboard/PageViewsChart";
 import { DashboardNotifications } from "@/components/dashboard/DashboardNotifications";
 import { RecentProposals } from "@/components/dashboard/RecentProposals";
 import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
+import { UserTypeToggle } from "@/components/dashboard/UserTypeToggle";
 import { supabase } from "@/integrations/supabase/client";
 
 type UserType = "buyer" | "agent";
@@ -39,78 +40,11 @@ export default function Dashboard() {
   };
 
   const fetchProfile = async (userId: string) => {
-    // Query profiles first (without join to avoid 400 errors)
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("profiles")
-      .select("*")
+      .select("*, user_roles(role)")
       .eq("id", userId)
       .maybeSingle();
-    
-    if (error) {
-      console.error("[DASHBOARD] Error fetching profile:", error);
-      // If it's a 400 error, the table might have issues, but try to continue
-      if (error.code === "PGRST116" || error.message?.includes("relation") || error.message?.includes("does not exist")) {
-        console.error("[DASHBOARD] Profiles table might not exist or has schema issues");
-        router.push("/register");
-        return;
-      }
-    }
-    
-    // Check if user has completed registration
-    if (!data) {
-      console.log("[DASHBOARD] No profile found, redirecting to /register");
-      router.push("/register");
-      return;
-    }
-    
-    // Fetch user_roles separately if needed (they're not critical for access)
-    let userRoles: any[] = [];
-    try {
-      const { data: rolesData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", userId);
-      userRoles = rolesData || [];
-    } catch (rolesError) {
-      console.warn("[DASHBOARD] Could not fetch user_roles (non-critical):", rolesError);
-      // Continue without roles - not critical for dashboard access
-    }
-
-    const profileData = data as any;
-    
-    // SIMPLIFIED VALIDATION: If they have user_type OR registration_status, allow access
-    console.log("[DASHBOARD] Checking registration status for user:", userId);
-    console.log("[DASHBOARD] Profile data:", {
-      user_type: profileData?.user_type,
-      registration_status: profileData?.registration_status,
-      has_first_name: !!profileData?.first_name,
-      has_last_name: !!profileData?.last_name,
-      has_full_name: !!profileData?.full_name,
-    });
-    
-    // PRIMARY CHECK: If registration_status exists, they've submitted the form
-    if (profileData?.registration_status) {
-      console.log("[DASHBOARD] ✅ Registration status found:", profileData.registration_status, "- ALLOWING ACCESS");
-      // Continue to dashboard - no redirect
-    } 
-    // SECONDARY CHECK: If user_type is set, they've at least started registration
-    else if (profileData?.user_type) {
-      console.log("[DASHBOARD] ✅ User type found:", profileData.user_type, "- ALLOWING ACCESS");
-      // Continue to dashboard - no redirect
-    }
-    // FALLBACK: Check for basic info
-    else if (profileData?.first_name || profileData?.last_name || profileData?.full_name) {
-      console.log("[DASHBOARD] ✅ Basic profile info found - ALLOWING ACCESS");
-      // Continue to dashboard - no redirect
-    }
-    // NO DATA: Redirect to registration
-    else {
-      console.log("[DASHBOARD] ❌ No registration data found - redirecting to /register");
-      router.push("/register");
-      return;
-    }
-    
-    console.log("[DASHBOARD] ✅ Registration validated - allowing dashboard access");
     
     setProfile(data);
     
@@ -123,20 +57,10 @@ export default function Dashboard() {
       return;
     }
     
-    // Determine user type from profile.user_type field (from registration form)
-    // service_provider = agent, business_buyer = buyer
-    if (profileData?.user_type === "service_provider") {
-      console.log("[DASHBOARD] User type determined from profile: service_provider -> agent");
-      setUserType("agent");
-    } else if (profileData?.user_type === "business_buyer") {
-      console.log("[DASHBOARD] User type determined from profile: business_buyer -> buyer");
-      setUserType("buyer");
-    } else {
-      // Fallback: if user_roles exist, they're an agent
-      const hasRoles = userRoles && userRoles.length > 0;
-      console.log("[DASHBOARD] User type fallback: using user_roles check", { hasRoles, userRoles });
-      setUserType((hasRoles ? "agent" : "buyer") as UserType);
-    }
+    // Determine user type: if they have roles, they're an agent (service provider)
+    // Otherwise, they're a buyer
+    const hasRoles = data?.user_roles && data.user_roles.length > 0;
+    setUserType((hasRoles ? "agent" : "buyer") as UserType);
   };
 
   if (loading) {
@@ -160,7 +84,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
             
             {/* Metrics Cards */}
-            <DashboardMetrics userType={userType} profile={profile} />
+            <DashboardMetrics userType={userType} />
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
@@ -182,6 +106,7 @@ export default function Dashboard() {
           </main>
         </div>
         <FreeioFooter />
+        <UserTypeToggle />
       </div>
     </SidebarProvider>
   );
