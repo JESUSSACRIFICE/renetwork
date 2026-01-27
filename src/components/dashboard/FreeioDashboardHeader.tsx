@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Bell, ChevronDown, User, LogOut } from "lucide-react";
+import { Search, Bell, ChevronDown, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -18,8 +17,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 interface FreeioDashboardHeaderProps {
   user: any;
@@ -30,17 +27,6 @@ interface FreeioDashboardHeaderProps {
 export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboardHeaderProps) {
   const router = useRouter();
 
-  const handleLogout = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      toast.success("Logged out successfully");
-      router.push("/auth");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to logout");
-    }
-  };
-
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
       <div className="w-full px-4">
@@ -48,9 +34,9 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-primary rounded flex items-center justify-center text-white font-bold text-lg">
-              RE
+              R
             </div>
-            <span className="text-xl font-bold text-gray-900">RE Network</span>
+            <span className="text-xl font-bold text-gray-900">Freeio.</span>
           </Link>
 
           {/* Navigation */}
@@ -58,7 +44,7 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
             <NavigationMenu>
               <NavigationMenuList className="space-x-1">
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Categories
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -69,31 +55,31 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 </NavigationMenuItem>
                 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Home
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Browse Jobs
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Users
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Blog
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900 hover:bg-transparent bg-transparent">
+                  <NavigationMenuTrigger className="text-gray-700 hover:text-gray-900">
                     Pages
                   </NavigationMenuTrigger>
                 </NavigationMenuItem>
@@ -134,7 +120,7 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 <DropdownMenuItem onClick={() => router.push("/dashboard")}>
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push("/dashboard/profile")}>
+                <DropdownMenuItem onClick={() => router.push(`/profile/${user?.id}`)}>
                   View Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/dashboard/messages")}>
@@ -142,11 +128,6 @@ export function FreeioDashboardHeader({ user, profile, userType }: FreeioDashboa
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/dashboard/settings")}>
                   Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600 focus:text-red-600">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
