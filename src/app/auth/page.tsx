@@ -8,11 +8,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Eye, EyeOff } from "lucide-react";
 
-const passwordSchema = z.string()
+const passwordSchema = z
+  .string()
   .min(8, "Password must be at least 8 characters")
   .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
@@ -32,6 +41,9 @@ export default function Auth() {
     password: "",
     confirmPassword: "",
   });
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +58,7 @@ export default function Auth() {
       if (error) throw error;
 
       toast.success("Welcome back!");
-      
+
       // Check if profile exists, if not redirect to setup
       const { data: profile } = await supabase
         .from("profiles")
@@ -72,7 +84,7 @@ export default function Auth() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/dashboard/reset-password`,
+        redirectTo: `${window.location.origin}/auth/reset-password`,
       });
 
       if (error) throw error;
@@ -89,7 +101,7 @@ export default function Auth() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (registerData.password !== registerData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -118,7 +130,7 @@ export default function Auth() {
       if (error) throw error;
 
       toast.success("Account created! Please choose your registration type.");
-      
+
       // Redirect to registration type selection
       if (data.user) {
         router.push("/register");
@@ -162,20 +174,40 @@ export default function Auth() {
                     type="email"
                     placeholder="you@example.com"
                     value={loginData.email}
-                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, email: e.target.value })
+                    }
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="login-password"
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={loginData.password}
+                      onChange={(e) =>
+                        setLoginData({
+                          ...loginData,
+                          password: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showLoginPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button
                   type="submit"
@@ -184,9 +216,15 @@ export default function Auth() {
                 >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
-                <Dialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
+                <Dialog
+                  open={isResetDialogOpen}
+                  onOpenChange={setIsResetDialogOpen}
+                >
                   <DialogTrigger asChild>
-                    <Button variant="link" className="w-full text-sm text-muted-foreground">
+                    <Button
+                      variant="link"
+                      className="w-full text-sm text-muted-foreground"
+                    >
                       Forgot your password?
                     </Button>
                   </DialogTrigger>
@@ -194,10 +232,14 @@ export default function Auth() {
                     <DialogHeader>
                       <DialogTitle>Reset Password</DialogTitle>
                       <DialogDescription>
-                        Enter your email address and we&apos;ll send you a link to reset your password.
+                        Enter your email address and we&apos;ll send you a link
+                        to reset your password.
                       </DialogDescription>
                     </DialogHeader>
-                    <form onSubmit={handleResetPassword} className="space-y-4">
+                    <form
+                      onSubmit={handleResetPassword}
+                      className="space-y-4"
+                    >
                       <div className="space-y-2">
                         <Label htmlFor="reset-email">Email</Label>
                         <Input
@@ -209,7 +251,11 @@ export default function Auth() {
                           required
                         />
                       </div>
-                      <Button type="submit" className="w-full" disabled={isResetting}>
+                      <Button
+                        type="submit"
+                        className="w-full"
+                        disabled={isResetting}
+                      >
                         {isResetting ? "Sending..." : "Send Reset Link"}
                       </Button>
                     </form>
@@ -229,7 +275,12 @@ export default function Auth() {
                       id="first-name"
                       placeholder="John"
                       value={registerData.firstName}
-                      onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          firstName: e.target.value,
+                        })
+                      }
                       required
                     />
                   </div>
@@ -239,7 +290,12 @@ export default function Auth() {
                       id="last-name"
                       placeholder="Doe"
                       value={registerData.lastName}
-                      onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          lastName: e.target.value,
+                        })
+                      }
                       required
                     />
                   </div>
@@ -251,31 +307,76 @@ export default function Auth() {
                     type="email"
                     placeholder="you@example.com"
                     value={registerData.email}
-                    onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                    onChange={(e) =>
+                      setRegisterData({
+                        ...registerData,
+                        email: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="register-password">Password</Label>
-                  <Input
-                    id="register-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={registerData.password}
-                    onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="register-password"
+                      type={showRegisterPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={registerData.password}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          password: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowRegisterPassword(!showRegisterPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showRegisterPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={registerData.confirmPassword}
-                    onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirm-password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={registerData.confirmPassword}
+                      onChange={(e) =>
+                        setRegisterData({
+                          ...registerData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
                 </div>
                 <Button
                   type="submit"
@@ -296,9 +397,4 @@ export default function Auth() {
     </div>
   );
 }
-
-
-
-
-
 
