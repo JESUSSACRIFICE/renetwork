@@ -20,7 +20,7 @@ export default function SavedSearches() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [userType, setUserType] = useState<UserType>("buyer");
+  const [userType, setUserType] = useState<UserType>("agent");
 
   useEffect(() => {
     checkAuthAndFetch();
@@ -53,14 +53,14 @@ export default function SavedSearches() {
     const overrideTypeParam = urlParams.get("type");
 
     if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
-      setUserType(overrideTypeParam as UserType);
+      setUserType(overrideTypeParam === "buyer" ? "agent" : "service_provider");
       return;
     }
 
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
-    setUserType((hasRoles ? "agent" : "buyer") as UserType);
+    setUserType(hasRoles ? "service_provider" : "agent");
   };
 
   const fetchSearches = async (userId: string) => {

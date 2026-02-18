@@ -15,7 +15,7 @@ export default function ProjectsPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [userType, setUserType] = useState<"buyer" | "agent">("buyer");
+  const [userType, setUserType] = useState<UserType>("agent");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function ProjectsPage() {
       .maybeSingle();
     setProfile(data);
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
-    setUserType((hasRoles ? "agent" : "buyer") as UserType);
+    setUserType(hasRoles ? "service_provider" : "agent");
   };
 
   if (loading) {

@@ -13,7 +13,7 @@ const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
-  const [userType, setUserType] = useState<UserType>("buyer");
+  const [userType, setUserType] = useState<UserType>("agent");
   const [stats, setStats] = useState({
     leads: 0,
     messages: 0,
@@ -53,7 +53,7 @@ const Dashboard = () => {
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
-    setUserType(hasRoles ? "agent" : "buyer");
+    setUserType(hasRoles ? "service_provider" : "agent");
   };
 
   const fetchStats = async (userId: string) => {

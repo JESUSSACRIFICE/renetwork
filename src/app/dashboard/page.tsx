@@ -39,17 +39,16 @@ export default function Dashboard() {
     const overrideTypeParam = urlParams.get("type");
 
     if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
-      setUserType(overrideTypeParam as UserType);
+      setUserType(overrideTypeParam === "buyer" ? "agent" : "service_provider");
       return;
     }
 
-    // Determine user type: if they have roles, they're an agent (service provider)
-    // Otherwise, they're a buyer
+    // Determine user type: if they have roles, they're a service provider; otherwise, a buyer
     const hasRoles =
       profile.user_roles &&
       Array.isArray(profile.user_roles) &&
       profile.user_roles.length > 0;
-    setUserType((hasRoles ? "agent" : "buyer") as UserType);
+    setUserType(hasRoles ? "service_provider" : "agent");
   }, [profile]);
 
   if (loading) {
