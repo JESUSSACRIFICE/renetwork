@@ -337,7 +337,7 @@ export default function ProfessionalDetail() {
               {isOwnProfile ? (
                 <Card className="p-6">
                   <p className="text-sm text-muted-foreground mb-4">
-                    You're viewing your public profile as others see it.
+                    You&apos;re viewing your public profile as others see it.
                   </p>
                   <div className="flex flex-col gap-2">
                     <Button asChild variant="default">

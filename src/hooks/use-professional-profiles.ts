@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 // Bypass strict typing for tables not in generated Supabase types (psp_types, user_psp_types, user_skills, skills)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
 export const profileKeys = {
