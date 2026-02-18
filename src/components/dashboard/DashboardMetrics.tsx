@@ -62,7 +62,7 @@ export function DashboardMetrics({ userType }: DashboardMetricsProps) {
     },
   ];
 
-  const metrics = userType === "buyer" ? buyerMetrics : agentMetrics;
+  const metrics = userType === "service_provider" ? buyerMetrics : agentMetrics;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
