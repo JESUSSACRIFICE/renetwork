@@ -108,6 +108,15 @@ export default function AgencyDetail() {
 
       if (profileError) throw profileError;
 
+      // Fetch company_name from business_info
+      const { data: businessInfo } = await supabase
+        .from("business_info")
+        .select("company_name")
+        .eq("user_id", id)
+        .maybeSingle();
+
+      const companyName = businessInfo?.company_name ?? null;
+
       // Query reviews separately
       const { data: reviewsData, error: reviewsError } = await supabase
         .from("reviews")
@@ -183,7 +192,7 @@ export default function AgencyDetail() {
         {
           id: "1",
           title: "Finance Manager & Health",
-          company: profileData.company_name || profileData.full_name || "Agency",
+          company: companyName || profileData.full_name || "Agency",
           salary: "$350 - $380 / month",
           tags: ["Music & Audio", "Temporary", "New York"],
           location: "New York",
@@ -191,7 +200,7 @@ export default function AgencyDetail() {
         {
           id: "2",
           title: "Data Privacy Support",
-          company: profileData.company_name || profileData.full_name || "Agency",
+          company: companyName || profileData.full_name || "Agency",
           salary: "$400 - $450 / month",
           tags: ["Digital Marketing", "Temporary", "New York"],
           location: "New York",
@@ -200,13 +209,13 @@ export default function AgencyDetail() {
 
       const processedAgency: Agency = {
         id: profileData.id,
-        name: profileData.company_name || profileData.full_name || "Agency",
-        company_name: profileData.company_name,
+        name: companyName || profileData.full_name || "Agency",
+        company_name: companyName ?? undefined,
         tagline: profileData.bio ? profileData.bio.substring(0, 50) + "..." : "Professional agency services",
         rating: parseFloat(avgRating.toFixed(1)) || 4.0,
         reviews: totalReviews || 1,
         location: "Los Angeles",
-        email: `contact@${(profileData.company_name || profileData.full_name || "agency").toLowerCase().replace(/\s+/g, "")}.com`,
+        email: `contact@${(companyName || profileData.full_name || "agency").toLowerCase().replace(/\s+/g, "")}.com`,
         phone: "(+88)123-456-789",
         logo_url: profileData.avatar_url,
         avatar_url: profileData.avatar_url,
