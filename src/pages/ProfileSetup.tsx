@@ -99,6 +99,12 @@ const ProfileSetup = () => {
         .eq("id", user.id)
         .maybeSingle();
 
+      const { data: businessInfo } = await supabase
+        .from("business_info")
+        .select("company_name, years_of_experience")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
       if (profile) {
         form.reset({
           full_name: profile.full_name,
@@ -106,9 +112,9 @@ const ProfileSetup = () => {
           phone: profile.phone || "",
           website: profile.website || "",
           license_number: profile.license_number || "",
-          company_name: profile.company_name || "",
-          experience_level: profile.experience_level as any,
-          years_of_experience: profile.years_of_experience || 0,
+          company_name: businessInfo?.company_name || "",
+          experience_level: profile.experience_level,
+          years_of_experience: businessInfo?.years_of_experience ?? 0,
           referral_fee_percentage: profile.referral_fee_percentage || 30,
           hourly_rate: profile.hourly_rate || 0,
           price_per_sqft: profile.price_per_sqft || 0,
