@@ -75,7 +75,18 @@ const Profile = () => {
           .single();
 
         if (profileError) throw profileError;
-        setProfile(profileData);
+
+        const { data: businessInfo } = await supabase
+          .from("business_info")
+          .select("company_name, years_of_experience")
+          .eq("user_id", id)
+          .maybeSingle();
+
+        setProfile({
+          ...profileData,
+          company_name: businessInfo?.company_name ?? null,
+          years_of_experience: businessInfo?.years_of_experience ?? null,
+        });
 
         const { data: rolesData } = await supabase
           .from("user_roles")
