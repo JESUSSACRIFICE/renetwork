@@ -22,13 +22,15 @@ interface PageViewsChartProps {
 
 export function PageViewsChart({ userType }: PageViewsChartProps) {
   const [selectedProject, setSelectedProject] = useState(
-    userType === "buyer" ? "as das da" : "Easy to build your own playlists...",
+    userType === "service_provider"
+      ? "as das da"
+      : "Easy to build your own playlists...",
   );
   const [selectedDays, setSelectedDays] = useState("15 days");
 
   // Sample data - in a real app, this would come from your API
   const chartData =
-    userType === "buyer"
+    userType === "service_provider"
       ? [
           { date: "Dec 24, 2025", views: 0.1 },
           { date: "Dec 27, 2025", views: 0.1 },
@@ -79,9 +81,11 @@ export function PageViewsChart({ userType }: PageViewsChartProps) {
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                domain={userType === "buyer" ? [-1.0, 1.0] : [0.5, 3.0]}
+                domain={
+                  userType === "service_provider" ? [-1.0, 1.0] : [0.5, 3.0]
+                }
                 ticks={
-                  userType === "buyer"
+                  userType === "service_provider"
                     ? [-1.0, -0.8, -0.6, -0.4, -0.2, 0.0, 0.2]
                     : [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
                 }
@@ -102,7 +106,7 @@ export function PageViewsChart({ userType }: PageViewsChartProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">
-              {userType === "buyer" ? "Projects" : "Projects"}
+              {userType === "service_provider" ? "Projects" : "Projects"}
             </label>
             <Select value={selectedProject} onValueChange={setSelectedProject}>
               <SelectTrigger className="w-full">

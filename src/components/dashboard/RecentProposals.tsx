@@ -11,7 +11,7 @@ interface RecentProposalsProps {
 export function RecentProposals({ userType }: RecentProposalsProps) {
   // Sample data - in a real app, this would come from your API
   const proposals =
-    userType === "buyer"
+    userType === "service_provider"
       ? [] // Empty for employer (shows "No proposals found")
       : [
           {
@@ -66,7 +66,7 @@ export function RecentProposals({ userType }: RecentProposalsProps) {
           },
         ];
 
-  if (userType === "buyer") {
+  if (userType === "service_provider") {
     return (
       <Card className="bg-white">
         <CardHeader>

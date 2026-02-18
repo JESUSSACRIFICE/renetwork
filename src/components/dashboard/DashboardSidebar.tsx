@@ -97,7 +97,7 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
           </Avatar>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-gray-900 capitalize truncate">
-              {profile?.full_name || (userType === "buyer" ? "Buyer" : "Agent")}
+              {profile?.full_name || (userType === "service_provider" ? "Buyer" : "Agent")}
             </div>
             <Link
               href={`/profile/${profile?.id || ""}`}

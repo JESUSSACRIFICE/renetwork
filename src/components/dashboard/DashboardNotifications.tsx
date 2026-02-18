@@ -12,7 +12,7 @@ export function DashboardNotifications({
 }: DashboardNotificationsProps) {
   // Sample notifications - in a real app, this would come from your API
   const notifications =
-    userType === "buyer"
+    userType === "service_provider"
       ? [] // Empty for employer
       : [
           {
