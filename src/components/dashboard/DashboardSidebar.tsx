@@ -31,7 +31,7 @@ import { cn } from "@/lib/utils";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DashboardSidebarProps {
-  userType: "buyer" | "agent";
+  userType: "service_provider" | "agent";
   profile?: any;
 }
 
@@ -50,7 +50,11 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
     { title: "Payments", url: "/dashboard/payments", icon: CreditCard },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
-    { title: "Reset Password", url: "/dashboard/reset-password", icon: KeyRound },
+    {
+      title: "Reset Password",
+      url: "/dashboard/reset-password",
+      icon: KeyRound,
+    },
     { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
@@ -69,16 +73,21 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
-    { title: "Reset Password", url: "/dashboard/reset-password", icon: KeyRound },
+    {
+      title: "Reset Password",
+      url: "/dashboard/reset-password",
+      icon: KeyRound,
+    },
     { title: "Help & Support", url: "/dashboard/help", icon: HelpCircle },
   ];
 
-  const menuItems = userType === "buyer" ? buyerMenuItems : agentMenuItems;
+  const menuItems =
+    userType === "service_provider" ? agentMenuItems : buyerMenuItems;
 
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-[calc(100vh-5rem)]">
       {/* Profile Section */}
-      <div className="p-6 border-b border-gray-200 flex-shrink-0">
+      {/* <div className="p-6 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center space-x-3">
           <Avatar className="w-12 h-12">
             <AvatarImage src={profile?.avatar_url} />
@@ -98,14 +107,16 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Navigation Menu with Scroll */}
       <ScrollArea className="flex-1">
         <nav className="p-4">
           <ul className="space-y-1">
             {menuItems.map((item) => {
-              const isActive = pathname === item.url || (pathname.startsWith(item.url) && item.url !== "/dashboard");
+              const isActive =
+                pathname === item.url ||
+                (pathname.startsWith(item.url) && item.url !== "/dashboard");
               return (
                 <li key={item.title}>
                   <Link
@@ -114,10 +125,15 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
                       "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors w-full",
                       isActive
                         ? "bg-gray-900 text-white"
-                        : "text-gray-700 hover:bg-gray-100"
+                        : "text-gray-700 hover:bg-gray-100",
                     )}
                   >
-                    <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-white" : "text-gray-600")} />
+                    <item.icon
+                      className={cn(
+                        "w-5 h-5 flex-shrink-0",
+                        isActive ? "text-white" : "text-gray-600",
+                      )}
+                    />
                     <span className="font-medium text-sm">{item.title}</span>
                   </Link>
                 </li>

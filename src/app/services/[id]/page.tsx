@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, Clock, BarChart3, Share2, Heart, ChevronLeft, ChevronRight, Plus, Minus, MessageSquare } from "lucide-react";
 import Header from "@/components/Header";
@@ -18,46 +18,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useService } from "@/hooks/use-services";
+import type { ServiceDetailData } from "@/hooks/use-services";
 
-interface Service {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  provider_id: string;
-  provider_name: string;
-  provider_avatar?: string;
-  provider_title?: string;
-  location?: string;
-  delivery_time?: string;
-  english_level?: string;
-  images?: string[];
-  features?: string[];
-  app_types?: string[];
-  design_tools?: string[];
-  devices?: string[];
-  packages?: Array<{
-    title: string;
-    price: number;
-    delivery_days: number;
-  }>;
-  faqs?: Array<{
-    question: string;
-    answer: string;
-    isOpen: boolean;
-  }>;
-  relatedServices?: Service[];
-}
+interface Service extends ServiceDetailData {}
 
 export default function ServiceDetail() {
   const params = useParams();
-  const router = useRouter();
-  const id = params.id as string;
-  const [service, setService] = useState<Service | null>(null);
-  const [loading, setLoading] = useState(true);
+  const id = (params?.id as string) ?? null;
+  const { data: serviceFromHook, isLoading: queryLoading, isSuccess } = useService(id);
+  const [fallbackService, setFallbackService] = useState<Service | null>(null);
+  const [fallbackLoading, setFallbackLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [reviewRating, setReviewRating] = useState(0);
@@ -67,170 +38,96 @@ export default function ServiceDetail() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   useEffect(() => {
-    if (id) {
-      fetchService();
-      checkSaved();
-    }
-  }, [id]);
-
-  const fetchService = async () => {
-    if (!id) return;
-    
-    try {
-      setLoading(true);
-      
-      // Query profile as service provider
-      const { data: profileData, error: profileError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      // Query reviews separately
-      const { data: reviewsData } = await supabase
-        .from("reviews")
-        .select("id, rating, comment, created_at, reviewer_id")
-        .eq("profile_id", id)
-        .order("created_at", { ascending: false });
-
-      // Get reviewer names
-      const reviewerIds = (reviewsData || []).map((r: any) => r.reviewer_id).filter(Boolean);
-      const reviewerNames: Record<string, string> = {};
-      
-      if (reviewerIds.length > 0) {
-        const { data: reviewersData } = await supabase
+    if (!id || !isSuccess || serviceFromHook != null) return;
+    let cancelled = false;
+    setFallbackLoading(true);
+    (async () => {
+      try {
+        const { data: profileData, error: profileError } = await supabase
           .from("profiles")
-          .select("id, full_name")
-          .in("id", reviewerIds);
-        
-        (reviewersData || []).forEach((reviewer: any) => {
-          reviewerNames[reviewer.id] = reviewer.full_name;
-        });
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (profileError || !profileData || cancelled) return;
+        let companyName: string | null = null;
+        const { data: bizRow } = await supabase
+          .from("business_info")
+          .select("company_name")
+          .eq("user_id", id)
+          .maybeSingle();
+        if (bizRow) companyName = bizRow.company_name;
+        const { data: reviewsData } = await supabase
+          .from("reviews")
+          .select("id, rating, comment, created_at, reviewer_id")
+          .eq("profile_id", id)
+          .order("created_at", { ascending: false });
+        const reviewerIds = (reviewsData ?? []).map((r: any) => r.reviewer_id).filter(Boolean);
+        let reviewerNames: Record<string, string> = {};
+        if (reviewerIds.length > 0) {
+          const { data: reviewersData } = await supabase
+            .from("profiles")
+            .select("id, full_name")
+            .in("id", reviewerIds);
+          (reviewersData ?? []).forEach((r: any) => { reviewerNames[r.id] = r.full_name; });
+        }
+        const reviews = (reviewsData ?? []).map((r: any) => ({
+          ...r,
+          reviewer_name: reviewerNames[r.reviewer_id] || "Anonymous",
+        }));
+        const avgRating = reviews.length > 0
+          ? reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length
+          : 0;
+        const { data: serviceAreasData } = await supabase
+          .from("service_areas")
+          .select("zip_code, radius_miles")
+          .eq("user_id", id);
+        if (cancelled) return;
+        const processed: Service = {
+          id: profileData.id,
+          title: `${companyName || profileData.full_name} – Service`,
+          category: "General",
+          description: profileData.bio || "Professional service offering.",
+          rating: parseFloat(avgRating.toFixed(1)) || 3.0,
+          reviews: reviews.length,
+          price: profileData.hourly_rate || 79,
+          provider_id: profileData.id,
+          provider_name: profileData.full_name,
+          provider_avatar: profileData.avatar_url,
+          provider_title: companyName || "Professional",
+          location: serviceAreasData?.[0]?.zip_code ? `${serviceAreasData[0].zip_code}` : "Los Angeles",
+          delivery_time: "2 Days",
+          english_level: "Native Or Bilingual",
+          images: [],
+          features: ["Professional service", "Quality assured"],
+          app_types: [],
+          design_tools: [],
+          devices: [],
+          packages: [
+            { title: "Standard", price: profileData.hourly_rate || 79, delivery_days: 5 },
+            { title: "Express", price: (profileData.hourly_rate || 79) * 1.2, delivery_days: 3 },
+          ],
+          faqs: [
+            { question: "What methods of payments are supported?", answer: "Standard payment methods.", isOpen: true },
+            { question: "Can I cancel at anytime?", answer: "Yes.", isOpen: false },
+          ],
+          relatedServices: [],
+        };
+        setFallbackService(processed);
+      } catch (e) {
+        if (!cancelled) toast.error("Failed to load service");
+      } finally {
+        if (!cancelled) setFallbackLoading(false);
       }
+    })();
+    return () => { cancelled = true; };
+  }, [id, isSuccess, serviceFromHook]);
 
-      const reviews = (reviewsData || []).map((r: any) => ({
-        ...r,
-        reviewer_name: reviewerNames[r.reviewer_id] || "Anonymous",
-      }));
+  const service = serviceFromHook ?? fallbackService;
+  const loading = queryLoading || (isSuccess && serviceFromHook == null && fallbackLoading);
 
-      const avgRating = reviews.length > 0
-        ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
-        : 0;
-
-      // Query service areas
-      const { data: serviceAreasData } = await supabase
-        .from("service_areas")
-        .select("zip_code, radius_miles")
-        .eq("user_id", id);
-
-      // Process service data
-      // Use the same title generation logic as search page
-      const serviceTitles = [
-        "Power management, notification and...",
-        "Full Service host that will do most of the work for you.",
-        "Easy to build your own playlists and sync them...",
-        "I will design website UI UX in adobe xd or figma",
-        "Web development, with HTML, CSS, Javascript and PHP",
-        "Developers drop the framework folder into a new...",
-        "Flexibility & Customization with CMS vs PHP Framework",
-        "PHP framework that you can use to create your own custom",
-      ];
-
-      // Extract numeric value from UUID (same logic as search page)
-      // Use multiple parts of the UUID to create a more distributed hash
-      const idStr = profileData.id.replace(/-/g, '');
-      // Take characters from different positions
-      const part1 = idStr.slice(0, 4) || '0000';
-      const part2 = idStr.slice(8, 12) || '0000';
-      const part3 = idStr.slice(-4) || '0000';
-      // Convert hex strings to numbers and combine
-      const num1 = parseInt(part1, 16) || 0;
-      const num2 = parseInt(part2, 16) || 0;
-      const num3 = parseInt(part3, 16) || 0;
-      const combinedValue = (num1 + num2 * 17 + num3 * 289) % serviceTitles.length;
-      const titleIndex = combinedValue;
-
-      const processedService: Service = {
-        id: profileData.id,
-        title: serviceTitles[titleIndex] || `${profileData.company_name || profileData.full_name} Service`,
-        category: "Design & Creative",
-        description: profileData.bio || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-        rating: parseFloat(avgRating.toFixed(1)) || 3.0,
-        reviews: reviews.length,
-        price: profileData.hourly_rate || 79,
-        provider_id: profileData.id,
-        provider_name: profileData.full_name,
-        provider_avatar: profileData.avatar_url,
-        provider_title: profileData.company_name || "Product Manager",
-        location: serviceAreasData && serviceAreasData.length > 0 
-          ? `${serviceAreasData[0].zip_code}` 
-          : "Los Angeles",
-        delivery_time: "2 Days",
-        english_level: "Native Or Bilingual",
-        images: [
-          undefined, // Would be actual image URLs
-          undefined,
-          undefined,
-          undefined,
-        ],
-        features: [
-          "Website Design",
-          "Mobile App Design",
-          "Brochure Design",
-          "Business Card Design",
-          "Flyer Design",
-        ],
-        app_types: ["Business", "Food & drink", "Graphics & design"],
-        design_tools: ["Adobe XD", "Figma", "Adobe Photoshop"],
-        devices: ["Mobile", "Desktop"],
-        packages: [
-          {
-            title: "10000 Words (+5 days) I will professionally translate english to german",
-            price: 85,
-            delivery_days: 5,
-          },
-          {
-            title: "2000 Words (+3 days) I will professionally translate english to german",
-            price: 45,
-            delivery_days: 3,
-          },
-        ],
-        faqs: [
-          {
-            question: "What methods of payments are supported?",
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            isOpen: true,
-          },
-          {
-            question: "Can I cancel at anytime?",
-            answer: "Yes, you can cancel your subscription at any time.",
-            isOpen: false,
-          },
-          {
-            question: "How do I get a receipt for my purchase?",
-            answer: "You will receive an email receipt after purchase.",
-            isOpen: false,
-          },
-          {
-            question: "How do I get access to a theme I purchased?",
-            answer: "After purchase, you'll receive download links via email.",
-            isOpen: false,
-          },
-        ],
-        relatedServices: [],
-      };
-
-      setService(processedService);
-    } catch (error: any) {
-      console.error("Error fetching service:", error);
-      toast.error("Failed to load service");
-      setService(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (id) checkSaved();
+  }, [id]);
 
   const checkSaved = async () => {
     // Check if service is saved/favorited
@@ -660,9 +557,11 @@ export default function ServiceDetail() {
                       <span>Rate: ${service.price - 5} - ${service.price + 5} / Hr</span>
                     </div>
                   </div>
-                  <Button className="w-full bg-primary hover:bg-primary/90">
-                    Contact Me
-                  </Button>
+                  <Link href="/dashboard/messages">
+                    <Button className="w-full bg-primary hover:bg-primary/90">
+                      Contact Me
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>

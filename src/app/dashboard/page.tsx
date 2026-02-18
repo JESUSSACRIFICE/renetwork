@@ -11,57 +11,46 @@ import { DashboardNotifications } from "@/components/dashboard/DashboardNotifica
 import { RecentProposals } from "@/components/dashboard/RecentProposals";
 import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
 import { UserTypeToggle } from "@/components/dashboard/UserTypeToggle";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { useProfile } from "@/hooks/use-professional-profiles";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
 export default function Dashboard() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const { user, isLoading: authLoading } = useAuth();
+  const { data: profile, isLoading: profileLoading } = useProfile(
+    user?.id ?? null,
+  );
   const [userType, setUserType] = useState<UserType>("agent");
-  const [loading, setLoading] = useState(true);
+  const loading = authLoading || profileLoading;
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/auth");
-      return;
     }
+  }, [authLoading, user, router]);
 
-    setUser(user);
-    await fetchProfile(user.id);
-    setLoading(false);
-  };
+  useEffect(() => {
+    if (!profile) return;
 
-  const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*, user_roles(role)")
-      .eq("id", userId)
-      .maybeSingle();
-    
-    setProfile(data);
-    
     // Check for URL parameter to override user type (for testing)
     const urlParams = new URLSearchParams(window.location.search);
-    const overrideTypeParam = urlParams.get('type');
-    
+    const overrideTypeParam = urlParams.get("type");
+
     if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
       setUserType(overrideTypeParam as UserType);
       return;
     }
-    
+
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
-    const hasRoles = data?.user_roles && data.user_roles.length > 0;
+    const hasRoles =
+      profile.user_roles &&
+      Array.isArray(profile.user_roles) &&
+      profile.user_roles.length > 0;
     setUserType((hasRoles ? "agent" : "buyer") as UserType);
-  };
+  }, [profile]);
 
   if (loading) {
     return (
@@ -77,12 +66,16 @@ export default function Dashboard() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-gray-50 w-full">
-        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+        <FreeioDashboardHeader
+          user={user}
+          profile={profile}
+          userType={userType}
+        />
         <div className="flex flex-1 w-full">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-gray-50 w-full max-w-full overflow-x-hidden">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
-            
+
             {/* Metrics Cards */}
             <DashboardMetrics userType={userType} />
 
@@ -92,7 +85,7 @@ export default function Dashboard() {
               <div className="lg:col-span-2">
                 <PageViewsChart userType={userType} />
               </div>
-              
+
               {/* Notifications - Takes 1 column */}
               <div className="lg:col-span-1">
                 <DashboardNotifications userType={userType} />

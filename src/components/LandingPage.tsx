@@ -13,13 +13,13 @@ import Sponsors from "@/components/Sponsors";
 import HotTopics from "@/components/HotTopics";
 import Footer from "@/components/Footer";
 import NewHero from "@/components/NewHero";
-import NewHeader from "@/components/NewHeader";
+import AppHeader from "@/components/AppHeader";
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
       {/* <Header /> */}
-      <NewHeader />
+      <AppHeader />
       <main className="flex-1">
         <NewHero />
 

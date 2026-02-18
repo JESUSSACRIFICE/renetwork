@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { FileText, MessageSquare, Heart, TrendingUp } from "lucide-react";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -26,8 +26,10 @@ const Dashboard = () => {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       router.push("/auth");
       return;
@@ -45,9 +47,9 @@ const Dashboard = () => {
       .select("*, user_roles(role)")
       .eq("id", userId)
       .maybeSingle();
-    
+
     setProfile(data);
-    
+
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
@@ -99,9 +101,13 @@ const Dashboard = () => {
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />
               <div>
-                <h1 className="text-3xl font-bold">Welcome back, {profile?.full_name?.split(' ')[0] || "User"}!</h1>
+                <h1 className="text-3xl font-bold">
+                  Welcome back, {profile?.full_name?.split(" ")[0] || "User"}!
+                </h1>
                 <p className="text-muted-foreground">
-                  {userType === "agent" ? "Manage your professional profile and leads" : "Find and connect with professionals"}
+                  {userType === "agent"
+                    ? "Manage your professional profile and leads"
+                    : "Find and connect with professionals"}
                 </p>
               </div>
             </div>
@@ -113,7 +119,9 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">New Leads</p>
+                        <p className="text-sm text-muted-foreground">
+                          New Leads
+                        </p>
                         <p className="text-3xl font-bold mt-2">{stats.leads}</p>
                       </div>
                       <FileText className="h-12 w-12 text-primary opacity-50" />
@@ -123,8 +131,12 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Unread Messages</p>
-                        <p className="text-3xl font-bold mt-2">{stats.messages}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Unread Messages
+                        </p>
+                        <p className="text-3xl font-bold mt-2">
+                          {stats.messages}
+                        </p>
                       </div>
                       <MessageSquare className="h-12 w-12 text-primary opacity-50" />
                     </div>
@@ -133,7 +145,9 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Profile Views</p>
+                        <p className="text-sm text-muted-foreground">
+                          Profile Views
+                        </p>
                         <p className="text-3xl font-bold mt-2">-</p>
                       </div>
                       <TrendingUp className="h-12 w-12 text-primary opacity-50" />
@@ -145,8 +159,12 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Saved Favorites</p>
-                        <p className="text-3xl font-bold mt-2">{stats.favorites}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Saved Favorites
+                        </p>
+                        <p className="text-3xl font-bold mt-2">
+                          {stats.favorites}
+                        </p>
                       </div>
                       <Heart className="h-12 w-12 text-primary opacity-50" />
                     </div>
@@ -155,8 +173,12 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Unread Messages</p>
-                        <p className="text-3xl font-bold mt-2">{stats.messages}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Unread Messages
+                        </p>
+                        <p className="text-3xl font-bold mt-2">
+                          {stats.messages}
+                        </p>
                       </div>
                       <MessageSquare className="h-12 w-12 text-primary opacity-50" />
                     </div>
@@ -165,7 +187,9 @@ const Dashboard = () => {
                   <Card className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm text-muted-foreground">Saved Searches</p>
+                        <p className="text-sm text-muted-foreground">
+                          Saved Searches
+                        </p>
                         <p className="text-3xl font-bold mt-2">-</p>
                       </div>
                       <TrendingUp className="h-12 w-12 text-primary opacity-50" />
@@ -187,7 +211,9 @@ const Dashboard = () => {
                     >
                       <FileText className="h-6 w-6 text-primary mb-2" />
                       <h3 className="font-semibold">View Leads</h3>
-                      <p className="text-sm text-muted-foreground">Manage incoming inquiries</p>
+                      <p className="text-sm text-muted-foreground">
+                        Manage incoming inquiries
+                      </p>
                     </button>
                     <button
                       onClick={() => router.push("/profile")}
@@ -195,7 +221,9 @@ const Dashboard = () => {
                     >
                       <FileText className="h-6 w-6 text-primary mb-2" />
                       <h3 className="font-semibold">Edit Profile</h3>
-                      <p className="text-sm text-muted-foreground">Update your information</p>
+                      <p className="text-sm text-muted-foreground">
+                        Update your information
+                      </p>
                     </button>
                   </>
                 ) : (
@@ -206,7 +234,9 @@ const Dashboard = () => {
                     >
                       <TrendingUp className="h-6 w-6 text-primary mb-2" />
                       <h3 className="font-semibold">Browse Professionals</h3>
-                      <p className="text-sm text-muted-foreground">Find real estate experts</p>
+                      <p className="text-sm text-muted-foreground">
+                        Find real estate experts
+                      </p>
                     </button>
                     <button
                       onClick={() => router.push("/dashboard/favorites")}
@@ -214,7 +244,9 @@ const Dashboard = () => {
                     >
                       <Heart className="h-6 w-6 text-primary mb-2" />
                       <h3 className="font-semibold">View Favorites</h3>
-                      <p className="text-sm text-muted-foreground">Your saved professionals</p>
+                      <p className="text-sm text-muted-foreground">
+                        Your saved professionals
+                      </p>
                     </button>
                   </>
                 )}

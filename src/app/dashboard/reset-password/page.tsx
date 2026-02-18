@@ -8,7 +8,13 @@ import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { FreeioDashboardHeader } from "@/components/dashboard/FreeioDashboardHeader";
 import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +22,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { KeyRound, Eye, EyeOff } from "lucide-react";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
-const passwordSchema = z.string()
+const passwordSchema = z
+  .string()
   .min(8, "Password must be at least 8 characters")
   .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
@@ -35,7 +42,7 @@ export default function ResetPasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isRecoveryMode, setIsRecoveryMode] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -54,10 +61,14 @@ export default function ResetPasswordPage() {
 
   const checkAuth = async () => {
     // Check if this is a recovery flow (user clicked reset link from email)
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     // Listen for auth state changes (handles the recovery token)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === "PASSWORD_RECOVERY") {
         setIsRecoveryMode(true);
         if (session?.user) {
@@ -67,7 +78,9 @@ export default function ResetPasswordPage() {
       }
     });
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       // Check URL hash for recovery token (Supabase puts it there)
       const hash = window.location.hash;
@@ -81,7 +94,7 @@ export default function ResetPasswordPage() {
     setUser(user);
     await fetchProfile(user.id);
     setLoading(false);
-    
+
     return () => subscription.unsubscribe();
   };
 
@@ -119,7 +132,8 @@ export default function ResetPasswordPage() {
     }
 
     if (!isRecoveryMode && formData.currentPassword === formData.newPassword) {
-      newErrors.newPassword = "New password must be different from current password";
+      newErrors.newPassword =
+        "New password must be different from current password";
     }
 
     setErrors(newErrors);
@@ -160,7 +174,7 @@ export default function ResetPasswordPage() {
       if (updateError) throw updateError;
 
       toast.success("Password updated successfully!");
-      
+
       // Reset form
       setFormData({
         currentPassword: "",
@@ -168,7 +182,7 @@ export default function ResetPasswordPage() {
         confirmPassword: "",
       });
       setErrors({});
-      
+
       // Redirect after a delay
       setTimeout(() => {
         if (isRecoveryMode) {
@@ -222,7 +236,10 @@ export default function ResetPasswordPage() {
                       type={showNewPassword ? "text" : "password"}
                       value={formData.newPassword}
                       onChange={(e) =>
-                        setFormData({ ...formData, newPassword: e.target.value })
+                        setFormData({
+                          ...formData,
+                          newPassword: e.target.value,
+                        })
                       }
                       className={errors.newPassword ? "border-destructive" : ""}
                       placeholder="Enter your new password"
@@ -232,14 +249,21 @@ export default function ResetPasswordPage() {
                       onClick={() => setShowNewPassword(!showNewPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
-                      {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showNewPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   {errors.newPassword && (
-                    <p className="text-sm text-destructive">{errors.newPassword}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.newPassword}
+                    </p>
                   )}
                   <p className="text-xs text-gray-500">
-                    Password must be at least 8 characters and include uppercase, lowercase, and a number
+                    Password must be at least 8 characters and include
+                    uppercase, lowercase, and a number
                   </p>
                 </div>
 
@@ -251,25 +275,42 @@ export default function ResetPasswordPage() {
                       type={showConfirmPassword ? "text" : "password"}
                       value={formData.confirmPassword}
                       onChange={(e) =>
-                        setFormData({ ...formData, confirmPassword: e.target.value })
+                        setFormData({
+                          ...formData,
+                          confirmPassword: e.target.value,
+                        })
                       }
-                      className={errors.confirmPassword ? "border-destructive" : ""}
+                      className={
+                        errors.confirmPassword ? "border-destructive" : ""
+                      }
                       placeholder="Confirm your new password"
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
-                      {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   {errors.confirmPassword && (
-                    <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                    <p className="text-sm text-destructive">
+                      {errors.confirmPassword}
+                    </p>
                   )}
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Updating Password..." : "Update Password"}
                 </Button>
               </form>
@@ -283,13 +324,19 @@ export default function ResetPasswordPage() {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col bg-gray-50 w-full">
-        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+        <FreeioDashboardHeader
+          user={user}
+          profile={profile}
+          userType={userType}
+        />
         <div className="flex flex-1 w-full">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-gray-50 w-full max-w-full overflow-x-hidden">
             <div className="max-w-2xl mx-auto">
               <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h1>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                  Reset Password
+                </h1>
                 <p className="text-gray-600">Change your account password</p>
               </div>
 
@@ -302,7 +349,8 @@ export default function ResetPasswordPage() {
                     <div>
                       <CardTitle>Update Password</CardTitle>
                       <CardDescription>
-                        Enter your current password and choose a new secure password
+                        Enter your current password and choose a new secure
+                        password
                       </CardDescription>
                     </div>
                   </div>
@@ -318,14 +366,21 @@ export default function ResetPasswordPage() {
                           type={showCurrentPassword ? "text" : "password"}
                           value={formData.currentPassword}
                           onChange={(e) =>
-                            setFormData({ ...formData, currentPassword: e.target.value })
+                            setFormData({
+                              ...formData,
+                              currentPassword: e.target.value,
+                            })
                           }
-                          className={errors.currentPassword ? "border-destructive" : ""}
+                          className={
+                            errors.currentPassword ? "border-destructive" : ""
+                          }
                           placeholder="Enter your current password"
                         />
                         <button
                           type="button"
-                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                          onClick={() =>
+                            setShowCurrentPassword(!showCurrentPassword)
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                         >
                           {showCurrentPassword ? (
@@ -336,7 +391,9 @@ export default function ResetPasswordPage() {
                         </button>
                       </div>
                       {errors.currentPassword && (
-                        <p className="text-sm text-destructive">{errors.currentPassword}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.currentPassword}
+                        </p>
                       )}
                     </div>
 
@@ -349,9 +406,14 @@ export default function ResetPasswordPage() {
                           type={showNewPassword ? "text" : "password"}
                           value={formData.newPassword}
                           onChange={(e) =>
-                            setFormData({ ...formData, newPassword: e.target.value })
+                            setFormData({
+                              ...formData,
+                              newPassword: e.target.value,
+                            })
                           }
-                          className={errors.newPassword ? "border-destructive" : ""}
+                          className={
+                            errors.newPassword ? "border-destructive" : ""
+                          }
                           placeholder="Enter your new password"
                         />
                         <button
@@ -367,30 +429,42 @@ export default function ResetPasswordPage() {
                         </button>
                       </div>
                       {errors.newPassword && (
-                        <p className="text-sm text-destructive">{errors.newPassword}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.newPassword}
+                        </p>
                       )}
                       <p className="text-xs text-gray-500">
-                        Password must be at least 8 characters and include uppercase, lowercase, and a number
+                        Password must be at least 8 characters and include
+                        uppercase, lowercase, and a number
                       </p>
                     </div>
 
                     {/* Confirm Password */}
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Label htmlFor="confirmPassword">
+                        Confirm New Password
+                      </Label>
                       <div className="relative">
                         <Input
                           id="confirmPassword"
                           type={showConfirmPassword ? "text" : "password"}
                           value={formData.confirmPassword}
                           onChange={(e) =>
-                            setFormData({ ...formData, confirmPassword: e.target.value })
+                            setFormData({
+                              ...formData,
+                              confirmPassword: e.target.value,
+                            })
                           }
-                          className={errors.confirmPassword ? "border-destructive" : ""}
+                          className={
+                            errors.confirmPassword ? "border-destructive" : ""
+                          }
                           placeholder="Confirm your new password"
                         />
                         <button
                           type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                         >
                           {showConfirmPassword ? (
@@ -401,7 +475,9 @@ export default function ResetPasswordPage() {
                         </button>
                       </div>
                       {errors.confirmPassword && (
-                        <p className="text-sm text-destructive">{errors.confirmPassword}</p>
+                        <p className="text-sm text-destructive">
+                          {errors.confirmPassword}
+                        </p>
                       )}
                     </div>
 
@@ -412,7 +488,9 @@ export default function ResetPasswordPage() {
                         disabled={isSubmitting}
                         className="flex-1"
                       >
-                        {isSubmitting ? "Updating Password..." : "Update Password"}
+                        {isSubmitting
+                          ? "Updating Password..."
+                          : "Update Password"}
                       </Button>
                       <Button
                         type="button"
@@ -430,25 +508,37 @@ export default function ResetPasswordPage() {
               {/* Security Tips */}
               <Card className="mt-6 border-blue-200 bg-blue-50/50">
                 <CardHeader>
-                  <CardTitle className="text-lg">Password Security Tips</CardTitle>
+                  <CardTitle className="text-lg">
+                    Password Security Tips
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 mt-0.5">•</span>
-                      <span>Use a unique password that you don&apos;t use elsewhere</span>
+                      <span>
+                        Use a unique password that you don&apos;t use elsewhere
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 mt-0.5">•</span>
-                      <span>Include a mix of letters, numbers, and special characters</span>
+                      <span>
+                        Include a mix of letters, numbers, and special
+                        characters
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 mt-0.5">•</span>
-                      <span>Avoid using personal information like your name or email</span>
+                      <span>
+                        Avoid using personal information like your name or email
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600 mt-0.5">•</span>
-                      <span>Consider using a password manager to store your passwords securely</span>
+                      <span>
+                        Consider using a password manager to store your
+                        passwords securely
+                      </span>
                     </li>
                   </ul>
                 </CardContent>
@@ -461,4 +551,3 @@ export default function ResetPasswordPage() {
     </SidebarProvider>
   );
 }
-

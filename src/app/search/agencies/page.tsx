@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, Building2, ArrowRight, Filter, Heart } from "lucide-react";
-import NewHeader from "@/components/NewHeader";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import SearchFiltersSidebar from "@/components/search/SearchFiltersSidebar";
+import SearchByNav from "@/components/search/SearchByNav";
 
 // Dynamically import AgencyMapView to avoid SSR issues with Leaflet
 const AgencyMapView = dynamic(() => import("@/components/agencies/AgencyMapView"), {
@@ -238,13 +239,14 @@ function AgenciesSearchContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NewHeader />
+      <AppHeader />
       <SearchFiltersSidebar 
         isOpen={isFiltersOpen} 
         onClose={() => setIsFiltersOpen(false)}
         onApplyFilters={handleApplyFilters}
       />
       <div className="container mx-auto px-4 py-8">
+        <SearchByNav />
         {/* Breadcrumbs */}
         <div className="mb-6 text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground">Home</Link>

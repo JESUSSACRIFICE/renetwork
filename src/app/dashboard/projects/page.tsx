@@ -9,7 +9,7 @@ import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
 export default function ProjectsPage() {
   const router = useRouter();
@@ -23,7 +23,9 @@ export default function ProjectsPage() {
   }, []);
 
   const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push("/auth");
       return;
@@ -45,17 +47,27 @@ export default function ProjectsPage() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+      <div className="min-h-screen flex flex-col bg-gray-50 w-full">
+        <FreeioDashboardHeader
+          user={user}
+          profile={profile}
+          userType={userType}
+        />
         <div className="flex flex-1">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-gray-50">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">My Projects</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+              My Projects
+            </h1>
             <Card>
               <CardHeader>
                 <CardTitle>My Projects</CardTitle>

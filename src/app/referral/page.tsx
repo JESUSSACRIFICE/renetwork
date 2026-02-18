@@ -7,14 +7,14 @@ import AdSpace from "@/components/referral/AdSpace";
 import { Button } from "@/components/ui/button";
 import { Search, ArrowRight, Users, Handshake, Shield, Target, BookOpen, MapPin, Gift } from "lucide-react";
 import Link from "next/link";
-import NewHeader from "@/components/NewHeader";
+import AppHeader from "@/components/AppHeader";
 import { SearchForm } from "@/components/hero/SearchForm";
 
 export default function ReferralLandingPage() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       {/* <ReferralHeader /> */}
-      <NewHeader />
+      <AppHeader />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full bg-gradient-to-r from-[#8B4513] via-[#A0522D] to-[#DEB887] py-12 sm:py-16 lg:py-8 overflow-hidden">

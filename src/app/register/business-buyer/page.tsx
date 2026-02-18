@@ -12,12 +12,31 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileUpload } from "@/components/registration/FileUpload";
 import { ESignature } from "@/components/registration/ESignature";
-import { CheckCircle2, ChevronLeft, ChevronRight, Loader2, AlertCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
@@ -30,9 +49,14 @@ const registrationSchema = z.object({
   location_zip_code: z.string().min(1, "ZIP code is required"),
 
   // Payment Preferences
-  payment_packet: z.enum(["weekly", "bi-weekly", "monthly", "yearly"]).optional(),
+  payment_packet: z
+    .enum(["weekly", "bi-weekly", "monthly", "yearly"])
+    .optional(),
   tier_package: z.enum(["basic", "standard", "advanced"]).optional(),
-  payment_methods: z.array(z.string()).min(1, "Please select at least one payment method").default(["cash"]),
+  payment_methods: z
+    .array(z.string())
+    .min(1, "Please select at least one payment method")
+    .default(["cash"]),
   payment_terms: z.string().optional(),
 
   // Buying Preferences
@@ -73,10 +97,14 @@ export default function BusinessBuyerRegistration() {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(["English"]);
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([
+    "English",
+  ]);
   const [purchaseDocuments, setPurchaseDocuments] = useState<any[]>([]);
   const [eSignatures, setESignatures] = useState<Record<string, any>>({});
-  const [truthVerification, setTruthVerification] = useState<Record<string, boolean>>({});
+  const [truthVerification, setTruthVerification] = useState<
+    Record<string, boolean>
+  >({});
 
   const form = useForm<RegistrationFormValues>({
     resolver: zodResolver(registrationSchema),
@@ -167,7 +195,9 @@ export default function BusinessBuyerRegistration() {
         business_industry: values.business_industry || null,
         languages_spoken: selectedLanguages,
         specific_requirements: values.specific_requirements || null,
-        purchase_documents_urls: purchaseDocuments.map((doc) => doc.url).filter(Boolean),
+        purchase_documents_urls: purchaseDocuments
+          .map((doc) => doc.url)
+          .filter(Boolean),
         truth_verified: Object.values(truthVerification).every((v) => v),
       });
 
@@ -183,7 +213,9 @@ export default function BusinessBuyerRegistration() {
         });
       }
 
-      toast.success("Registration submitted successfully! You will be notified via email once approved.");
+      toast.success(
+        "Registration submitted successfully! You will be notified via email once approved.",
+      );
       router.push("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Failed to submit registration");
@@ -205,25 +237,33 @@ export default function BusinessBuyerRegistration() {
       const isValid = await form.trigger("payment_methods");
       if (!isValid) {
         const error = form.formState.errors.payment_methods;
-        toast.error(error?.message || "Please select at least one payment method");
+        toast.error(
+          error?.message || "Please select at least one payment method",
+        );
         return;
       }
     }
-    
+
     // Validate all fields for current step
     let stepFields: (keyof RegistrationFormValues)[] = [];
     if (currentStep === 1) {
-      stepFields = ["business_name", "contact_person", "email", "phone", "location_zip_code"];
+      stepFields = [
+        "business_name",
+        "contact_person",
+        "email",
+        "phone",
+        "location_zip_code",
+      ];
     } else if (currentStep === 2) {
       stepFields = ["payment_methods"];
     }
-    
+
     if (stepFields.length > 0) {
       const isValid = await form.trigger(stepFields);
       if (!isValid) {
         const errors = form.formState.errors;
         const errorMessages = stepFields
-          .map(field => errors[field]?.message)
+          .map((field) => errors[field]?.message)
           .filter(Boolean);
         if (errorMessages.length > 0) {
           toast.error(errorMessages[0] || "Please fill in all required fields");
@@ -233,7 +273,7 @@ export default function BusinessBuyerRegistration() {
         return;
       }
     }
-    
+
     // For optional steps, just proceed
 
     // Verify truth for buying preferences step
@@ -247,7 +287,7 @@ export default function BusinessBuyerRegistration() {
       ];
 
       const missingFields = fieldsToVerify.filter(
-        (field) => !form.getValues(field as any)
+        (field) => !form.getValues(field as any),
       );
 
       if (missingFields.length > 0) {
@@ -279,7 +319,9 @@ export default function BusinessBuyerRegistration() {
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Basic Information</h2>
-              <p className="text-muted-foreground">Enter your business details</p>
+              <p className="text-muted-foreground">
+                Enter your business details
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -315,7 +357,7 @@ export default function BusinessBuyerRegistration() {
                   <FormItem>
                     <FormLabel>Email *</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" />
+                      <Input {...field} type="email" disabled />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -356,7 +398,9 @@ export default function BusinessBuyerRegistration() {
           <div className="space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Payment Preferences</h2>
-              <p className="text-muted-foreground">Set your payment preferences</p>
+              <p className="text-muted-foreground">
+                Set your payment preferences
+              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -414,7 +458,10 @@ export default function BusinessBuyerRegistration() {
                   <FormControl>
                     <div className="flex gap-6 mt-2">
                       {["cash", "credit"].map((method) => (
-                        <label key={method} className="flex items-center gap-2 cursor-pointer">
+                        <label
+                          key={method}
+                          className="flex items-center gap-2 cursor-pointer"
+                        >
                           <Checkbox
                             checked={field.value?.includes(method) || false}
                             onCheckedChange={(checked) => {
@@ -422,17 +469,21 @@ export default function BusinessBuyerRegistration() {
                               let newValue: string[];
                               if (checked) {
                                 // Add method if not already present
-                                newValue = current.includes(method) 
-                                  ? current 
+                                newValue = current.includes(method)
+                                  ? current
                                   : [...current, method];
                               } else {
                                 // Remove method, but ensure at least one remains
-                                newValue = current.filter((m: string) => m !== method);
+                                newValue = current.filter(
+                                  (m: string) => m !== method,
+                                );
                                 // If removing would make it empty, keep at least cash
                                 if (newValue.length === 0) {
                                   newValue = ["cash"];
                                   // Prevent unchecking if it's the last one
-                                  toast.warning("At least one payment method is required. Keeping cash.");
+                                  toast.warning(
+                                    "At least one payment method is required. Keeping cash.",
+                                  );
                                   setTimeout(() => {
                                     field.onChange(newValue);
                                     form.trigger("payment_methods");
@@ -447,7 +498,9 @@ export default function BusinessBuyerRegistration() {
                               }, 100);
                             }}
                           />
-                          <span className="capitalize font-medium">{method}</span>
+                          <span className="capitalize font-medium">
+                            {method}
+                          </span>
                         </label>
                       ))}
                     </div>
@@ -525,7 +578,9 @@ export default function BusinessBuyerRegistration() {
                         {...field}
                         type="number"
                         placeholder="0"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -543,7 +598,9 @@ export default function BusinessBuyerRegistration() {
                         {...field}
                         type="number"
                         placeholder="1000000"
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value) || 0)
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -605,7 +662,8 @@ export default function BusinessBuyerRegistration() {
                 <div className="text-sm">
                   <p className="font-medium mb-1">Truth Verification</p>
                   <p className="text-muted-foreground">
-                    You will be reported if any information provided is found to be false.
+                    You will be reported if any information provided is found to
+                    be false.
                   </p>
                 </div>
               </div>
@@ -617,8 +675,12 @@ export default function BusinessBuyerRegistration() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Additional Information</h2>
-              <p className="text-muted-foreground">Provide any additional details</p>
+              <h2 className="text-2xl font-bold mb-2">
+                Additional Information
+              </h2>
+              <p className="text-muted-foreground">
+                Provide any additional details
+              </p>
             </div>
             <FormField
               control={form.control}
@@ -627,7 +689,10 @@ export default function BusinessBuyerRegistration() {
                 <FormItem>
                   <FormLabel>Business Industry (Optional)</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g., Retail, Healthcare, Technology" />
+                    <Input
+                      {...field}
+                      placeholder="e.g., Retail, Healthcare, Technology"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -644,7 +709,9 @@ export default function BusinessBuyerRegistration() {
                         if (checked) {
                           setSelectedLanguages([...selectedLanguages, lang]);
                         } else {
-                          setSelectedLanguages(selectedLanguages.filter((l) => l !== lang));
+                          setSelectedLanguages(
+                            selectedLanguages.filter((l) => l !== lang),
+                          );
                         }
                       }}
                     />
@@ -725,9 +792,9 @@ export default function BusinessBuyerRegistration() {
             </div>
             <div className="p-4 bg-muted rounded-lg">
               <p className="text-sm">
-                <strong>Note:</strong> All documents are time-stamped and will be recorded when you
-                sign. You will be notified via email once your registration is reviewed and
-                approved.
+                <strong>Note:</strong> All documents are time-stamped and will
+                be recorded when you sign. You will be notified via email once
+                your registration is reviewed and approved.
               </p>
             </div>
           </div>
@@ -742,7 +809,9 @@ export default function BusinessBuyerRegistration() {
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Register as Business Buyer</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            Register as Business Buyer
+          </h1>
           <p className="text-muted-foreground">
             Complete all steps to register as a business buyer
           </p>
@@ -760,8 +829,8 @@ export default function BusinessBuyerRegistration() {
                       currentStep > step.id
                         ? "bg-green-500 text-white"
                         : currentStep === step.id
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground",
                     )}
                   >
                     {currentStep > step.id ? (
@@ -774,7 +843,9 @@ export default function BusinessBuyerRegistration() {
                     <p
                       className={cn(
                         "text-xs font-medium",
-                        currentStep === step.id ? "text-foreground" : "text-muted-foreground"
+                        currentStep === step.id
+                          ? "text-foreground"
+                          : "text-muted-foreground",
                       )}
                     >
                       {step.name}
@@ -785,7 +856,7 @@ export default function BusinessBuyerRegistration() {
                   <div
                     className={cn(
                       "h-1 flex-1 mx-2 transition-colors",
-                      currentStep > step.id ? "bg-green-500" : "bg-muted"
+                      currentStep > step.id ? "bg-green-500" : "bg-muted",
                     )}
                   />
                 )}
@@ -828,4 +899,3 @@ export default function BusinessBuyerRegistration() {
     </div>
   );
 }
-

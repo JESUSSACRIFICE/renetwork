@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Building2, User, ArrowRight } from "lucide-react";
+import { Building2, User, ArrowRight, Search } from "lucide-react";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -27,7 +27,8 @@ export default function RegisterPage() {
               </div>
               <h2 className="text-2xl font-bold">Service Provider</h2>
               <p className="text-muted-foreground">
-                Register as a professional service provider (Agent, Mortgage Consultant, Trade Professional, etc.)
+                Register as a professional service provider (Agent, Mortgage
+                Consultant, Trade Professional, etc.)
               </p>
               <ul className="text-sm text-left space-y-2 text-muted-foreground">
                 <li>• Post your services</li>
@@ -86,7 +87,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-
-
-

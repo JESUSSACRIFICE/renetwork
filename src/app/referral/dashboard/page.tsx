@@ -4,17 +4,33 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ReferralHeader from "@/components/referral/ReferralHeader";
 import ReferralFooter from "@/components/referral/ReferralFooter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { Briefcase, DollarSign, Users, TrendingUp, Clock, CheckCircle, XCircle } from "lucide-react";
+import {
+  Briefcase,
+  DollarSign,
+  Users,
+  TrendingUp,
+  Clock,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-  const [userType, setUserType] = useState<"customer" | "psp" | "agency">("customer");
+  const [userType, setUserType] = useState<"customer" | "psp" | "agency">(
+    "customer",
+  );
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -51,9 +67,27 @@ export default function DashboardPage() {
   };
 
   const recentActivity = [
-    { id: 1, type: "order", title: "Order #1234", status: "in-progress", date: "2 days ago" },
-    { id: 2, type: "payment", title: "Payment received", status: "completed", date: "1 week ago" },
-    { id: 3, type: "referral", title: "New referral", status: "pending", date: "2 weeks ago" },
+    {
+      id: 1,
+      type: "order",
+      title: "Order #1234",
+      status: "in-progress",
+      date: "2 days ago",
+    },
+    {
+      id: 2,
+      type: "payment",
+      title: "Payment received",
+      status: "completed",
+      date: "1 week ago",
+    },
+    {
+      id: 3,
+      type: "referral",
+      title: "New referral",
+      status: "pending",
+      date: "2 weeks ago",
+    },
   ];
 
   if (!user) {
@@ -61,7 +95,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 w-full">
       <ReferralHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -70,7 +104,10 @@ export default function DashboardPage() {
             <p className="text-gray-600">Welcome back, {user.email}</p>
           </div>
 
-          <Tabs defaultValue={userType} onValueChange={(v) => setUserType(v as any)}>
+          <Tabs
+            defaultValue={userType}
+            onValueChange={(v) => setUserType(v as any)}
+          >
             <TabsList>
               <TabsTrigger value="customer">Customer</TabsTrigger>
               <TabsTrigger value="psp">PSP</TabsTrigger>
@@ -82,31 +119,45 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Orders</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Active Orders
+                    </CardTitle>
                     <Briefcase className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.customer.activeOrders}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.customer.activeOrders}
+                    </div>
                     <p className="text-xs text-muted-foreground">In progress</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Completed</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Completed
+                    </CardTitle>
                     <CheckCircle className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.customer.completedOrders}</div>
-                    <p className="text-xs text-muted-foreground">Total orders</p>
+                    <div className="text-2xl font-bold">
+                      {stats.customer.completedOrders}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Total orders
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Spent</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Total Spent
+                    </CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.customer.totalSpent}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.customer.totalSpent}
+                    </div>
                     <p className="text-xs text-muted-foreground">All time</p>
                   </CardContent>
                 </Card>
@@ -116,8 +167,12 @@ export default function DashboardPage() {
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.customer.saved}</div>
-                    <p className="text-xs text-muted-foreground">Through referrals</p>
+                    <div className="text-2xl font-bold">
+                      {stats.customer.saved}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Through referrals
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -129,16 +184,25 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {recentActivity.map((activity) => (
-                      <div key={activity.id} className="flex items-center justify-between border-b pb-4 last:border-0">
+                      <div
+                        key={activity.id}
+                        className="flex items-center justify-between border-b pb-4 last:border-0"
+                      >
                         <div>
                           <p className="font-medium">{activity.title}</p>
-                          <p className="text-sm text-gray-500">{activity.date}</p>
+                          <p className="text-sm text-gray-500">
+                            {activity.date}
+                          </p>
                         </div>
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          activity.status === "completed" ? "bg-green-100 text-green-700" :
-                          activity.status === "in-progress" ? "bg-blue-100 text-blue-700" :
-                          "bg-yellow-100 text-yellow-700"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded text-xs ${
+                            activity.status === "completed"
+                              ? "bg-green-100 text-green-700"
+                              : activity.status === "in-progress"
+                                ? "bg-blue-100 text-blue-700"
+                                : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
                           {activity.status}
                         </span>
                       </div>
@@ -153,41 +217,59 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Projects</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Active Projects
+                    </CardTitle>
                     <Briefcase className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.psp.activeProjects}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.psp.activeProjects}
+                    </div>
                     <p className="text-xs text-muted-foreground">In progress</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Completed</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Completed
+                    </CardTitle>
                     <CheckCircle className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.psp.completedProjects}</div>
-                    <p className="text-xs text-muted-foreground">Total projects</p>
+                    <div className="text-2xl font-bold">
+                      {stats.psp.completedProjects}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Total projects
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Total Earnings
+                    </CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.psp.totalEarnings}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.psp.totalEarnings}
+                    </div>
                     <p className="text-xs text-muted-foreground">All time</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Pending</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Pending
+                    </CardTitle>
                     <Clock className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.psp.pendingPayments}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.psp.pendingPayments}
+                    </div>
                     <p className="text-xs text-muted-foreground">In escrow</p>
                   </CardContent>
                 </Card>
@@ -199,41 +281,61 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Active Listings</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Active Listings
+                    </CardTitle>
                     <Briefcase className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.agency.activeListings}</div>
-                    <p className="text-xs text-muted-foreground">Current listings</p>
+                    <div className="text-2xl font-bold">
+                      {stats.agency.activeListings}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Current listings
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Team Members</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Team Members
+                    </CardTitle>
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.agency.teamMembers}</div>
-                    <p className="text-xs text-muted-foreground">Active agents</p>
+                    <div className="text-2xl font-bold">
+                      {stats.agency.teamMembers}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Active agents
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Total Revenue
+                    </CardTitle>
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.agency.totalRevenue}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.agency.totalRevenue}
+                    </div>
                     <p className="text-xs text-muted-foreground">This year</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Referrals</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Referrals
+                    </CardTitle>
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{stats.agency.referralsReceived}</div>
+                    <div className="text-2xl font-bold">
+                      {stats.agency.referralsReceived}
+                    </div>
                     <p className="text-xs text-muted-foreground">Received</p>
                   </CardContent>
                 </Card>
@@ -273,4 +375,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

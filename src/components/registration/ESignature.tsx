@@ -8,17 +8,21 @@ import { Card } from "@/components/ui/card";
 import { Pen, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export interface ESignatureData {
+  signatureData: string;
+  namePrinted: string;
+  nameSigned: string;
+  signedAt: Date;
+}
+
 interface ESignatureProps {
-  onSignatureComplete?: (signature: {
-    signatureData: string;
-    namePrinted: string;
-    nameSigned: string;
-    signedAt: Date;
-  }) => void;
+  onSignatureComplete?: (signature: ESignatureData) => void;
   documentType: string;
   documentTitle: string;
   required?: boolean;
   className?: string;
+  /** When provided, prefill and show existing signature (e.g. from server). */
+  initialSignature?: ESignatureData | null;
 }
 
 export function ESignature({
@@ -27,12 +31,14 @@ export function ESignature({
   documentTitle,
   required = true,
   className,
+  initialSignature,
 }: ESignatureProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [signature, setSignature] = useState<string | null>(null);
-  const [namePrinted, setNamePrinted] = useState("");
-  const [nameSigned, setNameSigned] = useState("");
+  const [signature, setSignature] = useState<string | null>(initialSignature?.signatureData ?? null);
+  const [namePrinted, setNamePrinted] = useState(initialSignature?.namePrinted ?? "");
+  const [nameSigned, setNameSigned] = useState(initialSignature?.nameSigned ?? "");
+  const [hasSigned, setHasSigned] = useState(!!initialSignature);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -51,6 +57,15 @@ export function ESignature({
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
   }, []);
+
+  useEffect(() => {
+    if (initialSignature) {
+      setSignature(initialSignature.signatureData);
+      setNamePrinted(initialSignature.namePrinted);
+      setNameSigned(initialSignature.nameSigned);
+      setHasSigned(true);
+    }
+  }, [initialSignature?.signatureData, initialSignature?.namePrinted, initialSignature?.nameSigned]);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -107,7 +122,7 @@ export function ESignature({
     if (!signature || !namePrinted || !nameSigned) {
       return;
     }
-
+    setHasSigned(true);
     onSignatureComplete?.({
       signatureData: signature,
       namePrinted,
@@ -159,6 +174,20 @@ export function ESignature({
             Signature <span className="text-destructive">*</span>
           </Label>
           <div className="mt-2 border-2 border-dashed rounded-lg p-4 bg-muted/30">
+            {signature ? (
+              <div className="space-y-2">
+                <img
+                  src={signature}
+                  alt="Signature"
+                  className="max-h-[200px] w-auto border border-muted-foreground/20 rounded bg-white"
+                />
+                {hasSigned && initialSignature && (
+                  <p className="text-sm text-muted-foreground">
+                    Signed on {initialSignature.signedAt instanceof Date ? initialSignature.signedAt.toLocaleString() : new Date(initialSignature.signedAt).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            ) : null}
             <canvas
               ref={canvasRef}
               onMouseDown={startDrawing}
@@ -169,7 +198,7 @@ export function ESignature({
               onTouchMove={draw}
               onTouchEnd={stopDrawing}
               className="border border-muted-foreground/20 rounded bg-white cursor-crosshair w-full"
-              style={{ maxWidth: "100%", touchAction: "none" }}
+              style={{ maxWidth: "100%", touchAction: "none", display: signature ? "none" : undefined }}
             />
             <div className="flex gap-2 mt-2">
               <Button

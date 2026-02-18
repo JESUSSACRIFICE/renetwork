@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, DollarSign, Map, Grid } from "lucide-react";
 import Header from "@/components/Header";
@@ -8,37 +10,18 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import MapView from "@/components/browse/MapView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-interface ServiceListing {
-  id: string;
-  title: string;
-  provider: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  referralFee: string | null;
-  pricePerSqft: number | null;
-  location: string;
-  roles: string[];
-  serviceAreas?: Array<{
-    zip_code: string;
-    radius_miles: number;
-    lat?: number;
-    lng?: number;
-  }>;
-}
+import { useBrowseProfiles } from "@/hooks/use-professional-profiles";
+import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
 
 const Browse = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [priceRange, setPriceRange] = useState([0, 5000]);
-  const [selectedServiceTypes, setSelectedServiceTypes] = useState<string[]>([]);
+  const [selectedPspTypes, setSelectedPspTypes] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
-  const [services, setServices] = useState<ServiceListing[]>([]);
-  const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
 
   const category = searchParams?.get("category") || null;
@@ -46,88 +29,55 @@ const Browse = () => {
   const zipCode = searchParams?.get("zip") || null;
   const serviceCategory = searchParams?.get("service_category") || null;
   const serviceType = searchParams?.get("service_type") || null;
+  const pspFromUrl = searchParams?.get("psp")?.split(",").filter(Boolean) || [];
   const fields = searchParams?.get("fields")?.split(",") || [];
   const conditions = searchParams?.get("conditions")?.split(",") || [];
   const priceMin = Number(searchParams?.get("price_min")) || 0;
   const priceMax = Number(searchParams?.get("price_max")) || 5000;
 
-  useEffect(() => {
-    fetchServices();
-  }, [category, searchQuery, zipCode, serviceCategory, serviceType, fields.join(","), conditions.join(","), priceMin, priceMax]);
-
-  const fetchServices = async () => {
-    setLoading(true);
-    try {
-      let query = supabase
-        .from("profiles")
-        .select(`
-          id,
-          full_name,
-          company_name,
-          referral_fee_percentage,
-          hourly_rate,
-          price_per_sqft,
-          user_roles(role),
-          service_areas(zip_code, radius_miles)
-        `);
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-
-      // Transform and filter data
-      let listings: ServiceListing[] = (data || []).map((profile: any) => ({
-        id: profile.id,
-        title: profile.company_name || profile.full_name,
-        provider: profile.full_name,
-        rating: 4.8 + Math.random() * 0.2,
-        reviews: Math.floor(Math.random() * 200) + 50,
-        price: profile.hourly_rate || 0,
-        referralFee: profile.referral_fee_percentage ? `${profile.referral_fee_percentage}%` : null,
-        pricePerSqft: profile.price_per_sqft,
-        location: profile.service_areas?.[0]?.zip_code || "California",
-        roles: profile.user_roles?.map((r: any) => r.role) || [],
-        serviceAreas: profile.service_areas || [],
-      }));
-
-      // Client-side filtering for advanced options
-      if (serviceType) {
-        listings = listings.filter(listing => 
-          listing.roles.some(role => role === serviceType)
-        );
-      }
-
-      if (zipCode && listings.length > 0) {
-        // Filter by ZIP code proximity (simplified - in production use geolocation)
-        listings = listings.filter(listing => 
-          listing.location.includes(zipCode) || true // Keep all for demo
-        );
-      }
-
-      if (priceMin > 0 || priceMax < 5000) {
-        listings = listings.filter(listing => 
-          listing.price >= priceMin && listing.price <= priceMax
-        );
-      }
-
-      setServices(listings);
-    } catch (error: any) {
-      toast.error("Failed to load professionals");
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const filters = {
+    category,
+    searchQuery,
+    zipCode,
+    serviceCategory,
+    serviceType,
+    psp: pspFromUrl,
+    fields,
+    conditions,
+    priceMin,
+    priceMax,
   };
 
+  const { data: services = [], isLoading: loading, error } = useBrowseProfiles(filters);
+
+  useEffect(() => {
+    if (error) toast.error("Failed to load professionals");
+  }, [error]);
+
+  useEffect(() => {
+    setSelectedPspTypes((prev) =>
+      pspFromUrl.length > 0 ? pspFromUrl : prev
+    );
+  }, [pspFromUrl.join(",")]);
+
   const applyFilters = () => {
-    fetchServices();
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    if (selectedPspTypes.length > 0) {
+      params.set("psp", selectedPspTypes.join(","));
+    } else {
+      params.delete("psp");
+    }
+    params.set("price_min", String(priceRange[0]));
+    params.set("price_max", String(priceRange[1]));
+    router.push(`/browse?${params.toString()}`);
     toast.success("Filters applied");
   };
 
+  const effectivePsp = pspFromUrl.length > 0 ? pspFromUrl : selectedPspTypes;
   const filteredServices = services.filter((service) => {
-    if (selectedServiceTypes.length > 0) {
-      const hasMatchingRole = service.roles.some(role => 
-        selectedServiceTypes.some(type => role.includes(type.toLowerCase().replace(" ", "_")))
+    if (effectivePsp.length > 0) {
+      const hasMatchingRole = service.roles.some((role) =>
+        effectivePsp.includes(role)
       );
       if (!hasMatchingRole) return false;
     }
@@ -161,24 +111,33 @@ const Browse = () => {
             <aside className="lg:w-80 space-y-6">
               <div className="bg-card rounded-xl p-6 border shadow-sm space-y-6">
                 <div>
-                  <h3 className="font-semibold mb-4">Service Type</h3>
-                  <div className="space-y-3">
-                    {["Real Estate Agents", "Mortgage Consultants", "Trade Services", "Legal Services"].map((type) => (
-                      <div key={type} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={type}
-                          checked={selectedServiceTypes.includes(type)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setSelectedServiceTypes([...selectedServiceTypes, type]);
-                            } else {
-                              setSelectedServiceTypes(selectedServiceTypes.filter(t => t !== type));
-                            }
-                          }}
-                        />
-                        <Label htmlFor={type} className="text-sm cursor-pointer">
-                          {type}
-                        </Label>
+                  <h3 className="font-semibold mb-4">Professional Type (PSP)</h3>
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {Object.entries(PSP_OPTIONS_BY_LETTER).map(([letter, options]) => (
+                      <div key={letter} className="space-y-2">
+                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          {letter}
+                        </div>
+                        <div className="space-y-1.5">
+                          {options.map((type) => (
+                            <div key={type} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={type}
+                                checked={selectedPspTypes.includes(type)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedPspTypes([...selectedPspTypes, type]);
+                                  } else {
+                                    setSelectedPspTypes(selectedPspTypes.filter((t) => t !== type));
+                                  }
+                                }}
+                              />
+                              <Label htmlFor={type} className="text-sm cursor-pointer">
+                                {type}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -236,13 +195,18 @@ const Browse = () => {
                   <h1 className="text-2xl font-bold">
                     {category ? `${category} Professionals` : searchQuery ? `Results for "${searchQuery}"` : "Browse RE Professionals"}
                   </h1>
-                  {(serviceType || fields.length > 0 || zipCode) && (
+                  {(serviceType || effectivePsp.length > 0 || fields.length > 0 || zipCode) && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {serviceType && (
                         <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                          {serviceType.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                          {serviceType.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                         </span>
                       )}
+                      {effectivePsp.map((p) => (
+                        <span key={p} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                          {p}
+                        </span>
+                      ))}
                       {fields.map(field => (
                         <span key={field} className="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">
                           {field.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
@@ -281,7 +245,7 @@ const Browse = () => {
                 <div className="text-center py-12">
                   <p className="text-muted-foreground mb-4">No professionals found</p>
                   <Button onClick={() => {
-                    setSelectedServiceTypes([]);
+                    setSelectedPspTypes([]);
                     setSelectedRatings([]);
                     setPriceRange([0, 5000]);
                   }}>Clear Filters</Button>

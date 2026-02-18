@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,8 @@ const passwordSchema = z
 
 export default function Auth() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [resetEmail, setResetEmail] = useState("");
@@ -59,15 +61,19 @@ export default function Auth() {
 
       toast.success("Welcome back!");
 
-      // Check if profile exists, if not redirect to setup
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id")
+        .select("id, user_type")
         .eq("id", data.user.id)
         .maybeSingle();
 
-      if (!profile) {
+      const userType = (profile as { user_type?: string } | null)?.user_type;
+      if (redirectTo && redirectTo.startsWith("/")) {
+        router.push(redirectTo);
+      } else if (!profile) {
         router.push(`/profile/${data.user.id}/edit`);
+      } else if (userType === "customer") {
+        router.push("/browse");
       } else {
         router.push(`/profile/${data.user.id}`);
       }
@@ -123,6 +129,7 @@ export default function Auth() {
           data: {
             first_name: registerData.firstName,
             last_name: registerData.lastName,
+            user_type: "service_provider",
           },
         },
       });
@@ -209,11 +216,7 @@ export default function Auth() {
                     </button>
                   </div>
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
                 <Dialog
@@ -236,10 +239,7 @@ export default function Auth() {
                         to reset your password.
                       </DialogDescription>
                     </DialogHeader>
-                    <form
-                      onSubmit={handleResetPassword}
-                      className="space-y-4"
-                    >
+                    <form onSubmit={handleResetPassword} className="space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="reset-email">Email</Label>
                         <Input
@@ -378,11 +378,7 @@ export default function Auth() {
                     </button>
                   </div>
                 </div>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
+                <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
@@ -397,4 +393,3 @@ export default function Auth() {
     </div>
   );
 }
-

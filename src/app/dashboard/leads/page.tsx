@@ -14,7 +14,7 @@ import { Mail, Phone, Clock, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
 export default function DashboardLeads() {
   const router = useRouter();
@@ -29,8 +29,10 @@ export default function DashboardLeads() {
   }, []);
 
   const checkAuthAndFetch = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       router.push("/auth");
       return;
@@ -47,18 +49,18 @@ export default function DashboardLeads() {
       .select("*, user_roles(role)")
       .eq("id", userId)
       .maybeSingle();
-    
+
     setProfile(data);
-    
+
     // Check for URL parameter to override user type (for testing)
     const urlParams = new URLSearchParams(window.location.search);
-    const overrideTypeParam = urlParams.get('type');
-    
+    const overrideTypeParam = urlParams.get("type");
+
     if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
       setUserType(overrideTypeParam as UserType);
       return;
     }
-    
+
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
@@ -92,9 +94,9 @@ export default function DashboardLeads() {
 
       if (error) throw error;
 
-      setLeads(leads.map(lead => 
-        lead.id === leadId ? { ...lead, status } : lead
-      ));
+      setLeads(
+        leads.map((lead) => (lead.id === leadId ? { ...lead, status } : lead)),
+      );
 
       toast.success("Lead status updated");
     } catch (error: any) {
@@ -104,18 +106,27 @@ export default function DashboardLeads() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "new": return "bg-blue-500";
-      case "contacted": return "bg-yellow-500";
-      case "converted": return "bg-green-500";
-      case "closed": return "bg-gray-500";
-      default: return "bg-gray-500";
+      case "new":
+        return "bg-blue-500";
+      case "contacted":
+        return "bg-yellow-500";
+      case "converted":
+        return "bg-green-500";
+      case "closed":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+      <div className="min-h-screen flex flex-col bg-gray-50 w-full">
+        <FreeioDashboardHeader
+          user={user}
+          profile={profile}
+          userType={userType}
+        />
         <div className="flex flex-1">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-gray-50">
@@ -123,16 +134,22 @@ export default function DashboardLeads() {
               <SidebarTrigger />
               <div>
                 <h1 className="text-3xl font-bold">Leads</h1>
-                <p className="text-muted-foreground">Manage your incoming inquiries</p>
+                <p className="text-muted-foreground">
+                  Manage your incoming inquiries
+                </p>
               </div>
             </div>
 
             {loading ? (
-              <p className="text-center text-muted-foreground">Loading leads...</p>
+              <p className="text-center text-muted-foreground">
+                Loading leads...
+              </p>
             ) : leads.length === 0 ? (
               <Card className="p-12 text-center">
                 <p className="text-muted-foreground mb-4">No leads yet</p>
-                <p className="text-sm text-muted-foreground">Leads will appear here when people contact you</p>
+                <p className="text-sm text-muted-foreground">
+                  Leads will appear here when people contact you
+                </p>
               </Card>
             ) : (
               <div className="space-y-4">
@@ -149,7 +166,10 @@ export default function DashboardLeads() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            {format(new Date(lead.created_at), "MMM d, yyyy 'at' h:mm a")}
+                            {format(
+                              new Date(lead.created_at),
+                              "MMM d, yyyy 'at' h:mm a",
+                            )}
                           </div>
                         </div>
                       </div>
@@ -158,14 +178,20 @@ export default function DashboardLeads() {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center gap-2 text-sm">
                         <Mail className="h-4 w-4 text-primary" />
-                        <a href={`mailto:${lead.email}`} className="hover:underline">
+                        <a
+                          href={`mailto:${lead.email}`}
+                          className="hover:underline"
+                        >
                           {lead.email}
                         </a>
                       </div>
                       {lead.phone && (
                         <div className="flex items-center gap-2 text-sm">
                           <Phone className="h-4 w-4 text-primary" />
-                          <a href={`tel:${lead.phone}`} className="hover:underline">
+                          <a
+                            href={`tel:${lead.phone}`}
+                            className="hover:underline"
+                          >
                             {lead.phone}
                           </a>
                         </div>
@@ -193,7 +219,8 @@ export default function DashboardLeads() {
                           Mark as Converted
                         </Button>
                       )}
-                      {(lead.status === "new" || lead.status === "contacted") && (
+                      {(lead.status === "new" ||
+                        lead.status === "contacted") && (
                         <Button
                           size="sm"
                           variant="outline"
@@ -214,8 +241,3 @@ export default function DashboardLeads() {
     </SidebarProvider>
   );
 }
-
-
-
-
-

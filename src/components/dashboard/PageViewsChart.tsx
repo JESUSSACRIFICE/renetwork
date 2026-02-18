@@ -6,13 +6,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import {
   Select,
   SelectContent,
@@ -23,32 +17,33 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PageViewsChartProps {
-  userType: "buyer" | "agent";
+  userType: "service_provider" | "agent";
 }
 
 export function PageViewsChart({ userType }: PageViewsChartProps) {
   const [selectedProject, setSelectedProject] = useState(
-    userType === "buyer" ? "as das da" : "Easy to build your own playlists..."
+    userType === "buyer" ? "as das da" : "Easy to build your own playlists...",
   );
   const [selectedDays, setSelectedDays] = useState("15 days");
 
   // Sample data - in a real app, this would come from your API
-  const chartData = userType === "buyer"
-    ? [
-        { date: "Dec 24, 2025", views: 0.1 },
-        { date: "Dec 27, 2025", views: 0.1 },
-        { date: "Dec 30, 2025", views: 0.1 },
-        { date: "Jan 2, 2026", views: 0.1 },
-        { date: "Jan 7, 2026", views: 0.1 },
-      ]
-    : [
-        { date: "Dec 24, 2025", views: 1.0 },
-        { date: "Dec 27, 2025", views: 2.5 },
-        { date: "Dec 30, 2025", views: 2.8 },
-        { date: "Jan 2, 2026", views: 1.5 },
-        { date: "Jan 4, 2026", views: 2.9 },
-        { date: "Jan 7, 2026", views: 1.8 },
-      ];
+  const chartData =
+    userType === "buyer"
+      ? [
+          { date: "Dec 24, 2025", views: 0.1 },
+          { date: "Dec 27, 2025", views: 0.1 },
+          { date: "Dec 30, 2025", views: 0.1 },
+          { date: "Jan 2, 2026", views: 0.1 },
+          { date: "Jan 7, 2026", views: 0.1 },
+        ]
+      : [
+          { date: "Dec 24, 2025", views: 1.0 },
+          { date: "Dec 27, 2025", views: 2.5 },
+          { date: "Dec 30, 2025", views: 2.8 },
+          { date: "Jan 2, 2026", views: 1.5 },
+          { date: "Jan 4, 2026", views: 2.9 },
+          { date: "Jan 7, 2026", views: 1.8 },
+        ];
 
   const chartConfig = {
     views: {
@@ -60,12 +55,17 @@ export function PageViewsChart({ userType }: PageViewsChartProps) {
   return (
     <Card className="bg-white">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-gray-900">Page Views</CardTitle>
+        <CardTitle className="text-xl font-bold text-gray-900">
+          Page Views
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full mb-4">
           <ChartContainer config={chartConfig} className="h-full w-full">
-            <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="date"
@@ -80,9 +80,10 @@ export function PageViewsChart({ userType }: PageViewsChartProps) {
                 tickLine={false}
                 axisLine={false}
                 domain={userType === "buyer" ? [-1.0, 1.0] : [0.5, 3.0]}
-                ticks={userType === "buyer" 
-                  ? [-1.0, -0.8, -0.6, -0.4, -0.2, 0.0, 0.2]
-                  : [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+                ticks={
+                  userType === "buyer"
+                    ? [-1.0, -0.8, -0.6, -0.4, -0.2, 0.0, 0.2]
+                    : [0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
                 }
               />
               <ChartTooltip content={<ChartTooltipContent />} />
@@ -108,7 +109,9 @@ export function PageViewsChart({ userType }: PageViewsChartProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={selectedProject}>{selectedProject}</SelectItem>
+                <SelectItem value={selectedProject}>
+                  {selectedProject}
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>

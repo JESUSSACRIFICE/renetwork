@@ -5,9 +5,23 @@ import Link from "next/link";
 import ReferralHeader from "@/components/referral/ReferralHeader";
 import ReferralFooter from "@/components/referral/ReferralFooter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, MapPin, CheckCircle, MessageSquare, Building2, Users, Briefcase } from "lucide-react";
+import {
+  Star,
+  MapPin,
+  CheckCircle,
+  MessageSquare,
+  Building2,
+  Users,
+  Briefcase,
+} from "lucide-react";
 
 export default function AgencyPage() {
   const params = useParams();
@@ -23,15 +37,21 @@ export default function AgencyPage() {
     location: "San Francisco, CA",
     verified: true,
     established: "2015",
-    about: "Premier real estate agency specializing in luxury properties, commercial real estate, and investment opportunities. With over 50 experienced agents, we provide comprehensive real estate services.",
-    services: ["Luxury Residential", "Commercial Real Estate", "Property Management", "Investment Consulting"],
+    about:
+      "Premier real estate agency specializing in luxury properties, commercial real estate, and investment opportunities. With over 50 experienced agents, we provide comprehensive real estate services.",
+    services: [
+      "Luxury Residential",
+      "Commercial Real Estate",
+      "Property Management",
+      "Investment Consulting",
+    ],
     teamSize: 50,
     completedProjects: 1200,
     activeListings: 89,
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 w-full">
       <ReferralHeader />
       <main className="flex-1">
         <div className="bg-white border-b">
@@ -44,7 +64,9 @@ export default function AgencyPage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-2">
-                      <h1 className="text-3xl font-bold text-gray-900">{agency.name}</h1>
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        {agency.name}
+                      </h1>
                       {agency.verified && (
                         <CheckCircle className="h-6 w-6 text-blue-500" />
                       )}
@@ -53,13 +75,17 @@ export default function AgencyPage() {
                       <div className="flex items-center gap-1">
                         <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                         <span className="font-semibold">{agency.rating}</span>
-                        <span className="text-gray-500">({agency.reviews} reviews)</span>
+                        <span className="text-gray-500">
+                          ({agency.reviews} reviews)
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 text-gray-600">
                         <MapPin className="h-5 w-5" />
                         <span>{agency.location}</span>
                       </div>
-                      <span className="text-gray-500">Est. {agency.established}</span>
+                      <span className="text-gray-500">
+                        Est. {agency.established}
+                      </span>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -93,7 +119,9 @@ export default function AgencyPage() {
                       <CardTitle>About the Agency</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-700 leading-relaxed">{agency.about}</p>
+                      <p className="text-gray-700 leading-relaxed">
+                        {agency.about}
+                      </p>
                     </CardContent>
                   </Card>
 
@@ -121,9 +149,13 @@ export default function AgencyPage() {
                         <div className="flex items-center justify-between">
                           <div>
                             <h3 className="font-semibold text-lg">{service}</h3>
-                            <p className="text-gray-600 text-sm">Comprehensive agency services</p>
+                            <p className="text-gray-600 text-sm">
+                              Comprehensive agency services
+                            </p>
                           </div>
-                          <Link href={`/referral/results?category=${encodeURIComponent(service)}`}>
+                          <Link
+                            href={`/referral/results?category=${encodeURIComponent(service)}`}
+                          >
                             <Button variant="outline">View Details</Button>
                           </Link>
                         </div>
@@ -136,13 +168,16 @@ export default function AgencyPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle>Our Team</CardTitle>
-                      <CardDescription>Professional agents and specialists</CardDescription>
+                      <CardDescription>
+                        Professional agents and specialists
+                      </CardDescription>
                     </CardHeader>
                     <CardContent>
                       <p className="text-gray-700">
-                        Our agency employs {agency.teamSize} experienced professionals dedicated to providing 
-                        exceptional real estate services. Each team member is verified and brings expertise 
-                        in their respective areas.
+                        Our agency employs {agency.teamSize} experienced
+                        professionals dedicated to providing exceptional real
+                        estate services. Each team member is verified and brings
+                        expertise in their respective areas.
                       </p>
                     </CardContent>
                   </Card>
@@ -163,21 +198,27 @@ export default function AgencyPage() {
                       <Users className="h-5 w-5 text-primary" />
                       <span className="text-gray-600">Team Size</span>
                     </div>
-                    <span className="font-semibold">{agency.teamSize} agents</span>
+                    <span className="font-semibold">
+                      {agency.teamSize} agents
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Briefcase className="h-5 w-5 text-green-600" />
                       <span className="text-gray-600">Completed</span>
                     </div>
-                    <span className="font-semibold">{agency.completedProjects}+</span>
+                    <span className="font-semibold">
+                      {agency.completedProjects}+
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Building2 className="h-5 w-5 text-blue-600" />
                       <span className="text-gray-600">Active Listings</span>
                     </div>
-                    <span className="font-semibold">{agency.activeListings}</span>
+                    <span className="font-semibold">
+                      {agency.activeListings}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -194,7 +235,9 @@ export default function AgencyPage() {
                       Send Message
                     </Button>
                   </Link>
-                  <Link href={`/referral/results?type=agency&category=${encodeURIComponent(agency.name)}`}>
+                  <Link
+                    href={`/referral/results?type=agency&category=${encodeURIComponent(agency.name)}`}
+                  >
                     <Button variant="outline" className="w-full">
                       View Services
                     </Button>
@@ -209,4 +252,3 @@ export default function AgencyPage() {
     </div>
   );
 }
-

@@ -118,21 +118,22 @@ function ResultsContent() {
       ];
 
       let filtered = mockListings;
-      
+
       if (type) {
-        filtered = filtered.filter(l => l.type === type);
+        filtered = filtered.filter((l) => l.type === type);
       }
       if (category) {
-        filtered = filtered.filter(l => l.category?.includes(category));
+        filtered = filtered.filter((l) => l.category?.includes(category));
       }
       if (searchQuery) {
-        filtered = filtered.filter(l => 
-          l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          l.provider.toLowerCase().includes(searchQuery.toLowerCase())
+        filtered = filtered.filter(
+          (l) =>
+            l.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            l.provider.toLowerCase().includes(searchQuery.toLowerCase()),
         );
       }
       if (location) {
-        filtered = filtered.filter(l => l.location.includes(location));
+        filtered = filtered.filter((l) => l.location.includes(location));
       }
 
       setListings(filtered);
@@ -141,18 +142,18 @@ function ResultsContent() {
   };
 
   const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev =>
+    setSelectedCategories((prev) =>
       prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
+        ? prev.filter((c) => c !== category)
+        : [...prev, category],
     );
   };
 
   const handleRatingToggle = (rating: number) => {
-    setSelectedRatings(prev =>
+    setSelectedRatings((prev) =>
       prev.includes(rating)
-        ? prev.filter(r => r !== rating)
-        : [...prev, rating]
+        ? prev.filter((r) => r !== rating)
+        : [...prev, rating],
     );
   };
 
@@ -164,7 +165,7 @@ function ResultsContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 w-full">
       <ReferralHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -180,7 +181,9 @@ function ResultsContent() {
               {/* Additional Filters */}
               <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
                 <div>
-                  <Label className="text-sm font-semibold mb-3 block">Price Range</Label>
+                  <Label className="text-sm font-semibold mb-3 block">
+                    Price Range
+                  </Label>
                   <Slider
                     value={priceRange}
                     onValueChange={setPriceRange}
@@ -195,9 +198,16 @@ function ResultsContent() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-semibold mb-3 block">Categories</Label>
+                  <Label className="text-sm font-semibold mb-3 block">
+                    Categories
+                  </Label>
                   <div className="space-y-2">
-                    {["Real Estate Agent", "Mortgage Consultant", "Contractor", "Inspector"].map((cat) => (
+                    {[
+                      "Real Estate Agent",
+                      "Mortgage Consultant",
+                      "Contractor",
+                      "Inspector",
+                    ].map((cat) => (
                       <div key={cat} className="flex items-center space-x-2">
                         <Checkbox
                           id={cat}
@@ -213,7 +223,9 @@ function ResultsContent() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-semibold mb-3 block">Rating</Label>
+                  <Label className="text-sm font-semibold mb-3 block">
+                    Rating
+                  </Label>
                   <div className="space-y-2">
                     {[5, 4, 3].map((rating) => (
                       <div key={rating} className="flex items-center space-x-2">
@@ -222,7 +234,10 @@ function ResultsContent() {
                           checked={selectedRatings.includes(rating)}
                           onCheckedChange={() => handleRatingToggle(rating)}
                         />
-                        <Label htmlFor={`rating-${rating}`} className="text-sm cursor-pointer flex items-center gap-1">
+                        <Label
+                          htmlFor={`rating-${rating}`}
+                          className="text-sm cursor-pointer flex items-center gap-1"
+                        >
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                           {rating}+ Stars
                         </Label>
@@ -248,10 +263,13 @@ function ResultsContent() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">
-                      {searchQuery ? `Search Results for "${searchQuery}"` : "Browse Results"}
+                      {searchQuery
+                        ? `Search Results for "${searchQuery}"`
+                        : "Browse Results"}
                     </h1>
                     <p className="text-gray-600 mt-1">
-                      {listings.length} {listings.length === 1 ? "result" : "results"} found
+                      {listings.length}{" "}
+                      {listings.length === 1 ? "result" : "results"} found
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -280,7 +298,9 @@ function ResultsContent() {
                 </div>
               ) : listings.length === 0 ? (
                 <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                  <p className="text-gray-600 text-lg">No results found. Try adjusting your filters.</p>
+                  <p className="text-gray-600 text-lg">
+                    No results found. Try adjusting your filters.
+                  </p>
                 </div>
               ) : viewMode === "grid" ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -289,29 +309,49 @@ function ResultsContent() {
                       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
                         <div className="h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
                           <div className="text-5xl">
-                            {listing.type === "agency" ? "🏢" : listing.type === "profile" ? "👤" : "🛠️"}
+                            {listing.type === "agency"
+                              ? "🏢"
+                              : listing.type === "profile"
+                                ? "👤"
+                                : "🛠️"}
                           </div>
                         </div>
                         <div className="p-6">
                           <div className="flex items-start justify-between mb-2">
-                            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{listing.title}</h3>
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">{listing.type}</span>
+                            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+                              {listing.title}
+                            </h3>
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                              {listing.type}
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-600 mb-3">{listing.provider}</p>
+                          <p className="text-sm text-gray-600 mb-3">
+                            {listing.provider}
+                          </p>
                           <div className="flex items-center gap-4 mb-3">
                             <div className="flex items-center gap-1">
                               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm font-medium">{listing.rating}</span>
-                              <span className="text-xs text-gray-500">({listing.reviews})</span>
+                              <span className="text-sm font-medium">
+                                {listing.rating}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                ({listing.reviews})
+                              </span>
                             </div>
                             <div className="flex items-center gap-1 text-gray-600">
                               <MapPin className="h-4 w-4" />
-                              <span className="text-sm">{listing.location}</span>
+                              <span className="text-sm">
+                                {listing.location}
+                              </span>
                             </div>
                           </div>
                           <div className="flex items-center justify-between pt-3 border-t">
-                            <span className="text-sm text-gray-500">Starting at</span>
-                            <span className="text-lg font-bold text-gray-900">${listing.price}</span>
+                            <span className="text-sm text-gray-500">
+                              Starting at
+                            </span>
+                            <span className="text-lg font-bold text-gray-900">
+                              ${listing.price}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -326,30 +366,48 @@ function ResultsContent() {
                         <div className="flex flex-col md:flex-row gap-6">
                           <div className="w-full md:w-48 h-32 bg-gradient-to-br from-primary/20 to-primary/5 rounded-lg flex items-center justify-center shrink-0">
                             <div className="text-4xl">
-                              {listing.type === "agency" ? "🏢" : listing.type === "profile" ? "👤" : "🛠️"}
+                              {listing.type === "agency"
+                                ? "🏢"
+                                : listing.type === "profile"
+                                  ? "👤"
+                                  : "🛠️"}
                             </div>
                           </div>
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">
                               <div>
-                                <h3 className="text-xl font-semibold text-gray-900 mb-1">{listing.title}</h3>
-                                <p className="text-gray-600">{listing.provider}</p>
+                                <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                                  {listing.title}
+                                </h3>
+                                <p className="text-gray-600">
+                                  {listing.provider}
+                                </p>
                               </div>
-                              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">{listing.type}</span>
+                              <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                                {listing.type}
+                              </span>
                             </div>
                             <div className="flex items-center gap-6 mb-3">
                               <div className="flex items-center gap-1">
                                 <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                                <span className="text-sm font-medium">{listing.rating}</span>
-                                <span className="text-xs text-gray-500">({listing.reviews} reviews)</span>
+                                <span className="text-sm font-medium">
+                                  {listing.rating}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  ({listing.reviews} reviews)
+                                </span>
                               </div>
                               <div className="flex items-center gap-1 text-gray-600">
                                 <MapPin className="h-4 w-4" />
-                                <span className="text-sm">{listing.location}</span>
+                                <span className="text-sm">
+                                  {listing.location}
+                                </span>
                               </div>
                               <div className="flex items-center gap-1 text-gray-600">
                                 <DollarSign className="h-4 w-4" />
-                                <span className="text-sm font-semibold">${listing.price}</span>
+                                <span className="text-sm font-semibold">
+                                  ${listing.price}
+                                </span>
                               </div>
                             </div>
                             {listing.category && (
@@ -380,4 +438,3 @@ export default function ResultsPage() {
     </Suspense>
   );
 }
-

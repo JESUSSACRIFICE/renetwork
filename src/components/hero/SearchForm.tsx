@@ -38,98 +38,10 @@ export interface FilterValues {
   motive: string[];
 }
 
+import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
+
 // Options for dropdowns
 const findOptions = ["Service", "Profile", "Agency"];
-
-// A-Z Psp Options organized alphabetically
-const pspOptionsByLetter: Record<string, string[]> = {
-  A: [
-    "Accountant",
-    "Agent",
-    "Appraiser",
-    "Architect",
-    "Asbesto's",
-    "Attorney's",
-    "RE Attorney's",
-    "Worker's Comp",
-  ],
-  B: [
-    "Bookkeeper",
-    "Broker",
-    "Builder",
-  ],
-  C: [
-    "Cleaner",
-    "Concrete",
-    "Contractor",
-    "Construction",
-    "Consultant",
-    "Consultant's",
-    "Crowdfunding",
-  ],
-  D: [
-    "Developer",
-  ],
-  E: [
-    "Electrician",
-    "Escrow",
-  ],
-  F: [
-    "Flooring",
-    "Framer",
-  ],
-  G: [
-    "Gardening",
-  ],
-  H: [
-    "HVAC",
-  ],
-  I: [
-    "Investor",
-  ],
-  J: [
-    "Janitorial",
-  ],
-  L: [
-    "Landscaper",
-    "Loan",
-    "Loan Executive",
-    "Loan Originator",
-    "Loan Processor",
-  ],
-  M: [
-    "Mortgage",
-    "Mover's",
-  ],
-  P: [
-    "Painter",
-    "Pavement",
-    "Pest",
-    "Professional's",
-    "Plumber",
-    "Pool",
-    "Pressure Washer",
-  ],
-  R: [
-    "Real Estate",
-    "Roofing",
-  ],
-  S: [
-    "Sand-Blasting",
-    "Solar",
-    "Squat-Removal",
-  ],
-  T: [
-    "Taxes",
-    "Transaction Coordinator",
-    "Trash Bin Cleaner",
-  ],
-  W: [
-    "Wholesaler",
-    "Welder",
-    "Window Cleaner",
-  ],
-};
 
 // Agent nested options (updated with all options)
 const agentOptions = [
@@ -149,21 +61,39 @@ const agentOptions = [
 const realEstateOptions = ["Selling", "Buying", "Leasing", "All"];
 
 // Crowdfunding nested options
-const crowdfundingOptions = [
-  "Accreditation",
-  "Accredited",
-  "Non Accredited",
-];
+const crowdfundingOptions = ["Accreditation", "Accredited", "Non Accredited"];
 
 // Flooring nested options
 const flooringIndoorOptions = ["Asphalt", "Tile"];
-const flooringOutdoorOptions = ["Asphalt", "Concrete", "Gravel", "Rock", "Stone"];
-const representationOptions = ["Selling", "Leasing/Renting", "Consulting", "Buying", "Institution", "Crowdfunding", "All of the above"];
+const flooringOutdoorOptions = [
+  "Asphalt",
+  "Concrete",
+  "Gravel",
+  "Rock",
+  "Stone",
+];
+const representationOptions = [
+  "Selling",
+  "Leasing/Renting",
+  "Consulting",
+  "Buying",
+  "Institution",
+  "Crowdfunding",
+  "All of the above",
+];
 const buyingOptions = ["Buying", "Cash", "Owner Finance", "Credit", "Others"];
 const institutionOptions = ["Mortgage", "Bank", "Already have"];
 const creditOptions = ["Already acquired loan", "Need Loan"];
 // Fields options with nested structure
-const fieldsOptions = ["Commercial", "Multi-Unit", "Industrial", "Agriculture", "Residential", "Other", "All of the above"];
+const fieldsOptions = [
+  "Commercial",
+  "Multi-Unit",
+  "Industrial",
+  "Agriculture",
+  "Residential",
+  "Other",
+  "All of the above",
+];
 
 // Commercial sub-options (first level under Commercial)
 const commercialOptions = [
@@ -174,28 +104,14 @@ const commercialOptions = [
 ];
 
 // Retail nested options (under Commercial > Retail)
-const commercialRetailOptions = [
-  "Single",
-  "Mall",
-  "Anchor",
-];
+const commercialRetailOptions = ["Single", "Mall", "Anchor"];
 
 // Mall nested options (under Commercial > Retail > Mall)
-const commercialMallOptions = [
-  "Strip",
-  "Out-door",
-  "In-door",
-];
+const commercialMallOptions = ["Strip", "Out-door", "In-door"];
 
-const commercialRecreationalOptions = [
-  "Water-Park",
-  "Amusement Park",
-];
+const commercialRecreationalOptions = ["Water-Park", "Amusement Park"];
 
-const commercialHospitalityOptions = [
-  "Hotel's",
-  "Motel's",
-];
+const commercialHospitalityOptions = ["Hotel's", "Motel's"];
 
 // Multi-Unit nested options
 const multiUnitOptions = [
@@ -246,7 +162,14 @@ const otherOptions = [
   "Land Developement",
   "All of the above",
 ];
-const priceOptions = ["Luxury", "Mid", "Economic", "Budget", "Premium", "Affordable"];
+const priceOptions = [
+  "Luxury",
+  "Mid",
+  "Economic",
+  "Budget",
+  "Premium",
+  "Affordable",
+];
 const percentageShareOptions = ["10%", "20%", "30%", "40%", "50%"];
 const willingToTrainOptions = ["Yes", "No", "Maybe"];
 const motiveOptions = ["Serious", "Wasting time", "Exploring", "Ready to hire"];
@@ -305,7 +228,7 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
 
       // Determine which page to navigate to based on "find" option
       const findOption = filters.find[0]; // Get first selected option
-      
+
       if (findOption === "Profile") {
         router.push(`/search/profiles?${params.toString()}`);
       } else if (findOption === "Service") {
@@ -320,7 +243,9 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
   };
 
   return (
-    <div className={`bg-white text-black overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[500px] border-2 border-white rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px] ${className}`}>
+    <div
+      className={`bg-white text-black overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[330px] border-2 border-white rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px] ${className}`}
+    >
       <div className="space-y-1 text-black">
         {/* Find */}
         <MultiSelect
@@ -335,23 +260,33 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
         <PSPMultiSelect
           label="A-Z Psp"
           placeholder="Ex. Architect, Agent, Builder..."
-          optionsByLetter={pspOptionsByLetter}
+          optionsByLetter={PSP_OPTIONS_BY_LETTER}
           value={filters.psp}
           onChange={(value) => setFilters({ ...filters, psp: value })}
           agentValue={filters.agentTypes}
-          onAgentChange={(value) => setFilters({ ...filters, agentTypes: value })}
+          onAgentChange={(value) =>
+            setFilters({ ...filters, agentTypes: value })
+          }
           agentOptions={agentOptions}
           realEstateValue={filters.realEstateTypes}
-          onRealEstateChange={(value) => setFilters({ ...filters, realEstateTypes: value })}
+          onRealEstateChange={(value) =>
+            setFilters({ ...filters, realEstateTypes: value })
+          }
           realEstateOptions={realEstateOptions}
           crowdfundingValue={filters.crowdfundingTypes}
-          onCrowdfundingChange={(value) => setFilters({ ...filters, crowdfundingTypes: value })}
+          onCrowdfundingChange={(value) =>
+            setFilters({ ...filters, crowdfundingTypes: value })
+          }
           crowdfundingOptions={crowdfundingOptions}
           flooringIndoorValue={filters.flooringIndoorTypes}
-          onFlooringIndoorChange={(value) => setFilters({ ...filters, flooringIndoorTypes: value })}
+          onFlooringIndoorChange={(value) =>
+            setFilters({ ...filters, flooringIndoorTypes: value })
+          }
           flooringIndoorOptions={flooringIndoorOptions}
           flooringOutdoorValue={filters.flooringOutdoorTypes}
-          onFlooringOutdoorChange={(value) => setFilters({ ...filters, flooringOutdoorTypes: value })}
+          onFlooringOutdoorChange={(value) =>
+            setFilters({ ...filters, flooringOutdoorTypes: value })
+          }
           flooringOutdoorOptions={flooringOutdoorOptions}
         />
 
@@ -362,15 +297,23 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
             placeholder="Select representation types..."
             options={representationOptions}
             value={filters.representation}
-            onChange={(value) => setFilters({ ...filters, representation: value })}
+            onChange={(value) =>
+              setFilters({ ...filters, representation: value })
+            }
             buyingValue={filters.buyingTypes}
-            onBuyingChange={(value) => setFilters({ ...filters, buyingTypes: value })}
+            onBuyingChange={(value) =>
+              setFilters({ ...filters, buyingTypes: value })
+            }
             buyingOptions={buyingOptions}
             institutionValue={filters.institutionTypes}
-            onInstitutionChange={(value) => setFilters({ ...filters, institutionTypes: value })}
+            onInstitutionChange={(value) =>
+              setFilters({ ...filters, institutionTypes: value })
+            }
             institutionOptions={institutionOptions}
             creditValue={filters.creditTypes}
-            onCreditChange={(value) => setFilters({ ...filters, creditTypes: value })}
+            onCreditChange={(value) =>
+              setFilters({ ...filters, creditTypes: value })
+            }
             creditOptions={creditOptions}
           />
         )}
@@ -383,36 +326,58 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
           value={filters.fields}
           onChange={(value) => setFilters({ ...filters, fields: value })}
           commercialValue={filters.commercialTypes}
-          onCommercialChange={(value) => setFilters({ ...filters, commercialTypes: value })}
+          onCommercialChange={(value) =>
+            setFilters({ ...filters, commercialTypes: value })
+          }
           commercialOptions={commercialOptions}
           commercialRetailValue={filters.commercialRetailTypes}
-          onCommercialRetailChange={(value) => setFilters({ ...filters, commercialRetailTypes: value })}
+          onCommercialRetailChange={(value) =>
+            setFilters({ ...filters, commercialRetailTypes: value })
+          }
           commercialRetailOptions={commercialRetailOptions}
           commercialMallValue={filters.commercialMallTypes}
-          onCommercialMallChange={(value) => setFilters({ ...filters, commercialMallTypes: value })}
+          onCommercialMallChange={(value) =>
+            setFilters({ ...filters, commercialMallTypes: value })
+          }
           commercialMallOptions={commercialMallOptions}
           commercialRecreationalValue={filters.commercialRecreationalTypes}
-          onCommercialRecreationalChange={(value) => setFilters({ ...filters, commercialRecreationalTypes: value })}
+          onCommercialRecreationalChange={(value) =>
+            setFilters({ ...filters, commercialRecreationalTypes: value })
+          }
           commercialRecreationalOptions={commercialRecreationalOptions}
           commercialHospitalityValue={filters.commercialHospitalityTypes}
-          onCommercialHospitalityChange={(value) => setFilters({ ...filters, commercialHospitalityTypes: value })}
+          onCommercialHospitalityChange={(value) =>
+            setFilters({ ...filters, commercialHospitalityTypes: value })
+          }
           commercialHospitalityOptions={commercialHospitalityOptions}
           commercialOtherValue={filters.commercialOtherTypes}
-          onCommercialOtherChange={(value) => setFilters({ ...filters, commercialOtherTypes: value })}
+          onCommercialOtherChange={(value) =>
+            setFilters({ ...filters, commercialOtherTypes: value })
+          }
           multiUnitValue={filters.multiUnitTypes}
-          onMultiUnitChange={(value) => setFilters({ ...filters, multiUnitTypes: value })}
+          onMultiUnitChange={(value) =>
+            setFilters({ ...filters, multiUnitTypes: value })
+          }
           multiUnitOptions={multiUnitOptions}
           industrialValue={filters.industrialTypes}
-          onIndustrialChange={(value) => setFilters({ ...filters, industrialTypes: value })}
+          onIndustrialChange={(value) =>
+            setFilters({ ...filters, industrialTypes: value })
+          }
           industrialOptions={industrialOptions}
           agricultureValue={filters.agricultureTypes}
-          onAgricultureChange={(value) => setFilters({ ...filters, agricultureTypes: value })}
+          onAgricultureChange={(value) =>
+            setFilters({ ...filters, agricultureTypes: value })
+          }
           agricultureOptions={agricultureOptions}
           residentialValue={filters.residentialTypes}
-          onResidentialChange={(value) => setFilters({ ...filters, residentialTypes: value })}
+          onResidentialChange={(value) =>
+            setFilters({ ...filters, residentialTypes: value })
+          }
           residentialOptions={residentialOptions}
           otherValue={filters.otherTypes}
-          onOtherChange={(value) => setFilters({ ...filters, otherTypes: value })}
+          onOtherChange={(value) =>
+            setFilters({ ...filters, otherTypes: value })
+          }
           otherOptions={otherOptions}
         />
 
@@ -431,7 +396,9 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
           placeholder="Select"
           options={percentageShareOptions}
           value={filters.percentageShare}
-          onChange={(value) => setFilters({ ...filters, percentageShare: value })}
+          onChange={(value) =>
+            setFilters({ ...filters, percentageShare: value })
+          }
         />
 
         {/* Willing to train */}
@@ -440,7 +407,9 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
           placeholder="Select"
           options={willingToTrainOptions}
           value={filters.willingToTrain}
-          onChange={(value) => setFilters({ ...filters, willingToTrain: value })}
+          onChange={(value) =>
+            setFilters({ ...filters, willingToTrain: value })
+          }
         />
 
         {/* Motive */}
@@ -453,10 +422,13 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
         />
       </div>
       {/* Search Button */}
-      <Button onClick={handleSearch} className="w-full bg-primary hover:bg-primary/90 text-white" size="lg">
+      <Button
+        onClick={handleSearch}
+        className="w-full bg-primary hover:bg-primary/90 text-white"
+        size="lg"
+      >
         Search
       </Button>
     </div>
   );
 };
-

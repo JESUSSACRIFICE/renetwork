@@ -3,7 +3,13 @@
 import { useState } from "react";
 import ReferralHeader from "@/components/referral/ReferralHeader";
 import ReferralFooter from "@/components/referral/ReferralFooter";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +24,9 @@ export default function SettingsPage() {
     bio: "Real estate professional",
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -32,7 +40,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 w-full">
       <ReferralHeader />
       <main className="flex-1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -50,7 +58,9 @@ export default function SettingsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Profile Settings</CardTitle>
-                    <CardDescription>Update your profile information</CardDescription>
+                    <CardDescription>
+                      Update your profile information
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,7 +124,9 @@ export default function SettingsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Security Settings</CardTitle>
-                    <CardDescription>Manage your account security</CardDescription>
+                    <CardDescription>
+                      Manage your account security
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -126,7 +138,9 @@ export default function SettingsPage() {
                       <Input id="newPassword" type="password" />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Label htmlFor="confirmPassword">
+                        Confirm New Password
+                      </Label>
                       <Input id="confirmPassword" type="password" />
                     </div>
                     <Button>Update Password</Button>
@@ -138,10 +152,14 @@ export default function SettingsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Notification Settings</CardTitle>
-                    <CardDescription>Manage your notification preferences</CardDescription>
+                    <CardDescription>
+                      Manage your notification preferences
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-600">Notification settings coming soon...</p>
+                    <p className="text-gray-600">
+                      Notification settings coming soon...
+                    </p>
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -153,4 +171,3 @@ export default function SettingsPage() {
     </div>
   );
 }
-

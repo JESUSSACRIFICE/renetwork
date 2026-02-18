@@ -3,7 +3,7 @@
 import { FileText, CheckCircle2, Hourglass, MessageSquare } from "lucide-react";
 
 interface DashboardMetricsProps {
-  userType: "buyer" | "agent";
+  userType: "service_provider" | "agent";
 }
 
 export function DashboardMetrics({ userType }: DashboardMetricsProps) {

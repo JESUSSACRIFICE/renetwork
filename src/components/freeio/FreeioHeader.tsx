@@ -11,24 +11,39 @@ export default function FreeioHeader() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-gray-900">
-            Freeio.
+            RE Network
           </Link>
 
           {/* Navigation Links */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Home
             </Link>
-            <Link href="/browse-jobs" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/browse-jobs"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Browse Jobs
             </Link>
-            <Link href="/users" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/users"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Users
             </Link>
-            <Link href="/blog" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/blog"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Blog
             </Link>
-            <Link href="/pages" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/pages"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Pages
             </Link>
           </nav>
@@ -50,4 +65,3 @@ export default function FreeioHeader() {
     </header>
   );
 }
-

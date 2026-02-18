@@ -12,7 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Search, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-type UserType = "buyer" | "agent";
+type UserType = "service_provider" | "agent";
 
 export default function SavedSearches() {
   const router = useRouter();
@@ -27,7 +27,9 @@ export default function SavedSearches() {
   }, []);
 
   const checkAuthAndFetch = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push("/auth");
       return;
@@ -43,18 +45,18 @@ export default function SavedSearches() {
       .select("*, user_roles(role)")
       .eq("id", userId)
       .maybeSingle();
-    
+
     setProfile(data);
-    
+
     // Check for URL parameter to override user type (for testing)
     const urlParams = new URLSearchParams(window.location.search);
-    const overrideTypeParam = urlParams.get('type');
-    
+    const overrideTypeParam = urlParams.get("type");
+
     if (overrideTypeParam === "buyer" || overrideTypeParam === "agent") {
       setUserType(overrideTypeParam as UserType);
       return;
     }
-    
+
     // Determine user type: if they have roles, they're an agent (service provider)
     // Otherwise, they're a buyer
     const hasRoles = data?.user_roles && data.user_roles.length > 0;
@@ -81,7 +83,7 @@ export default function SavedSearches() {
   const deleteSearch = async (id: string) => {
     try {
       await supabase.from("saved_searches").delete().eq("id", id);
-      setSearches(searches.filter(s => s.id !== id));
+      setSearches(searches.filter((s) => s.id !== id));
       toast.success("Search deleted");
     } catch (error: any) {
       toast.error("Failed to delete search");
@@ -90,8 +92,12 @@ export default function SavedSearches() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <FreeioDashboardHeader user={user} profile={profile} userType={userType} />
+      <div className="min-h-screen flex flex-col bg-gray-50 w-full">
+        <FreeioDashboardHeader
+          user={user}
+          profile={profile}
+          userType={userType}
+        />
         <div className="flex flex-1">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 p-8 bg-gray-50">
@@ -99,7 +105,9 @@ export default function SavedSearches() {
               <SidebarTrigger />
               <div>
                 <h1 className="text-3xl font-bold">Saved Searches</h1>
-                <p className="text-muted-foreground">Your saved search filters</p>
+                <p className="text-muted-foreground">
+                  Your saved search filters
+                </p>
               </div>
             </div>
 
@@ -108,8 +116,12 @@ export default function SavedSearches() {
             ) : searches.length === 0 ? (
               <Card className="p-12 text-center">
                 <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">No saved searches yet</p>
-                <Button onClick={() => router.push("/browse")}>Start Searching</Button>
+                <p className="text-muted-foreground mb-4">
+                  No saved searches yet
+                </p>
+                <Button onClick={() => router.push("/browse")}>
+                  Start Searching
+                </Button>
               </Card>
             ) : (
               <div className="grid gap-4">
@@ -119,17 +131,27 @@ export default function SavedSearches() {
                       <div>
                         <h3 className="font-semibold mb-2">{search.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {Object.keys(search.search_params).length} filters applied
+                          {Object.keys(search.search_params).length} filters
+                          applied
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => {
-                          const params = new URLSearchParams(search.search_params);
-                          router.push(`/browse?${params.toString()}`);
-                        }}>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            const params = new URLSearchParams(
+                              search.search_params,
+                            );
+                            router.push(`/browse?${params.toString()}`);
+                          }}
+                        >
                           Apply Search
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteSearch(search.id)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteSearch(search.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -145,8 +167,3 @@ export default function SavedSearches() {
     </SidebarProvider>
   );
 }
-
-
-
-
-

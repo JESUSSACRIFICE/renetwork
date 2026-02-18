@@ -8,7 +8,7 @@ export function FreeioFooter() {
       <div className="w-full px-4">
         <div className="flex items-center justify-between max-w-[1920px] mx-auto">
           <p className="text-sm text-gray-600">
-            © Freeio. 2022 CreativeLayers. All rights reserved.
+            © RE Network 2022 CreativeLayers. All rights reserved.
           </p>
           <div className="flex items-center space-x-2 text-gray-600">
             <span className="text-sm">English</span>

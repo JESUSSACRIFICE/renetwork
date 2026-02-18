@@ -3,54 +3,38 @@
 import Link from "next/link";
 import { Star, MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBrowseProfiles } from "@/hooks/use-professional-profiles";
+
+const AVATAR_EMOJIS = ["🏢", "💰", "⚡", "⚖️"];
+
+function formatRole(role: string) {
+  return role
+    .split("_")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ");
+}
 
 const TopRatedFreelancers = () => {
-  const freelancers = [
-    {
-      name: "Alexandra Bennett",
-      title: "Top Agent - Commercial",
-      location: "Los Angeles, CA",
-      rating: 5.0,
-      reviews: 342,
-      hourlyRate: 0,
-      referralFee: "30%",
-      image: "🏢",
-      skills: ["Commercial", "Multi-Unit", "REO"],
-    },
-    {
-      name: "James Rodriguez",
-      title: "Mortgage Consultant",
-      location: "San Francisco, CA",
-      rating: 5.0,
-      reviews: 298,
-      hourlyRate: 0,
-      referralFee: "40%",
-      image: "💰",
-      skills: ["FHA", "VA Loans", "Commercial"],
-    },
-    {
-      name: "Maria Santos",
-      title: "Master Electrician",
-      location: "San Diego, CA",
-      rating: 4.9,
-      reviews: 265,
-      hourlyRate: 125,
-      referralFee: null,
-      image: "⚡",
-      skills: ["Commercial", "Industrial", "Residential"],
-    },
-    {
-      name: "Robert Chen",
-      title: "RE Attorney",
-      location: "Sacramento, CA",
-      rating: 4.9,
-      reviews: 189,
-      hourlyRate: 275,
-      referralFee: null,
-      image: "⚖️",
-      skills: ["Title", "Foreclosure", "Contracts"],
-    },
-  ];
+  const { data: profiles = [] } = useBrowseProfiles({});
+  const freelancers = profiles
+    .slice(0, 4)
+    .sort((a, b) => b.rating - a.rating)
+    .map((p, i) => {
+      const roleLabel = p.roles?.[0];
+      const title = p.title !== p.provider ? p.title : roleLabel ? formatRole(roleLabel) : "Professional";
+      return {
+      id: p.id,
+      name: p.provider,
+      title,
+      location: p.location || "Location not specified",
+      rating: p.rating,
+      reviews: p.reviews,
+      hourlyRate: p.price || 0,
+      referralFee: p.referralFee,
+      image: AVATAR_EMOJIS[i % AVATAR_EMOJIS.length],
+      skills: p.skills || [],
+    };
+    });
 
   return (
     <section className="py-20 bg-background">
@@ -75,8 +59,8 @@ const TopRatedFreelancers = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {freelancers.map((freelancer) => (
             <Link
-              key={freelancer.name}
-              href={`/profile/${freelancer.name.toLowerCase().replace(" ", "-")}`}
+              key={freelancer.id}
+              href={`/profile/${freelancer.id}`}
               className="group"
             >
               <div className="bg-card rounded-2xl border p-6 hover:shadow-xl transition-all duration-300 hover:-translate-y-2 hover:border-primary/50">
@@ -116,7 +100,7 @@ const TopRatedFreelancers = () => {
 
                   {/* Skills */}
                   <div className="flex flex-wrap gap-2">
-                    {freelancer.skills.map((skill) => (
+                    {(freelancer.skills || []).map((skill) => (
                       <span
                         key={skill}
                         className="px-2 py-1 bg-accent text-xs rounded-full"
@@ -133,7 +117,7 @@ const TopRatedFreelancers = () => {
                         {freelancer.hourlyRate > 0 ? "Starting at" : "Referral Fee"}
                       </span>
                       <span className="text-xl font-bold text-primary">
-                        {freelancer.hourlyRate > 0 ? `$${freelancer.hourlyRate}/hr` : freelancer.referralFee}
+                        {freelancer.hourlyRate > 0 ? `$${freelancer.hourlyRate}/hr` : freelancer.referralFee || "Contact"}
                       </span>
                     </div>
                   </div>

@@ -9,7 +9,12 @@ const footerLinks = {
   Projects: ["Browse Projects", "Browse Freelancers", "Browse Categories"],
   Trending: ["Designers", "Developers", "Writers", "Marketers"],
   "Top Skills": ["PHP", "JavaScript", "Python", "React"],
-  "Top Jobs": ["Web Developer", "Graphic Designer", "Content Writer", "SEO Expert"],
+  "Top Jobs": [
+    "Web Developer",
+    "Graphic Designer",
+    "Content Writer",
+    "SEO Expert",
+  ],
   "Your Services": ["Post a Project", "Browse Projects", "Browse Freelancers"],
 };
 
@@ -21,9 +26,11 @@ export default function FreeioFooter() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-8">
           {/* Logo and Contact */}
           <div className="col-span-2 lg:col-span-1">
-            <h3 className="text-2xl font-bold text-white mb-4">Freeio.</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">RE Network</h3>
             <p className="text-sm mb-4">Customer Care</p>
-            <p className="text-lg font-semibold text-white mb-2">+1 234 567 890</p>
+            <p className="text-lg font-semibold text-white mb-2">
+              +1 234 567 890
+            </p>
             <Link href="/help" className="text-sm hover:text-white">
               Need help?
             </Link>
@@ -36,7 +43,10 @@ export default function FreeioFooter() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link}>
-                    <Link href="#" className="text-sm hover:text-white transition-colors">
+                    <Link
+                      href="#"
+                      className="text-sm hover:text-white transition-colors"
+                    >
                       {link}
                     </Link>
                   </li>
@@ -59,7 +69,9 @@ export default function FreeioFooter() {
                 placeholder="Enter your email"
                 className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
               />
-              <Button className="bg-gray-800 hover:bg-gray-700 text-white">Send</Button>
+              <Button className="bg-gray-800 hover:bg-gray-700 text-white">
+                Send
+              </Button>
             </div>
           </div>
         </div>
@@ -83,7 +95,7 @@ export default function FreeioFooter() {
         <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm">
-              © Freeio. 2023 creativelayers. all rights reserved.
+              © RE Network 2023 creativelayers. all rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <div className="flex gap-4">
@@ -112,4 +124,3 @@ export default function FreeioFooter() {
     </footer>
   );
 }
-

@@ -2,9 +2,25 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Bell, MessageSquare, Menu, Building2, Home, DollarSign, Hammer, FileText, Scale, Users, User, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+  Search,
+  Bell,
+  MessageSquare,
+  Menu,
+  Building2,
+  Home,
+  DollarSign,
+  Hammer,
+  FileText,
+  Scale,
+  Users,
+  User,
+  LogOut,
+} from "lucide-react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { useUnreadCount } from "@/hooks/use-messages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,29 +31,22 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
 const Header = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const { unreadCount } = useUnreadCount(user?.id ?? null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-
-  useEffect(() => {
-    // Get current user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-    });
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const handleLogout = async () => {
     try {
@@ -58,15 +67,69 @@ const Header = () => {
   };
 
   const professionalServices = [
-    { icon: Home, name: "Real Estate Agents", href: "/browse?category=agents", subcategories: ["Residential", "Commercial", "Luxury", "Investment"] },
-    { icon: DollarSign, name: "Mortgage Consultants", href: "/browse?category=mortgage", subcategories: ["FHA Loans", "Commercial Loans", "VA Loans", "Refinancing"] },
-    { icon: Scale, name: "Real Estate Attorneys", href: "/browse?category=attorney", subcategories: ["Title", "Foreclosure", "Contract Law", "Real Estate Litigation"] },
-    { icon: FileText, name: "Escrow Officers", href: "/browse?category=escrow", subcategories: ["Title Insurance", "Closing Services", "Escrow Management"] },
+    {
+      icon: Home,
+      name: "Real Estate Agents",
+      href: "/browse?category=agents",
+      subcategories: ["Residential", "Commercial", "Luxury", "Investment"],
+    },
+    {
+      icon: DollarSign,
+      name: "Mortgage Consultants",
+      href: "/browse?category=mortgage",
+      subcategories: [
+        "FHA Loans",
+        "Commercial Loans",
+        "VA Loans",
+        "Refinancing",
+      ],
+    },
+    {
+      icon: Scale,
+      name: "Real Estate Attorneys",
+      href: "/browse?category=attorney",
+      subcategories: [
+        "Title",
+        "Foreclosure",
+        "Contract Law",
+        "Real Estate Litigation",
+      ],
+    },
+    {
+      icon: FileText,
+      name: "Escrow Officers",
+      href: "/browse?category=escrow",
+      subcategories: [
+        "Title Insurance",
+        "Closing Services",
+        "Escrow Management",
+      ],
+    },
   ];
 
   const tradeServices = [
-    { icon: Hammer, name: "General Contractors", href: "/browse?category=contractors", subcategories: ["New Construction", "Renovations", "Remodeling", "Commercial"] },
-    { icon: Building2, name: "Property Inspectors", href: "/browse?category=inspectors", subcategories: ["Home Inspection", "Commercial", "Pre-Purchase", "Maintenance"] },
+    {
+      icon: Hammer,
+      name: "General Contractors",
+      href: "/browse?category=contractors",
+      subcategories: [
+        "New Construction",
+        "Renovations",
+        "Remodeling",
+        "Commercial",
+      ],
+    },
+    {
+      icon: Building2,
+      name: "Property Inspectors",
+      href: "/browse?category=inspectors",
+      subcategories: [
+        "Home Inspection",
+        "Commercial",
+        "Pre-Purchase",
+        "Maintenance",
+      ],
+    },
   ];
 
   const propertyTypes = [
@@ -117,7 +180,10 @@ const Header = () => {
                         </div>
                         <div className="flex flex-wrap gap-2 pl-13">
                           {service.subcategories.slice(0, 2).map((sub) => (
-                            <span key={sub} className="text-xs text-muted-foreground">
+                            <span
+                              key={sub}
+                              className="text-xs text-muted-foreground"
+                            >
                               {sub}
                             </span>
                           ))}
@@ -130,7 +196,9 @@ const Header = () => {
 
               {/* Trade Services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="h-10 px-4">Trade Services</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="h-10 px-4">
+                  Trade Services
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid w-[400px] gap-3 p-4">
                     {tradeServices.map((service) => (
@@ -141,7 +209,9 @@ const Header = () => {
                       >
                         <div className="flex items-center gap-3">
                           <service.icon className="h-5 w-5 text-primary" />
-                          <span className="font-semibold text-sm">{service.name}</span>
+                          <span className="font-semibold text-sm">
+                            {service.name}
+                          </span>
                         </div>
                         <div className="text-xs text-muted-foreground pl-8">
                           {service.subcategories.join(", ")}
@@ -154,7 +224,9 @@ const Header = () => {
 
               {/* Property Types */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="h-10 px-4">Property Types</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="h-10 px-4">
+                  Property Types
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid grid-cols-2 w-[400px] gap-2 p-4">
                     {propertyTypes.map((type) => (
@@ -172,15 +244,47 @@ const Header = () => {
 
               {/* Pages */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="h-10 px-4">Pages</NavigationMenuTrigger>
+                <NavigationMenuTrigger className="h-10 px-4">
+                  Pages
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <div className="grid w-[300px] gap-2 p-4">
-                    <Link href="/community" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">Community & Forums</Link>
-                    <Link href="/tools" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">Real Estate Tools</Link>
-                    <Link href="/about" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">About Network</Link>
-                    <Link href="/training" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">Training Programs</Link>
-                    <Link href="/help" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">Help Center</Link>
-                    <Link href="/contact" className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm">Contact</Link>
+                    <Link
+                      href="/community"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Community & Forums
+                    </Link>
+                    <Link
+                      href="/tools"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Real Estate Tools
+                    </Link>
+                    <Link
+                      href="/about"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      About Network
+                    </Link>
+                    <Link
+                      href="/training"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Training Programs
+                    </Link>
+                    <Link
+                      href="/help"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Help Center
+                    </Link>
+                    <Link
+                      href="/contact"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Contact
+                    </Link>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -198,7 +302,10 @@ const Header = () => {
         </nav>
 
         {/* Search Bar - Desktop */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md">
+        <form
+          onSubmit={handleSearch}
+          className="hidden md:flex flex-1 max-w-md"
+        >
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -214,18 +321,27 @@ const Header = () => {
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="hidden md:flex relative hover:bg-accent"
                 onClick={() => router.push("/dashboard/messages")}
               >
                 <MessageSquare className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
               </Button>
-              <Button variant="ghost" size="icon" className="hidden md:flex relative hover:bg-accent">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:flex relative hover:bg-accent"
+              >
                 <Bell className="h-5 w-5" />
               </Button>
-              
+
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="hidden lg:flex">
@@ -246,17 +362,28 @@ const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push(`/profile/${user.id}`)}>
+                  <DropdownMenuItem
+                    onClick={() => router.push(`/profile/${user.id}`)}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     My Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push(`/profile/${user.id}/edit`)}>
+                  <DropdownMenuItem
+                    onClick={() => router.push(`/profile/${user.id}/edit`)}
+                  >
                     <User className="mr-2 h-4 w-4" />
                     Edit Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push("/dashboard/messages")}>
+                  <DropdownMenuItem
+                    onClick={() => router.push("/dashboard/messages")}
+                  >
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Messages
+                    {unreadCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
@@ -280,7 +407,7 @@ const Header = () => {
               </Link>
             </>
           )}
-          
+
           {/* Mobile Menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -295,9 +422,11 @@ const Header = () => {
                     Join Network
                   </Button>
                 </Link>
-                
+
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-lg">Professional Services</h3>
+                  <h3 className="font-semibold text-lg">
+                    Professional Services
+                  </h3>
                   {professionalServices.map((service) => (
                     <Link
                       key={service.name}
@@ -309,7 +438,7 @@ const Header = () => {
                       <span>{service.name}</span>
                     </Link>
                   ))}
-                  
+
                   <h3 className="font-semibold text-lg mt-6">Trade Services</h3>
                   {tradeServices.map((service) => (
                     <Link
