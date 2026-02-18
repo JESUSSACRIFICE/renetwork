@@ -238,7 +238,9 @@ export function useUnreadCount(userId: string | null) {
         }
       )
       .subscribe();
-    return () => supabase.removeChannel(channel);
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [userId, queryClient]);
 
   return { unreadCount: query.data ?? 0, isLoading: query.isLoading };
