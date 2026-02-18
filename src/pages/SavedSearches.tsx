@@ -20,7 +20,9 @@ const SavedSearches = () => {
   }, []);
 
   const checkAuthAndFetch = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       router.push("/auth");
       return;
@@ -58,7 +60,7 @@ const SavedSearches = () => {
   const deleteSearch = async (id: string) => {
     try {
       await supabase.from("saved_searches").delete().eq("id", id);
-      setSearches(searches.filter(s => s.id !== id));
+      setSearches(searches.filter((s) => s.id !== id));
       toast.success("Search deleted");
     } catch (error: any) {
       toast.error("Failed to delete search");
@@ -70,13 +72,15 @@ const SavedSearches = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType="buyer" profile={profile} />
+          <DashboardSidebar userType="service_provider" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />
               <div>
                 <h1 className="text-3xl font-bold">Saved Searches</h1>
-                <p className="text-muted-foreground">Your saved search filters</p>
+                <p className="text-muted-foreground">
+                  Your saved search filters
+                </p>
               </div>
             </div>
 
@@ -85,8 +89,12 @@ const SavedSearches = () => {
             ) : searches.length === 0 ? (
               <Card className="p-12 text-center">
                 <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">No saved searches yet</p>
-                <Button onClick={() => router.push("/browse")}>Start Searching</Button>
+                <p className="text-muted-foreground mb-4">
+                  No saved searches yet
+                </p>
+                <Button onClick={() => router.push("/browse")}>
+                  Start Searching
+                </Button>
               </Card>
             ) : (
               <div className="grid gap-4">
@@ -96,17 +104,27 @@ const SavedSearches = () => {
                       <div>
                         <h3 className="font-semibold mb-2">{search.name}</h3>
                         <p className="text-sm text-muted-foreground">
-                          {Object.keys(search.search_params).length} filters applied
+                          {Object.keys(search.search_params).length} filters
+                          applied
                         </p>
                       </div>
                       <div className="flex gap-2">
-                        <Button variant="outline" onClick={() => {
-                          const params = new URLSearchParams(search.search_params);
-                          router.push(`/browse?${params.toString()}`);
-                        }}>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            const params = new URLSearchParams(
+                              search.search_params,
+                            );
+                            router.push(`/browse?${params.toString()}`);
+                          }}
+                        >
                           Apply Search
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteSearch(search.id)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => deleteSearch(search.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>

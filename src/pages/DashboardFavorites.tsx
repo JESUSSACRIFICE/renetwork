@@ -21,8 +21,10 @@ const DashboardFavorites = () => {
   }, []);
 
   const checkAuthAndFetch = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
     if (!user) {
       router.push("/auth");
       return;
@@ -45,7 +47,8 @@ const DashboardFavorites = () => {
     try {
       const { data, error } = await supabase
         .from("favorites")
-        .select(`
+        .select(
+          `
           id,
           created_at,
           profile:profile_id (
@@ -59,7 +62,8 @@ const DashboardFavorites = () => {
             service_areas(zip_code),
             reviews(rating)
           )
-        `)
+        `,
+        )
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
@@ -82,7 +86,7 @@ const DashboardFavorites = () => {
 
       if (error) throw error;
 
-      setFavorites(favorites.filter(f => f.id !== favoriteId));
+      setFavorites(favorites.filter((f) => f.id !== favoriteId));
       toast.success("Removed from favorites");
     } catch (error: any) {
       toast.error("Failed to remove favorite");
@@ -98,7 +102,9 @@ const DashboardFavorites = () => {
 
   const calculateAvgRating = (reviews: any[]) => {
     if (!reviews || reviews.length === 0) return 0;
-    return (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+    return (
+      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    ).toFixed(1);
   };
 
   return (
@@ -106,18 +112,22 @@ const DashboardFavorites = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
-          <DashboardSidebar userType="buyer" profile={profile} />
+          <DashboardSidebar userType="service_provider" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
               <SidebarTrigger />
               <div>
                 <h1 className="text-3xl font-bold">Favorite Professionals</h1>
-                <p className="text-muted-foreground">Your saved real estate experts</p>
+                <p className="text-muted-foreground">
+                  Your saved real estate experts
+                </p>
               </div>
             </div>
 
             {loading ? (
-              <p className="text-center text-muted-foreground">Loading favorites...</p>
+              <p className="text-center text-muted-foreground">
+                Loading favorites...
+              </p>
             ) : favorites.length === 0 ? (
               <Card className="p-12 text-center">
                 <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
@@ -131,15 +141,20 @@ const DashboardFavorites = () => {
                 {favorites.map((favorite) => {
                   const prof = favorite.profile;
                   const avgRating = calculateAvgRating(prof.reviews || []);
-                  
+
                   return (
-                    <Card key={favorite.id} className="p-6 hover:shadow-lg transition-shadow">
+                    <Card
+                      key={favorite.id}
+                      className="p-6 hover:shadow-lg transition-shadow"
+                    >
                       <div className="flex items-start justify-between mb-4">
                         <Link href={`/profile/${prof.id}`} className="flex-1">
                           <h3 className="font-bold text-lg hover:text-primary transition-colors line-clamp-1">
                             {prof.company_name || prof.full_name}
                           </h3>
-                          <p className="text-sm text-muted-foreground">{prof.full_name}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {prof.full_name}
+                          </p>
                         </Link>
                         <Button
                           variant="ghost"
@@ -152,14 +167,16 @@ const DashboardFavorites = () => {
                       </div>
 
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {prof.user_roles?.slice(0, 2).map((r: any, idx: number) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                          >
-                            {formatRole(r.role)}
-                          </span>
-                        ))}
+                        {prof.user_roles
+                          ?.slice(0, 2)
+                          .map((r: any, idx: number) => (
+                            <span
+                              key={idx}
+                              className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                            >
+                              {formatRole(r.role)}
+                            </span>
+                          ))}
                       </div>
 
                       <div className="space-y-2 mb-4">
@@ -180,13 +197,15 @@ const DashboardFavorites = () => {
                       </div>
 
                       <div className="pt-3 border-t">
-                        <p className="text-sm text-muted-foreground mb-1">Starting at</p>
+                        <p className="text-sm text-muted-foreground mb-1">
+                          Starting at
+                        </p>
                         <p className="text-lg font-bold text-primary">
                           {prof.hourly_rate
                             ? `$${prof.hourly_rate}/hr`
                             : prof.referral_fee_percentage
-                            ? `${prof.referral_fee_percentage}%`
-                            : "Contact for quote"}
+                              ? `${prof.referral_fee_percentage}%`
+                              : "Contact for quote"}
                         </p>
                       </div>
 
