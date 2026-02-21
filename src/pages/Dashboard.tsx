@@ -229,7 +229,7 @@ const Dashboard = () => {
                 ) : (
                   <>
                     <button
-                      onClick={() => router.push("/browse")}
+                      onClick={() => router.push("/search/services")}
                       className="p-4 text-left border rounded-lg hover:bg-muted transition-colors"
                     >
                       <TrendingUp className="h-6 w-6 text-primary mb-2" />

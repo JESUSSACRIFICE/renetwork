@@ -26,7 +26,7 @@ const footerLinks = {
   ],
   Account: [
     { name: "Dashboard", href: "/referral/dashboard" },
-    { name: "Register", href: "/referral/register" },
+    { name: "Register", href: "/register" },
     { name: "Settings", href: "/referral/settings" },
     { name: "Advertise", href: "/referral/advertise" },
   ],

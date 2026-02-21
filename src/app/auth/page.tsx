@@ -73,7 +73,9 @@ function AuthContent() {
       } else if (!profile) {
         router.push(`/profile/${data.user.id}/edit`);
       } else if (userType === "customer") {
-        router.push("/browse");
+        router.push("/search/profiles");
+      } else if (userType === "admin") {
+        router.push("/dashboard");
       } else {
         router.push(`/profile/${data.user.id}`);
       }
@@ -396,11 +398,13 @@ function AuthContent() {
 
 export default function Auth() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/5">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-accent/5">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+        </div>
+      }
+    >
       <AuthContent />
     </Suspense>
   );

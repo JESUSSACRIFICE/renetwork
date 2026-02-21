@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUnreadCount } from "@/hooks/use-messages";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ import { toast } from "sonner";
 
 const Header = () => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -51,6 +53,7 @@ const Header = () => {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
+      queryClient.invalidateQueries({ queryKey: AUTH_USER_QUERY_KEY });
       toast.success("Logged out successfully");
       router.push("/");
     } catch (error) {
@@ -61,7 +64,7 @@ const Header = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/browse?q=${encodeURIComponent(searchQuery)}`);
+      router.push(`/search/services?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery("");
     }
   };
@@ -70,13 +73,13 @@ const Header = () => {
     {
       icon: Home,
       name: "Real Estate Agents",
-      href: "/browse?category=agents",
+      href: "/search/services?category=agents",
       subcategories: ["Residential", "Commercial", "Luxury", "Investment"],
     },
     {
       icon: DollarSign,
       name: "Mortgage Consultants",
-      href: "/browse?category=mortgage",
+      href: "/search/services?category=mortgage",
       subcategories: [
         "FHA Loans",
         "Commercial Loans",
@@ -87,7 +90,7 @@ const Header = () => {
     {
       icon: Scale,
       name: "Real Estate Attorneys",
-      href: "/browse?category=attorney",
+      href: "/search/services?category=attorney",
       subcategories: [
         "Title",
         "Foreclosure",
@@ -98,7 +101,7 @@ const Header = () => {
     {
       icon: FileText,
       name: "Escrow Officers",
-      href: "/browse?category=escrow",
+      href: "/search/services?category=escrow",
       subcategories: [
         "Title Insurance",
         "Closing Services",
@@ -111,7 +114,7 @@ const Header = () => {
     {
       icon: Hammer,
       name: "General Contractors",
-      href: "/browse?category=contractors",
+      href: "/search/services?category=contractors",
       subcategories: [
         "New Construction",
         "Renovations",
@@ -122,7 +125,7 @@ const Header = () => {
     {
       icon: Building2,
       name: "Property Inspectors",
-      href: "/browse?category=inspectors",
+      href: "/search/services?category=inspectors",
       subcategories: [
         "Home Inspection",
         "Commercial",
@@ -133,12 +136,12 @@ const Header = () => {
   ];
 
   const propertyTypes = [
-    { name: "Residential", href: "/browse?type=residential" },
-    { name: "Commercial", href: "/browse?type=commercial" },
-    { name: "Multi-Unit (4+)", href: "/browse?type=multi-unit" },
-    { name: "Industrial", href: "/browse?type=industrial" },
-    { name: "Agricultural", href: "/browse?type=agricultural" },
-    { name: "Land Development", href: "/browse?type=land" },
+    { name: "Residential", href: "/search/services?type=residential" },
+    { name: "Commercial", href: "/search/services?type=commercial" },
+    { name: "Multi-Unit (4+)", href: "/search/services?type=multi-unit" },
+    { name: "Industrial", href: "/search/services?type=industrial" },
+    { name: "Agricultural", href: "/search/services?type=agricultural" },
+    { name: "Land Development", href: "/search/services?type=land" },
   ];
 
   return (

@@ -21,19 +21,24 @@ const TopRatedFreelancers = () => {
     .sort((a, b) => b.rating - a.rating)
     .map((p, i) => {
       const roleLabel = p.roles?.[0];
-      const title = p.title !== p.provider ? p.title : roleLabel ? formatRole(roleLabel) : "Professional";
+      const title =
+        p.title !== p.provider
+          ? p.title
+          : roleLabel
+            ? formatRole(roleLabel)
+            : "Professional";
       return {
-      id: p.id,
-      name: p.provider,
-      title,
-      location: p.location || "Location not specified",
-      rating: p.rating,
-      reviews: p.reviews,
-      hourlyRate: p.price || 0,
-      referralFee: p.referralFee,
-      image: AVATAR_EMOJIS[i % AVATAR_EMOJIS.length],
-      skills: p.skills || [],
-    };
+        id: p.id,
+        name: p.provider,
+        title,
+        location: p.location || "Location not specified",
+        rating: p.rating,
+        reviews: p.reviews,
+        hourlyRate: p.price || 0,
+        referralFee: p.referralFee,
+        image: AVATAR_EMOJIS[i % AVATAR_EMOJIS.length],
+        skills: p.skills || [],
+      };
     });
 
   return (
@@ -48,7 +53,7 @@ const TopRatedFreelancers = () => {
               Connect with our highest-rated real estate professionals
             </p>
           </div>
-          <Link href="/browse?sort=rating" className="hidden md:block">
+          <Link href="/search/services?sort=rating" className="hidden md:block">
             <Button variant="ghost" className="group">
               View All
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -72,12 +77,14 @@ const TopRatedFreelancers = () => {
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-success rounded-full border-4 border-card" />
                   </div>
-                  
+
                   <div className="space-y-1">
                     <h3 className="font-bold text-lg group-hover:text-primary transition-colors">
                       {freelancer.name}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{freelancer.title}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {freelancer.title}
+                    </p>
                   </div>
                 </div>
 
@@ -86,7 +93,9 @@ const TopRatedFreelancers = () => {
                   <div className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">{freelancer.location}</span>
+                      <span className="text-muted-foreground">
+                        {freelancer.location}
+                      </span>
                     </div>
                   </div>
 
@@ -94,7 +103,9 @@ const TopRatedFreelancers = () => {
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-warning text-warning" />
                       <span className="font-semibold">{freelancer.rating}</span>
-                      <span className="text-sm text-muted-foreground">({freelancer.reviews})</span>
+                      <span className="text-sm text-muted-foreground">
+                        ({freelancer.reviews})
+                      </span>
                     </div>
                   </div>
 
@@ -114,10 +125,14 @@ const TopRatedFreelancers = () => {
                   <div className="pt-4 border-t">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">
-                        {freelancer.hourlyRate > 0 ? "Starting at" : "Referral Fee"}
+                        {freelancer.hourlyRate > 0
+                          ? "Starting at"
+                          : "Referral Fee"}
                       </span>
                       <span className="text-xl font-bold text-primary">
-                        {freelancer.hourlyRate > 0 ? `$${freelancer.hourlyRate}/hr` : freelancer.referralFee || "Contact"}
+                        {freelancer.hourlyRate > 0
+                          ? `$${freelancer.hourlyRate}/hr`
+                          : freelancer.referralFee || "Contact"}
                       </span>
                     </div>
                   </div>
@@ -128,7 +143,7 @@ const TopRatedFreelancers = () => {
         </div>
 
         <div className="mt-8 text-center md:hidden">
-          <Link href="/browse?sort=rating">
+          <Link href="/search/services?sort=rating">
             <Button variant="outline" className="w-full">
               View All Freelancers
             </Button>

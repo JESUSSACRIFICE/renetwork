@@ -115,7 +115,8 @@ async function fetchBrowseProfiles(
     .from("profiles")
     .select(
       "id, full_name, referral_fee_percentage, hourly_rate, price_per_sqft",
-    );
+    )
+    .eq("user_type", "service_provider");
   if (profileIds.length > 0) {
     profilesQuery = profilesQuery.in("id", profileIds);
   }
@@ -322,7 +323,8 @@ async function fetchSearchProfiles(
     .from("profiles")
     .select(
       "id, full_name, avatar_url, bio, hourly_rate, mailing_address",
-    );
+    )
+    .eq("user_type", "service_provider");
   if (profileIds.length > 0) {
     profilesQuery = profilesQuery.in("id", profileIds);
   }
@@ -1069,6 +1071,32 @@ export interface ProfilePspTypesPayload {
   selectedPspLabels: string[];
 }
 
+export interface ProfileSkillsPayload {
+  userId: string;
+  selectedSkillLabels: string[];
+}
+
+async function updateProfileSkillsMutation(
+  payload: ProfileSkillsPayload,
+): Promise<void> {
+  const { userId, selectedSkillLabels } = payload;
+  const { data: skillRows } = await db
+    .from("skills")
+    .select("id")
+    .in("label", selectedSkillLabels);
+  const skillIds = (skillRows || []).map((r: { id: string }) => r.id);
+
+  await db.from("user_skills").delete().eq("user_id", userId);
+  if (skillIds.length > 0) {
+    const inserts = skillIds.map((skill_id) => ({
+      user_id: userId,
+      skill_id,
+    }));
+    const { error } = await db.from("user_skills").insert(inserts);
+    if (error) throw error;
+  }
+}
+
 async function updateProfilePspTypesMutation(
   payload: ProfilePspTypesPayload,
 ): Promise<void> {
@@ -1382,6 +1410,39 @@ export function useProfileLanguagesUpdate() {
     },
     onError: (err: Error) =>
       toast.error(err?.message || "Failed to update profile"),
+  });
+}
+
+export function useProfileSkillsUpdate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateProfileSkillsMutation,
+    onSuccess: (_, variables) => {
+      invalidateDetail(queryClient, variables.userId);
+      queryClient.invalidateQueries({ queryKey: profileKeys.browse({}) });
+      toast.success("Skills updated successfully!");
+    },
+    onError: (err: Error) =>
+      toast.error(err?.message || "Failed to update skills"),
+  });
+}
+
+export const skillsKeys = {
+  all: ["skills"] as const,
+  list: () => [...skillsKeys.all, "list"] as const,
+};
+
+export function useSkillsList() {
+  return useQuery({
+    queryKey: skillsKeys.list(),
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("skills")
+        .select("id, label")
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data as { id: string; label: string }[];
+    },
   });
 }
 

@@ -11,10 +11,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
-import MapView from "@/components/browse/MapView";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBrowseProfiles } from "@/hooks/use-professional-profiles";
 import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
+import MapView from "@/components/browse/MapView";
 
 function BrowseContent() {
   const searchParams = useSearchParams();
@@ -48,16 +48,18 @@ function BrowseContent() {
     priceMax,
   };
 
-  const { data: services = [], isLoading: loading, error } = useBrowseProfiles(filters);
+  const {
+    data: services = [],
+    isLoading: loading,
+    error,
+  } = useBrowseProfiles(filters);
 
   useEffect(() => {
     if (error) toast.error("Failed to load professionals");
   }, [error]);
 
   useEffect(() => {
-    setSelectedPspTypes((prev) =>
-      pspFromUrl.length > 0 ? pspFromUrl : prev
-    );
+    setSelectedPspTypes((prev) => (pspFromUrl.length > 0 ? pspFromUrl : prev));
   }, [pspFromUrl.join(",")]);
 
   const applyFilters = () => {
@@ -69,7 +71,7 @@ function BrowseContent() {
     }
     params.set("price_min", String(priceRange[0]));
     params.set("price_max", String(priceRange[1]));
-    router.push(`/browse?${params.toString()}`);
+    router.push(`/search/services?${params.toString()}`);
     toast.success("Filters applied");
   };
 
@@ -77,17 +79,22 @@ function BrowseContent() {
   const filteredServices = services.filter((service) => {
     if (effectivePsp.length > 0) {
       const hasMatchingRole = service.roles.some((role) =>
-        effectivePsp.includes(role)
+        effectivePsp.includes(role),
       );
       if (!hasMatchingRole) return false;
     }
 
-    if (service.price > 0 && (service.price < priceRange[0] || service.price > priceRange[1])) {
+    if (
+      service.price > 0 &&
+      (service.price < priceRange[0] || service.price > priceRange[1])
+    ) {
       return false;
     }
 
     if (selectedRatings.length > 0) {
-      const meetsRating = selectedRatings.some(rating => service.rating >= rating);
+      const meetsRating = selectedRatings.some(
+        (rating) => service.rating >= rating,
+      );
       if (!meetsRating) return false;
     }
 
@@ -111,35 +118,52 @@ function BrowseContent() {
             <aside className="lg:w-80 space-y-6">
               <div className="bg-card rounded-xl p-6 border shadow-sm space-y-6">
                 <div>
-                  <h3 className="font-semibold mb-4">Professional Type (PSP)</h3>
+                  <h3 className="font-semibold mb-4">
+                    Professional Type (PSP)
+                  </h3>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {Object.entries(PSP_OPTIONS_BY_LETTER).map(([letter, options]) => (
-                      <div key={letter} className="space-y-2">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                          {letter}
+                    {Object.entries(PSP_OPTIONS_BY_LETTER).map(
+                      ([letter, options]) => (
+                        <div key={letter} className="space-y-2">
+                          <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            {letter}
+                          </div>
+                          <div className="space-y-1.5">
+                            {options.map((type) => (
+                              <div
+                                key={type}
+                                className="flex items-center space-x-2"
+                              >
+                                <Checkbox
+                                  id={type}
+                                  checked={selectedPspTypes.includes(type)}
+                                  onCheckedChange={(checked) => {
+                                    if (checked) {
+                                      setSelectedPspTypes([
+                                        ...selectedPspTypes,
+                                        type,
+                                      ]);
+                                    } else {
+                                      setSelectedPspTypes(
+                                        selectedPspTypes.filter(
+                                          (t) => t !== type,
+                                        ),
+                                      );
+                                    }
+                                  }}
+                                />
+                                <Label
+                                  htmlFor={type}
+                                  className="text-sm cursor-pointer"
+                                >
+                                  {type}
+                                </Label>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div className="space-y-1.5">
-                          {options.map((type) => (
-                            <div key={type} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={type}
-                                checked={selectedPspTypes.includes(type)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setSelectedPspTypes([...selectedPspTypes, type]);
-                                  } else {
-                                    setSelectedPspTypes(selectedPspTypes.filter((t) => t !== type));
-                                  }
-                                }}
-                              />
-                              <Label htmlFor={type} className="text-sm cursor-pointer">
-                                {type}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
 
@@ -165,18 +189,23 @@ function BrowseContent() {
                   <div className="space-y-3">
                     {[5, 4, 3].map((stars) => (
                       <div key={stars} className="flex items-center space-x-2">
-                        <Checkbox 
+                        <Checkbox
                           id={`${stars}-stars`}
                           checked={selectedRatings.includes(stars)}
                           onCheckedChange={(checked) => {
                             if (checked) {
                               setSelectedRatings([...selectedRatings, stars]);
                             } else {
-                              setSelectedRatings(selectedRatings.filter(r => r !== stars));
+                              setSelectedRatings(
+                                selectedRatings.filter((r) => r !== stars),
+                              );
                             }
                           }}
                         />
-                        <Label htmlFor={`${stars}-stars`} className="text-sm cursor-pointer flex items-center gap-1">
+                        <Label
+                          htmlFor={`${stars}-stars`}
+                          className="text-sm cursor-pointer flex items-center gap-1"
+                        >
                           {stars}+ <Star className="h-3 w-3 fill-current" />
                         </Label>
                       </div>
@@ -184,7 +213,9 @@ function BrowseContent() {
                   </div>
                 </div>
 
-                <Button className="w-full" onClick={applyFilters}>Apply Filters</Button>
+                <Button className="w-full" onClick={applyFilters}>
+                  Apply Filters
+                </Button>
               </div>
             </aside>
 
@@ -193,23 +224,40 @@ function BrowseContent() {
               <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
                 <div>
                   <h1 className="text-2xl font-bold">
-                    {category ? `${category} Professionals` : searchQuery ? `Results for "${searchQuery}"` : "Browse RE Professionals"}
+                    {category
+                      ? `${category} Professionals`
+                      : searchQuery
+                        ? `Results for "${searchQuery}"`
+                        : "Browse RE Professionals"}
                   </h1>
-                  {(serviceType || effectivePsp.length > 0 || fields.length > 0 || zipCode) && (
+                  {(serviceType ||
+                    effectivePsp.length > 0 ||
+                    fields.length > 0 ||
+                    zipCode) && (
                     <div className="flex flex-wrap gap-2 mt-2">
                       {serviceType && (
                         <span className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                          {serviceType.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                          {serviceType
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </span>
                       )}
                       {effectivePsp.map((p) => (
-                        <span key={p} className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
+                        <span
+                          key={p}
+                          className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
+                        >
                           {p}
                         </span>
                       ))}
-                      {fields.map(field => (
-                        <span key={field} className="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full">
-                          {field.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+                      {fields.map((field) => (
+                        <span
+                          key={field}
+                          className="px-2 py-1 bg-secondary/10 text-secondary text-xs rounded-full"
+                        >
+                          {field
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </span>
                       ))}
                       {zipCode && (
@@ -221,8 +269,13 @@ function BrowseContent() {
                   )}
                 </div>
                 <div className="flex items-center gap-4">
-                  <p className="text-muted-foreground">{filteredServices.length} results</p>
-                  <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as "grid" | "map")}>
+                  <p className="text-muted-foreground">
+                    {filteredServices.length} results
+                  </p>
+                  <Tabs
+                    value={viewMode}
+                    onValueChange={(v) => setViewMode(v as "grid" | "map")}
+                  >
                     <TabsList>
                       <TabsTrigger value="grid" className="gap-2">
                         <Grid className="h-4 w-4" />
@@ -239,16 +292,24 @@ function BrowseContent() {
 
               {loading ? (
                 <div className="text-center py-12">
-                  <p className="text-muted-foreground">Loading professionals...</p>
+                  <p className="text-muted-foreground">
+                    Loading professionals...
+                  </p>
                 </div>
               ) : filteredServices.length === 0 ? (
                 <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">No professionals found</p>
-                  <Button onClick={() => {
-                    setSelectedPspTypes([]);
-                    setSelectedRatings([]);
-                    setPriceRange([0, 5000]);
-                  }}>Clear Filters</Button>
+                  <p className="text-muted-foreground mb-4">
+                    No professionals found
+                  </p>
+                  <Button
+                    onClick={() => {
+                      setSelectedPspTypes([]);
+                      setSelectedRatings([]);
+                      setPriceRange([0, 5000]);
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
                 </div>
               ) : viewMode === "map" ? (
                 <MapView services={filteredServices} />
@@ -266,7 +327,9 @@ function BrowseContent() {
                             <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors line-clamp-1">
                               {service.title}
                             </h3>
-                            <p className="text-sm text-muted-foreground line-clamp-1">{service.provider}</p>
+                            <p className="text-sm text-muted-foreground line-clamp-1">
+                              {service.provider}
+                            </p>
                           </div>
                         </div>
 
@@ -291,8 +354,12 @@ function BrowseContent() {
                           <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
                               <Star className="h-4 w-4 fill-warning text-warning" />
-                              <span className="font-semibold">{service.rating.toFixed(1)}</span>
-                              <span className="text-sm text-muted-foreground">({service.reviews})</span>
+                              <span className="font-semibold">
+                                {service.rating.toFixed(1)}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                ({service.reviews})
+                              </span>
                             </div>
                           </div>
 
@@ -303,14 +370,18 @@ function BrowseContent() {
 
                           <div className="pt-3 border-t flex items-center justify-between">
                             <span className="text-sm text-muted-foreground">
-                              {service.price > 0 ? "Starting at" : service.pricePerSqft ? "Price/sqft" : "Referral Fee"}
+                              {service.price > 0
+                                ? "Starting at"
+                                : service.pricePerSqft
+                                  ? "Price/sqft"
+                                  : "Referral Fee"}
                             </span>
                             <span className="text-lg font-bold text-primary">
-                              {service.price > 0 
+                              {service.price > 0
                                 ? `$${service.price}/hr`
                                 : service.pricePerSqft
-                                ? `$${service.pricePerSqft}/sqft`
-                                : service.referralFee}
+                                  ? `$${service.pricePerSqft}/sqft`
+                                  : service.referralFee}
                             </span>
                           </div>
                         </div>
@@ -330,23 +401,22 @@ function BrowseContent() {
 
 export default function Browse() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 bg-background">
-          <div className="container py-8">
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading...</p>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1 bg-background">
+            <div className="container py-8">
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Loading...</p>
+              </div>
             </div>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    }>
+          </main>
+          <Footer />
+        </div>
+      }
+    >
       <BrowseContent />
     </Suspense>
   );
 }
-
-
-

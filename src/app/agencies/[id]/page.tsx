@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { toast } from "sonner";
 import Image from "next/image";
 
@@ -75,6 +77,7 @@ export default function AgencyDetail() {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { user } = useAuth();
   const [agency, setAgency] = useState<Agency | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
@@ -84,6 +87,7 @@ export default function AgencyDetail() {
   const [reviewName, setReviewName] = useState("");
   const [reviewEmail, setReviewEmail] = useState("");
   const [saveInfo, setSaveInfo] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -377,10 +381,29 @@ export default function AgencyDetail() {
                     <span>{agency.email}</span>
                   </div>
                 </div>
-                <Button className="bg-primary hover:bg-primary/90">
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Message
-                </Button>
+                {user ? (
+                  <Link href={`/dashboard/messages?recipient=${id}`}>
+                    <Button className="bg-primary hover:bg-primary/90">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Message
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Button
+                      className="bg-primary hover:bg-primary/90"
+                      onClick={() => setAuthModalOpen(true)}
+                    >
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Message
+                    </Button>
+                    <AuthModal
+                      open={authModalOpen}
+                      onOpenChange={setAuthModalOpen}
+                      redirectTo={`/dashboard/messages?recipient=${id}`}
+                    />
+                  </>
+                )}
               </div>
             </div>
 

@@ -33,11 +33,12 @@ type Thread = {
 
 function buildThreads(
   messages: MessageWithParticipants[],
-  currentUserId: string
+  currentUserId: string,
 ): Thread[] {
   const byOther = new Map<string, MessageWithParticipants[]>();
   for (const m of messages) {
-    const otherId = m.sender_id === currentUserId ? m.recipient_id : m.sender_id;
+    const otherId =
+      m.sender_id === currentUserId ? m.recipient_id : m.sender_id;
     if (!byOther.has(otherId)) byOther.set(otherId, []);
     byOther.get(otherId)!.push(m);
   }
@@ -45,12 +46,13 @@ function buildThreads(
   for (const [otherId, msgs] of byOther) {
     const sorted = [...msgs].sort(
       (a, b) =>
-        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
     );
     const last = sorted[sorted.length - 1];
-    const other = last.sender_id === currentUserId ? last.recipient : last.sender;
+    const other =
+      last.sender_id === currentUserId ? last.recipient : last.sender;
     const unreadCount = sorted.filter(
-      (m) => m.recipient_id === currentUserId && !m.read
+      (m) => m.recipient_id === currentUserId && !m.read,
     ).length;
     threads.push({
       otherId,
@@ -64,7 +66,7 @@ function buildThreads(
   threads.sort(
     (a, b) =>
       new Date(b.lastMessage.created_at).getTime() -
-      new Date(a.lastMessage.created_at).getTime()
+      new Date(a.lastMessage.created_at).getTime(),
   );
   return threads;
 }
@@ -87,12 +89,12 @@ const Messages = () => {
 
   const threads = useMemo(
     () => (user && messages.length > 0 ? buildThreads(messages, user.id) : []),
-    [messages, user?.id]
+    [messages, user?.id],
   );
 
   const selectedThread = useMemo(
     () => threads.find((t) => t.otherId === selectedOtherId) ?? null,
-    [threads, selectedOtherId]
+    [threads, selectedOtherId],
   );
 
   // Mark messages as read when viewing a thread
@@ -179,7 +181,11 @@ const Messages = () => {
               </div>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Create order">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="Create order"
+                  >
                     <FilePlus className="h-5 w-5" />
                   </Button>
                 </DialogTrigger>
@@ -204,7 +210,7 @@ const Messages = () => {
               <Card className="m-8 p-12 text-center">
                 <Mail className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">No messages yet</p>
-                <Button onClick={() => router.push("/browse")}>
+                <Button onClick={() => router.push("/search/services")}>
                   Find Professionals
                 </Button>
               </Card>
@@ -252,13 +258,15 @@ const Messages = () => {
                         <div className="flex items-center gap-2 shrink-0">
                           {thread.unreadCount > 0 && (
                             <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                              {thread.unreadCount > 99 ? "99+" : thread.unreadCount}
+                              {thread.unreadCount > 99
+                                ? "99+"
+                                : thread.unreadCount}
                             </span>
                           )}
                           <span className="text-xs text-muted-foreground">
                             {format(
                               new Date(thread.lastMessage.created_at),
-                              "MMM d"
+                              "MMM d",
                             )}
                           </span>
                         </div>
@@ -322,7 +330,7 @@ const Messages = () => {
                                 >
                                   {format(
                                     new Date(msg.created_at),
-                                    "MMM d, h:mm a"
+                                    "MMM d, h:mm a",
                                   )}
                                 </p>
                               </div>

@@ -2,11 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Search, MapPin, ChevronDown, DollarSign, Home, Wrench } from "lucide-react";
+import {
+  Search,
+  MapPin,
+  ChevronDown,
+  DollarSign,
+  Home,
+  Wrench,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -70,11 +87,11 @@ const PRICE_RANGES = [
 export const AdvancedSearchFilters = () => {
   const router = useRouter();
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
-  
+
   // Basic filters
   const [keyword, setKeyword] = useState("");
   const [zipCode, setZipCode] = useState("");
-  
+
   // Advanced filters
   const [serviceCategory, setServiceCategory] = useState<string>("");
   const [serviceType, setServiceType] = useState<string>("");
@@ -85,8 +102,9 @@ export const AdvancedSearchFilters = () => {
   const [radius, setRadius] = useState(25);
 
   // Get available service types based on category
-  const availableServiceTypes = serviceCategory 
-    ? SERVICE_TYPES[serviceCategory as keyof typeof SERVICE_TYPES]?.options || []
+  const availableServiceTypes = serviceCategory
+    ? SERVICE_TYPES[serviceCategory as keyof typeof SERVICE_TYPES]?.options ||
+      []
     : [];
 
   // Reset dependent filters when category changes
@@ -96,35 +114,39 @@ export const AdvancedSearchFilters = () => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    
+
     // Basic filters
     if (keyword.trim()) params.set("q", keyword);
     if (zipCode.trim()) params.set("zip", zipCode);
     if (radius !== 25) params.set("radius", radius.toString());
-    
+
     // Advanced filters
     if (serviceCategory) params.set("service_category", serviceCategory);
     if (serviceType) params.set("service_type", serviceType);
-    if (propertyFields.length > 0) params.set("fields", propertyFields.join(","));
-    if (propertyConditions.length > 0) params.set("conditions", propertyConditions.join(","));
+    if (propertyFields.length > 0)
+      params.set("fields", propertyFields.join(","));
+    if (propertyConditions.length > 0)
+      params.set("conditions", propertyConditions.join(","));
     if (customPriceRange) params.set("price_demo", customPriceRange);
     if (priceRange[0] > 0 || priceRange[1] < 5000) {
       params.set("price_min", priceRange[0].toString());
       params.set("price_max", priceRange[1].toString());
     }
 
-    router.push(`/browse?${params.toString()}`);
+    router.push(`/search/services?${params.toString()}`);
   };
 
   const handleFieldToggle = (field: string) => {
-    setPropertyFields(prev =>
-      prev.includes(field) ? prev.filter(f => f !== field) : [...prev, field]
+    setPropertyFields((prev) =>
+      prev.includes(field) ? prev.filter((f) => f !== field) : [...prev, field],
     );
   };
 
   const handleConditionToggle = (condition: string) => {
-    setPropertyConditions(prev =>
-      prev.includes(condition) ? prev.filter(c => c !== condition) : [...prev, condition]
+    setPropertyConditions((prev) =>
+      prev.includes(condition)
+        ? prev.filter((c) => c !== condition)
+        : [...prev, condition],
     );
   };
 
@@ -184,11 +206,17 @@ export const AdvancedSearchFilters = () => {
               onClick={() => setIsAdvancedOpen(!isAdvancedOpen)}
               className="text-primary hover:text-primary-dark"
             >
-              <ChevronDown className={`mr-2 h-4 w-4 transition-transform ${isAdvancedOpen ? "rotate-180" : ""}`} />
+              <ChevronDown
+                className={`mr-2 h-4 w-4 transition-transform ${isAdvancedOpen ? "rotate-180" : ""}`}
+              />
               {isAdvancedOpen ? "Hide" : "Show"} Advanced Filters
             </Button>
             {(serviceCategory || serviceType || propertyFields.length > 0) && (
-              <Button variant="ghost" onClick={clearFilters} className="text-sm">
+              <Button
+                variant="ghost"
+                onClick={clearFilters}
+                className="text-sm"
+              >
                 Clear All Filters
               </Button>
             )}
@@ -200,33 +228,48 @@ export const AdvancedSearchFilters = () => {
               {/* Row 1: Service Category & Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Service Category</Label>
-                  <Select value={serviceCategory} onValueChange={setServiceCategory}>
+                  <Label className="text-sm font-medium">
+                    Service Category
+                  </Label>
+                  <Select
+                    value={serviceCategory}
+                    onValueChange={setServiceCategory}
+                  >
                     <SelectTrigger className="h-12 bg-muted/50 border-0">
                       <SelectValue placeholder="Select category..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(SERVICE_TYPES).map(([key, { label, icon: Icon }]) => (
-                        <SelectItem key={key} value={key}>
-                          <div className="flex items-center gap-2">
-                            <Icon className="h-4 w-4" />
-                            {label}
-                          </div>
-                        </SelectItem>
-                      ))}
+                      {Object.entries(SERVICE_TYPES).map(
+                        ([key, { label, icon: Icon }]) => (
+                          <SelectItem key={key} value={key}>
+                            <div className="flex items-center gap-2">
+                              <Icon className="h-4 w-4" />
+                              {label}
+                            </div>
+                          </SelectItem>
+                        ),
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Specific Service</Label>
-                  <Select 
-                    value={serviceType} 
+                  <Label className="text-sm font-medium">
+                    Specific Service
+                  </Label>
+                  <Select
+                    value={serviceType}
                     onValueChange={setServiceType}
                     disabled={!serviceCategory}
                   >
                     <SelectTrigger className="h-12 bg-muted/50 border-0">
-                      <SelectValue placeholder={serviceCategory ? "Select service..." : "Choose category first"} />
+                      <SelectValue
+                        placeholder={
+                          serviceCategory
+                            ? "Select service..."
+                            : "Choose category first"
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {availableServiceTypes.map((type) => (
@@ -241,7 +284,9 @@ export const AdvancedSearchFilters = () => {
 
               {/* Row 2: Property Fields */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Property Fields (Multi-Select)</Label>
+                <Label className="text-sm font-medium">
+                  Property Fields (Multi-Select)
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -256,16 +301,27 @@ export const AdvancedSearchFilters = () => {
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-4 bg-popover z-50" align="start">
+                  <PopoverContent
+                    className="w-full p-4 bg-popover z-50"
+                    align="start"
+                  >
                     <div className="space-y-3">
                       {PROPERTY_FIELDS.all.map((field) => (
-                        <div key={field.value} className="flex items-center space-x-2">
+                        <div
+                          key={field.value}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={field.value}
                             checked={propertyFields.includes(field.value)}
-                            onCheckedChange={() => handleFieldToggle(field.value)}
+                            onCheckedChange={() =>
+                              handleFieldToggle(field.value)
+                            }
                           />
-                          <Label htmlFor={field.value} className="cursor-pointer">
+                          <Label
+                            htmlFor={field.value}
+                            className="cursor-pointer"
+                          >
                             {field.label}
                           </Label>
                         </div>
@@ -277,7 +333,9 @@ export const AdvancedSearchFilters = () => {
 
               {/* Row 3: Property Conditions */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium">Property Condition</Label>
+                <Label className="text-sm font-medium">
+                  Property Condition
+                </Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -292,16 +350,29 @@ export const AdvancedSearchFilters = () => {
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-full p-4 bg-popover z-50" align="start">
+                  <PopoverContent
+                    className="w-full p-4 bg-popover z-50"
+                    align="start"
+                  >
                     <div className="space-y-3">
                       {PROPERTY_CONDITIONS.map((condition) => (
-                        <div key={condition.value} className="flex items-center space-x-2">
+                        <div
+                          key={condition.value}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={condition.value}
-                            checked={propertyConditions.includes(condition.value)}
-                            onCheckedChange={() => handleConditionToggle(condition.value)}
+                            checked={propertyConditions.includes(
+                              condition.value,
+                            )}
+                            onCheckedChange={() =>
+                              handleConditionToggle(condition.value)
+                            }
                           />
-                          <Label htmlFor={condition.value} className="cursor-pointer">
+                          <Label
+                            htmlFor={condition.value}
+                            className="cursor-pointer"
+                          >
                             {condition.label}
                           </Label>
                         </div>
@@ -314,11 +385,15 @@ export const AdvancedSearchFilters = () => {
               {/* Row 4: Price Range & Demographics */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Price Range (Hourly Rate)</Label>
+                  <Label className="text-sm font-medium">
+                    Price Range (Hourly Rate)
+                  </Label>
                   <div className="space-y-4 pt-2">
                     <Slider
                       value={priceRange}
-                      onValueChange={(value) => setPriceRange([value[0], value[1]])}
+                      onValueChange={(value) =>
+                        setPriceRange([value[0], value[1]])
+                      }
                       max={5000}
                       step={50}
                       className="w-full"
@@ -331,8 +406,13 @@ export const AdvancedSearchFilters = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Price Demographics</Label>
-                  <Select value={customPriceRange} onValueChange={setCustomPriceRange}>
+                  <Label className="text-sm font-medium">
+                    Price Demographics
+                  </Label>
+                  <Select
+                    value={customPriceRange}
+                    onValueChange={setCustomPriceRange}
+                  >
                     <SelectTrigger className="h-12 bg-muted/50 border-0">
                       <SelectValue placeholder="Select price range..." />
                     </SelectTrigger>
@@ -350,7 +430,9 @@ export const AdvancedSearchFilters = () => {
               {/* Row 5: Radius */}
               {zipCode && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Search Radius: {radius} miles</Label>
+                  <Label className="text-sm font-medium">
+                    Search Radius: {radius} miles
+                  </Label>
                   <Slider
                     value={[radius]}
                     onValueChange={(value) => setRadius(value[0])}
@@ -363,23 +445,43 @@ export const AdvancedSearchFilters = () => {
               )}
 
               {/* Active Filters Display */}
-              {(serviceType || propertyFields.length > 0 || propertyConditions.length > 0) && (
+              {(serviceType ||
+                propertyFields.length > 0 ||
+                propertyConditions.length > 0) && (
                 <div className="pt-4 border-t border-border">
-                  <Label className="text-sm font-medium mb-2 block">Active Filters:</Label>
+                  <Label className="text-sm font-medium mb-2 block">
+                    Active Filters:
+                  </Label>
                   <div className="flex flex-wrap gap-2">
                     {serviceType && (
                       <span className="px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                        {availableServiceTypes.find(t => t.value === serviceType)?.label}
+                        {
+                          availableServiceTypes.find(
+                            (t) => t.value === serviceType,
+                          )?.label
+                        }
                       </span>
                     )}
                     {propertyFields.map((field) => (
-                      <span key={field} className="px-3 py-1 bg-secondary/10 text-secondary text-xs rounded-full">
-                        {PROPERTY_FIELDS.all.find(f => f.value === field)?.label}
+                      <span
+                        key={field}
+                        className="px-3 py-1 bg-secondary/10 text-secondary text-xs rounded-full"
+                      >
+                        {
+                          PROPERTY_FIELDS.all.find((f) => f.value === field)
+                            ?.label
+                        }
                       </span>
                     ))}
                     {propertyConditions.map((condition) => (
-                      <span key={condition} className="px-3 py-1 bg-accent text-accent-foreground text-xs rounded-full">
-                        {PROPERTY_CONDITIONS.find(c => c.value === condition)?.label}
+                      <span
+                        key={condition}
+                        className="px-3 py-1 bg-accent text-accent-foreground text-xs rounded-full"
+                      >
+                        {
+                          PROPERTY_CONDITIONS.find((c) => c.value === condition)
+                            ?.label
+                        }
                       </span>
                     ))}
                   </div>

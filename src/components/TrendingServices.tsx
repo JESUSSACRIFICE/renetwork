@@ -60,7 +60,10 @@ const TrendingServices = () => {
               Most popular services that businesses are booking right now
             </p>
           </div>
-          <Link href="/browse?trending=true" className="hidden md:block">
+          <Link
+            href="/search/services?trending=true"
+            className="hidden md:block"
+          >
             <Button variant="ghost" className="group">
               View All
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -77,7 +80,9 @@ const TrendingServices = () => {
             >
               <div className="bg-card rounded-2xl border overflow-hidden hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:border-primary/50">
                 {/* Image */}
-                <div className={`aspect-[4/3] bg-gradient-to-br ${service.bgColor} relative overflow-hidden flex items-center justify-center`}>
+                <div
+                  className={`aspect-[4/3] bg-gradient-to-br ${service.bgColor} relative overflow-hidden flex items-center justify-center`}
+                >
                   <div className="text-7xl transform group-hover:scale-110 transition-transform duration-500">
                     {service.image}
                   </div>
@@ -104,19 +109,29 @@ const TrendingServices = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-sm">
                       {service.provider.charAt(0)}
                     </div>
-                    <span className="text-sm text-muted-foreground">{service.provider}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {service.provider}
+                    </span>
                   </div>
 
                   {/* Rating & Price */}
                   <div className="flex items-center justify-between pt-3 border-t">
                     <div className="flex items-center gap-1">
                       <Star className="h-4 w-4 fill-warning text-warning" />
-                      <span className="font-semibold text-sm">{service.rating}</span>
-                      <span className="text-xs text-muted-foreground">({service.reviews})</span>
+                      <span className="font-semibold text-sm">
+                        {service.rating}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        ({service.reviews})
+                      </span>
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-muted-foreground">Starting at</div>
-                      <div className="text-lg font-bold text-primary">${service.price}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Starting at
+                      </div>
+                      <div className="text-lg font-bold text-primary">
+                        ${service.price}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -126,7 +141,7 @@ const TrendingServices = () => {
         </div>
 
         <div className="mt-8 text-center md:hidden">
-          <Link href="/browse?trending=true">
+          <Link href="/search/services?trending=true">
             <Button variant="outline" className="w-full">
               View All Trending Services
             </Button>

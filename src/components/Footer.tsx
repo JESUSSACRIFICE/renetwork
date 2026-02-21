@@ -1,14 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, MessageCircle, Twitter, Linkedin, Facebook, Instagram } from "lucide-react";
+import {
+  Mail,
+  MessageCircle,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Instagram,
+} from "lucide-react";
 
 const Footer = () => {
   const footerLinks = {
     Products: [
-      { name: "Services", href: "/browse" },
-      { name: "Freelancers", href: "/browse?type=freelancers" },
-      { name: "Agencies", href: "/browse?type=agencies" },
+      { name: "Services", href: "/search/services" },
+      { name: "Freelancers", href: "/search/services?type=freelancers" },
+      { name: "Agencies", href: "/search/services?type=agencies" },
     ],
     "For PSPs": [
       { name: "Training", href: "/training" },
@@ -82,13 +89,22 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t">
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <span>© 2025 RE Network</span>
-            <Link href="/terms" className="hover:text-primary transition-colors">
+            <Link
+              href="/terms"
+              className="hover:text-primary transition-colors"
+            >
               Terms
             </Link>
-            <Link href="/privacy" className="hover:text-primary transition-colors">
+            <Link
+              href="/privacy"
+              className="hover:text-primary transition-colors"
+            >
               Privacy
             </Link>
-            <Link href="/legal" className="hover:text-primary transition-colors">
+            <Link
+              href="/legal"
+              className="hover:text-primary transition-colors"
+            >
               Legal
             </Link>
           </div>

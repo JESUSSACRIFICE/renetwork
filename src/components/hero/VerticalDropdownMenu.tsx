@@ -79,8 +79,6 @@ const fieldsOptions = [
   "Investment",
 ];
 
-
-
 export function VerticalDropdownMenu() {
   const router = useRouter();
   const [filters, setFilters] = useState<FilterValues>({
@@ -112,24 +110,24 @@ export function VerticalDropdownMenu() {
         params.append(key, value);
       }
     });
-    router.push(`/browse?${params.toString()}`);
+    router.push(`/search/services?${params.toString()}`);
   };
 
-//   const clearFilters = () => {
-//     setFilters({
-//       agent: "",
-//       vacancy: "",
-//       property: "",
-//       fields: "",
-//     });
-//   };
+  //   const clearFilters = () => {
+  //     setFilters({
+  //       agent: "",
+  //       vacancy: "",
+  //       property: "",
+  //       fields: "",
+  //     });
+  //   };
 
   // Filter options based on search input
-  
+
   const filterOptions = (options: string[], search: string) => {
     if (!search) return options;
     return options.filter((option) =>
-      option.toLowerCase().includes(search.toLowerCase())
+      option.toLowerCase().includes(search.toLowerCase()),
     );
   };
 
@@ -149,7 +147,7 @@ export function VerticalDropdownMenu() {
                 role="combobox"
                 className={cn(
                   "w-full justify-between bg-background",
-                  !filters.agent && "text-muted-foreground"
+                  !filters.agent && "text-muted-foreground",
                 )}
               >
                 {filters.agent || "Ex. Service, Profile, Agency..."}
@@ -194,14 +192,18 @@ export function VerticalDropdownMenu() {
                 role="combobox"
                 className={cn(
                   "w-full justify-between bg-background",
-                  !filters.vacancy && "text-muted-foreground"
+                  !filters.vacancy && "text-muted-foreground",
                 )}
               >
                 {filters.vacancy || "Ex. Architect, Agent, Builder..."}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={{ width: "var(--radix-popover-trigger-width)" }}
+            >
               <Command>
                 <CommandInput placeholder="Search..." />
                 <CommandList>
@@ -228,7 +230,9 @@ export function VerticalDropdownMenu() {
 
         {/* Property Condition - Autocomplete Input */}
         <div className="space-y-2">
-          <label className="text-sm font-bold text-foreground">Property Condition</label>
+          <label className="text-sm font-bold text-foreground">
+            Property Condition
+          </label>
           <Popover
             open={openPopovers.property}
             onOpenChange={(open) => togglePopover("property", open)}
@@ -239,14 +243,18 @@ export function VerticalDropdownMenu() {
                 role="combobox"
                 className={cn(
                   "w-full justify-between bg-background",
-                  !filters.property && "text-muted-foreground"
+                  !filters.property && "text-muted-foreground",
                 )}
               >
                 {filters.property || "Ex. Luxury, mid, economic..."}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={{ width: "var(--radix-popover-trigger-width)" }}
+            >
               <Command>
                 <CommandInput placeholder="Search..." />
                 <CommandList>
@@ -284,14 +292,18 @@ export function VerticalDropdownMenu() {
                 role="combobox"
                 className={cn(
                   "w-full justify-between bg-background",
-                  !filters.fields && "text-muted-foreground"
+                  !filters.fields && "text-muted-foreground",
                 )}
               >
                 {filters.fields || "Ex. Commercial, Residential,..."}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="p-0" align="start" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+            <PopoverContent
+              className="p-0"
+              align="start"
+              style={{ width: "var(--radix-popover-trigger-width)" }}
+            >
               <Command>
                 <CommandInput placeholder="Search..." />
                 <CommandList>

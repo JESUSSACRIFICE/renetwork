@@ -1,7 +1,18 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { Star, MapPin, Phone, Globe, Mail, Heart, MessageSquare, DollarSign, Award, Briefcase } from "lucide-react";
+import {
+  Star,
+  MapPin,
+  Phone,
+  Globe,
+  Mail,
+  Heart,
+  MessageSquare,
+  DollarSign,
+  Award,
+  Briefcase,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,7 +40,9 @@ const ProfessionalDetail = () => {
   }, [id]);
 
   const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     setUser(user);
     if (user && id) {
       checkFavorite(user.id);
@@ -43,23 +56,25 @@ const ProfessionalDetail = () => {
       .eq("user_id", userId)
       .eq("profile_id", id)
       .maybeSingle();
-    
+
     setIsFavorite(!!data);
   };
 
   const fetchProfessional = async () => {
     if (!id) return;
-    
+
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select(`
+        .select(
+          `
           *,
           user_roles(role),
           service_areas(zip_code, radius_miles),
           payment_preferences(*),
           reviews:reviews(rating, comment, created_at, reviewer:reviewer_id(full_name))
-        `)
+        `,
+        )
         .eq("id", id)
         .single();
 
@@ -108,7 +123,12 @@ const ProfessionalDetail = () => {
   };
 
   const avgRating = professional?.reviews?.length
-    ? (professional.reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / professional.reviews.length).toFixed(1)
+    ? (
+        professional.reviews.reduce(
+          (sum: number, r: any) => sum + r.rating,
+          0,
+        ) / professional.reviews.length
+      ).toFixed(1)
     : "0.0";
 
   if (loading) {
@@ -130,7 +150,7 @@ const ProfessionalDetail = () => {
         <main className="flex-1 bg-background flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">Professional Not Found</h1>
-            <Link href="/browse">
+            <Link href="/search/services">
               <Button>Browse Professionals</Button>
             </Link>
           </div>
@@ -149,7 +169,10 @@ const ProfessionalDetail = () => {
           <div className="container py-8">
             <div className="flex flex-col md:flex-row gap-8 items-start">
               <Avatar className="h-32 w-32 border-4 border-background shadow-xl">
-                <AvatarImage src={professional.avatar_url} alt={professional.full_name} />
+                <AvatarImage
+                  src={professional.avatar_url}
+                  alt={professional.full_name}
+                />
                 <AvatarFallback className="text-3xl">
                   {professional.full_name?.charAt(0)}
                 </AvatarFallback>
@@ -161,11 +184,15 @@ const ProfessionalDetail = () => {
                     <h1 className="text-3xl font-bold mb-2">
                       {professional.company_name || professional.full_name}
                     </h1>
-                    <p className="text-lg text-muted-foreground mb-3">{professional.full_name}</p>
+                    <p className="text-lg text-muted-foreground mb-3">
+                      {professional.full_name}
+                    </p>
                     <div className="flex items-center gap-4 flex-wrap">
                       <div className="flex items-center gap-1">
                         <Star className="h-5 w-5 fill-warning text-warning" />
-                        <span className="font-semibold text-lg">{avgRating}</span>
+                        <span className="font-semibold text-lg">
+                          {avgRating}
+                        </span>
                         <span className="text-muted-foreground">
                           ({professional.reviews?.length || 0} reviews)
                         </span>
@@ -173,7 +200,8 @@ const ProfessionalDetail = () => {
                       {professional.service_areas?.[0] && (
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <MapPin className="h-4 w-4" />
-                          {professional.service_areas[0].zip_code} ({professional.service_areas[0].radius_miles} mi)
+                          {professional.service_areas[0].zip_code} (
+                          {professional.service_areas[0].radius_miles} mi)
                         </div>
                       )}
                     </div>
@@ -221,22 +249,28 @@ const ProfessionalDetail = () => {
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">
-                      {professional.hourly_rate ? "Starting at" : professional.price_per_sqft ? "Price per sqft" : "Referral Fee"}
+                      {professional.hourly_rate
+                        ? "Starting at"
+                        : professional.price_per_sqft
+                          ? "Price per sqft"
+                          : "Referral Fee"}
                     </p>
                     <p className="text-2xl font-bold text-primary">
                       {professional.hourly_rate
                         ? `$${professional.hourly_rate}/hr`
                         : professional.price_per_sqft
-                        ? `$${professional.price_per_sqft}/sqft`
-                        : professional.referral_fee_percentage
-                        ? `${professional.referral_fee_percentage}%`
-                        : "Contact for quote"}
+                          ? `$${professional.price_per_sqft}/sqft`
+                          : professional.referral_fee_percentage
+                            ? `${professional.referral_fee_percentage}%`
+                            : "Contact for quote"}
                     </p>
                   </div>
                   <Separator />
                   <div className="flex items-center gap-2 text-sm">
                     <Briefcase className="h-4 w-4" />
-                    <span>{professional.years_of_experience || 0} years experience</span>
+                    <span>
+                      {professional.years_of_experience || 0} years experience
+                    </span>
                   </div>
                   {professional.license_number && (
                     <div className="flex items-center gap-2 text-sm">
@@ -257,7 +291,9 @@ const ProfessionalDetail = () => {
               <Tabs defaultValue="about" className="w-full">
                 <TabsList className="w-full justify-start">
                   <TabsTrigger value="about">About</TabsTrigger>
-                  <TabsTrigger value="reviews">Reviews ({professional.reviews?.length || 0})</TabsTrigger>
+                  <TabsTrigger value="reviews">
+                    Reviews ({professional.reviews?.length || 0})
+                  </TabsTrigger>
                   <TabsTrigger value="service-areas">Service Areas</TabsTrigger>
                 </TabsList>
 
@@ -268,16 +304,19 @@ const ProfessionalDetail = () => {
                       {professional.bio || "No bio available."}
                     </p>
 
-                    {professional.languages && professional.languages.length > 0 && (
-                      <div className="mb-4">
-                        <h3 className="font-semibold mb-2">Languages</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {professional.languages.map((lang: string) => (
-                            <Badge key={lang} variant="outline">{lang}</Badge>
-                          ))}
+                    {professional.languages &&
+                      professional.languages.length > 0 && (
+                        <div className="mb-4">
+                          <h3 className="font-semibold mb-2">Languages</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {professional.languages.map((lang: string) => (
+                              <Badge key={lang} variant="outline">
+                                {lang}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     {professional.willing_to_train && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -289,7 +328,9 @@ const ProfessionalDetail = () => {
 
                   {professional.payment_preferences && (
                     <Card className="p-6 mt-6">
-                      <h2 className="text-xl font-bold mb-4">Payment Options</h2>
+                      <h2 className="text-xl font-bold mb-4">
+                        Payment Options
+                      </h2>
                       <div className="space-y-2">
                         {professional.payment_preferences.accepts_cash && (
                           <div className="flex items-center gap-2">
@@ -311,7 +352,8 @@ const ProfessionalDetail = () => {
                         )}
                         {professional.payment_preferences.payment_terms && (
                           <p className="text-sm text-muted-foreground mt-2">
-                            Terms: {professional.payment_preferences.payment_terms}
+                            Terms:{" "}
+                            {professional.payment_preferences.payment_terms}
                           </p>
                         )}
                       </div>
@@ -320,8 +362,8 @@ const ProfessionalDetail = () => {
                 </TabsContent>
 
                 <TabsContent value="reviews" className="mt-6">
-                  <ReviewsList 
-                    profileId={id!} 
+                  <ReviewsList
+                    profileId={id!}
                     reviews={professional.reviews || []}
                     onReviewAdded={fetchProfessional}
                   />
@@ -330,22 +372,32 @@ const ProfessionalDetail = () => {
                 <TabsContent value="service-areas" className="mt-6">
                   <Card className="p-6">
                     <h2 className="text-xl font-bold mb-4">Service Areas</h2>
-                    {professional.service_areas && professional.service_areas.length > 0 ? (
+                    {professional.service_areas &&
+                    professional.service_areas.length > 0 ? (
                       <div className="space-y-3">
-                        {professional.service_areas.map((area: any, idx: number) => (
-                          <div key={idx} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                            <MapPin className="h-5 w-5 text-primary" />
-                            <div>
-                              <p className="font-medium">ZIP Code: {area.zip_code}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Service radius: {area.radius_miles} miles
-                              </p>
+                        {professional.service_areas.map(
+                          (area: any, idx: number) => (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+                            >
+                              <MapPin className="h-5 w-5 text-primary" />
+                              <div>
+                                <p className="font-medium">
+                                  ZIP Code: {area.zip_code}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Service radius: {area.radius_miles} miles
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ),
+                        )}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">No service areas specified</p>
+                      <p className="text-muted-foreground">
+                        No service areas specified
+                      </p>
                     )}
                   </Card>
                 </TabsContent>
@@ -354,7 +406,10 @@ const ProfessionalDetail = () => {
 
             {/* Contact Sidebar */}
             <div className="space-y-6">
-              <ContactForm profileId={id!} professionalName={professional.full_name} />
+              <ContactForm
+                profileId={id!}
+                professionalName={professional.full_name}
+              />
             </div>
           </div>
         </div>

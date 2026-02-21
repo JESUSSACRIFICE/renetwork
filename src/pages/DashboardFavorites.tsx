@@ -112,6 +112,7 @@ const DashboardFavorites = () => {
       <div className="min-h-screen flex flex-col w-full">
         <Header />
         <div className="flex flex-1 w-full">
+          w
           <DashboardSidebar userType="service_provider" profile={profile} />
           <main className="flex-1 p-8 bg-background">
             <div className="flex items-center gap-4 mb-8">
@@ -132,7 +133,7 @@ const DashboardFavorites = () => {
               <Card className="p-12 text-center">
                 <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground mb-4">No favorites yet</p>
-                <Button onClick={() => router.push("/browse")}>
+                <Button onClick={() => router.push("/search/services")}>
                   Browse Professionals
                 </Button>
               </Card>

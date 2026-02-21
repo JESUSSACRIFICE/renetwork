@@ -38,40 +38,18 @@ export interface FilterValues {
   motive: string[];
 }
 
-import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
+import {
+  PSP_OPTIONS_BY_LETTER,
+  agentOptions,
+  crowdfundingOptions,
+  flooringIndoorOptions,
+  flooringOutdoorOptions,
+  realEstateOptions,
+} from "@/lib/psp-types";
 
 // Options for dropdowns
 const findOptions = ["Service", "Profile", "Agency"];
 
-// Agent nested options (updated with all options)
-const agentOptions = [
-  "Escrow",
-  "Insurance",
-  "Real Estate",
-  "Selling",
-  "Sell-to-Buy",
-  "Buying",
-  "Buy-to-Sell",
-  "Leasing",
-  "Consulting",
-  "All",
-];
-
-// Real Estate nested options (under Agent > Real Estate)
-const realEstateOptions = ["Selling", "Buying", "Leasing", "All"];
-
-// Crowdfunding nested options
-const crowdfundingOptions = ["Accreditation", "Accredited", "Non Accredited"];
-
-// Flooring nested options
-const flooringIndoorOptions = ["Asphalt", "Tile"];
-const flooringOutdoorOptions = [
-  "Asphalt",
-  "Concrete",
-  "Gravel",
-  "Rock",
-  "Stone",
-];
 const representationOptions = [
   "Selling",
   "Leasing/Renting",
@@ -237,7 +215,7 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
         router.push(`/search/agencies?${params.toString()}`);
       } else {
         // Default to browse page
-        router.push(`/browse?${params.toString()}`);
+        router.push(`/search/services?${params.toString()}`);
       }
     }
   };
@@ -262,30 +240,28 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
           placeholder="Ex. Architect, Agent, Builder..."
           optionsByLetter={PSP_OPTIONS_BY_LETTER}
           value={filters.psp}
-          onChange={(value) => setFilters({ ...filters, psp: value })}
+          onChange={(v) => setFilters({ ...filters, psp: v })}
           agentValue={filters.agentTypes}
-          onAgentChange={(value) =>
-            setFilters({ ...filters, agentTypes: value })
-          }
+          onAgentChange={(v) => setFilters({ ...filters, agentTypes: v })}
           agentOptions={agentOptions}
           realEstateValue={filters.realEstateTypes}
-          onRealEstateChange={(value) =>
-            setFilters({ ...filters, realEstateTypes: value })
+          onRealEstateChange={(v) =>
+            setFilters({ ...filters, realEstateTypes: v })
           }
           realEstateOptions={realEstateOptions}
           crowdfundingValue={filters.crowdfundingTypes}
-          onCrowdfundingChange={(value) =>
-            setFilters({ ...filters, crowdfundingTypes: value })
+          onCrowdfundingChange={(v) =>
+            setFilters({ ...filters, crowdfundingTypes: v })
           }
           crowdfundingOptions={crowdfundingOptions}
           flooringIndoorValue={filters.flooringIndoorTypes}
-          onFlooringIndoorChange={(value) =>
-            setFilters({ ...filters, flooringIndoorTypes: value })
+          onFlooringIndoorChange={(v) =>
+            setFilters({ ...filters, flooringIndoorTypes: v })
           }
           flooringIndoorOptions={flooringIndoorOptions}
           flooringOutdoorValue={filters.flooringOutdoorTypes}
-          onFlooringOutdoorChange={(value) =>
-            setFilters({ ...filters, flooringOutdoorTypes: value })
+          onFlooringOutdoorChange={(v) =>
+            setFilters({ ...filters, flooringOutdoorTypes: v })
           }
           flooringOutdoorOptions={flooringOutdoorOptions}
         />

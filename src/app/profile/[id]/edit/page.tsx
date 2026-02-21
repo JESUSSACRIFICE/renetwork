@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { BasicInfoForm } from "@/components/profiles/BasicInfoForm";
 import { ProfessionalRolesForm } from "@/components/profiles/ProfessionalRolesForm";
+import { SkillsForm } from "@/components/profiles/SkillsForm";
 import { ExperienceForm } from "@/components/profiles/ExperienceForm";
 import { PricingForm } from "@/components/profiles/PricingForm";
 import { ServiceAreasForm } from "@/components/profiles/ServiceAreasForm";
@@ -23,6 +24,7 @@ export default function ProfileSetup() {
   const { data: profile } = useProfile(user?.id ?? null);
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([
     "English",
   ]);
@@ -45,6 +47,12 @@ export default function ProfileSetup() {
       setSelectedRoles(profile.psp_labels ?? []);
     }
   }, [profile?.psp_labels]);
+
+  useEffect(() => {
+    if (profile && "skills" in profile) {
+      setSelectedSkills(profile.skills ?? []);
+    }
+  }, [profile?.skills]);
 
   const handleSaveSuccess = (nextSection?: number) => {
     if (typeof nextSection === "number") setActiveSection(nextSection);
@@ -97,38 +105,47 @@ export default function ProfileSetup() {
               onSaveSuccess={handleSaveSuccess}
             />
 
-            <ExperienceForm
+            <SkillsForm
               userId={user!.id}
+              selectedSkills={selectedSkills}
+              setSelectedSkills={setSelectedSkills}
               isOpen={activeSection === 2}
               onOpenChange={(open) => open && setActiveSection(2)}
               onSaveSuccess={handleSaveSuccess}
             />
 
-            <PricingForm
+            <ExperienceForm
               userId={user!.id}
               isOpen={activeSection === 3}
               onOpenChange={(open) => open && setActiveSection(3)}
               onSaveSuccess={handleSaveSuccess}
             />
 
-            <ServiceAreasForm
+            <PricingForm
               userId={user!.id}
               isOpen={activeSection === 4}
               onOpenChange={(open) => open && setActiveSection(4)}
               onSaveSuccess={handleSaveSuccess}
             />
 
-            <TrainingForm
+            <ServiceAreasForm
               userId={user!.id}
               isOpen={activeSection === 5}
               onOpenChange={(open) => open && setActiveSection(5)}
               onSaveSuccess={handleSaveSuccess}
             />
 
-            <PaymentPrefsForm
+            <TrainingForm
               userId={user!.id}
               isOpen={activeSection === 6}
               onOpenChange={(open) => open && setActiveSection(6)}
+              onSaveSuccess={handleSaveSuccess}
+            />
+
+            <PaymentPrefsForm
+              userId={user!.id}
+              isOpen={activeSection === 7}
+              onOpenChange={(open) => open && setActiveSection(7)}
               onSaveSuccess={handleSaveSuccess}
             />
 
@@ -136,8 +153,8 @@ export default function ProfileSetup() {
               userId={user!.id}
               selectedLanguages={selectedLanguages}
               setSelectedLanguages={setSelectedLanguages}
-              isOpen={activeSection === 7}
-              onOpenChange={(open) => open && setActiveSection(7)}
+              isOpen={activeSection === 8}
+              onOpenChange={(open) => open && setActiveSection(8)}
               onSaveSuccess={handleSaveSuccess}
             />
           </div>

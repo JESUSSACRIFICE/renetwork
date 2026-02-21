@@ -30,7 +30,8 @@ const passwordSchema = z
 export default function CustomerSignupPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
-  const { data: customerProfile, isLoading: profileLoading } = useCustomerProfile(user?.id ?? null);
+  const { data: customerProfile, isLoading: profileLoading } =
+    useCustomerProfile(user?.id ?? null);
   const [loading, setLoading] = useState(false);
 
   const [signupForm, setSignupForm] = useState({
@@ -47,7 +48,7 @@ export default function CustomerSignupPage() {
     if (authLoading || profileLoading) return;
     if (!user) return;
     if (customerProfile) {
-      router.replace("/browse");
+      router.replace("/search/services");
       return;
     }
     router.replace("/dashboard");
@@ -93,7 +94,7 @@ export default function CustomerSignupPage() {
       if (updateError) throw updateError;
 
       toast.success("Account created! You can now browse.");
-      router.push("/browse");
+      router.push("/search/services");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Sign up failed";
       toast.error(message);

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Star,
@@ -22,17 +22,32 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import ContactForm from "@/components/professional/ContactForm";
+import { ReferClientDialog } from "@/components/professional/ReferClientDialog";
 import ReviewsList from "@/components/professional/ReviewsList";
 import { Separator } from "@/components/ui/separator";
-import { useProfile, useProfileFavorite } from "@/hooks/use-professional-profiles";
+import {
+  useProfile,
+  useProfileFavorite,
+} from "@/hooks/use-professional-profiles";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function ProfessionalDetail() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = (params?.id as string) ?? null;
+  const referrerCode = searchParams.get("ref");
   const { user } = useAuth();
-  const { data: professional, isLoading: loading, isError, error, refetch } = useProfile(id);
-  const { isFavorite, toggleFavorite, isToggling } = useProfileFavorite(id, user?.id ?? null);
+  const {
+    data: professional,
+    isLoading: loading,
+    isError,
+    error,
+    refetch,
+  } = useProfile(id);
+  const { isFavorite, toggleFavorite, isToggling } = useProfileFavorite(
+    id,
+    user?.id ?? null,
+  );
 
   const isOwnProfile = !!id && !!user && user.id === id;
 
@@ -75,7 +90,7 @@ export default function ProfessionalDetail() {
         <main className="flex-1 bg-background flex items-center justify-center h-full">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">Professional Not Found</h1>
-            <Link href="/browse">
+            <Link href="/search/services">
               <Button>Browse Professionals</Button>
             </Link>
           </div>
@@ -349,10 +364,20 @@ export default function ProfessionalDetail() {
                   </div>
                 </Card>
               ) : (
-                <ContactForm
-                  profileId={id}
-                  professionalName={professional.full_name}
-                />
+                <div className="space-y-4">
+                  {user && (
+                    <ReferClientDialog
+                      profileId={id}
+                      professionalName={professional.full_name}
+                      referrerId={user.id}
+                    />
+                  )}
+                  <ContactForm
+                    profileId={id}
+                    professionalName={professional.full_name}
+                    referrerCode={referrerCode}
+                  />
+                </div>
               )}
             </div>
           </div>

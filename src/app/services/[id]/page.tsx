@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -508,6 +509,7 @@ export default function ServiceDetail() {
                   {/* Packages */}
                   {service.packages && service.packages.length > 0 && (
                     <div className="space-y-3 mb-4">
+                      <div className="font-semibold text-sm mb-2">Choose a package</div>
                       {service.packages.map((pkg, idx) => (
                         <div key={idx} className="flex items-start gap-2">
                           <Checkbox id={`package-${idx}`} />
@@ -515,6 +517,12 @@ export default function ServiceDetail() {
                             <Label htmlFor={`package-${idx}`} className="font-normal cursor-pointer">
                               <div className="font-medium">{pkg.title}</div>
                               <div className="text-sm text-muted-foreground">${pkg.price}</div>
+                              {pkg.delivery_days && (
+                                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                                  <Clock className="h-3 w-3" />
+                                  {pkg.delivery_days} day{pkg.delivery_days !== 1 ? "s" : ""} delivery
+                                </div>
+                              )}
                             </Label>
                           </div>
                         </div>

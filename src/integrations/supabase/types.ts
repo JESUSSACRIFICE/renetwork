@@ -316,6 +316,7 @@ export type Database = {
           name: string;
           phone: string | null;
           profile_id: string;
+          referrer_id: string | null;
           status: string;
           updated_at: string;
           user_id: string | null;
@@ -328,6 +329,7 @@ export type Database = {
           name: string;
           phone?: string | null;
           profile_id: string;
+          referrer_id?: string | null;
           status?: string;
           updated_at?: string;
           user_id?: string | null;
@@ -340,6 +342,7 @@ export type Database = {
           name?: string;
           phone?: string | null;
           profile_id?: string;
+          referrer_id?: string | null;
           status?: string;
           updated_at?: string;
           user_id?: string | null;
@@ -432,6 +435,49 @@ export type Database = {
         };
         Relationships: [];
       };
+      offers: {
+        Row: {
+          id: string;
+          sender_id: string;
+          recipient_id: string;
+          title: string;
+          description: string | null;
+          amount_cents: number;
+          status: "pending" | "accepted" | "declined" | "withdrawn" | "completion_requested" | "completed";
+          accepted_at: string | null;
+          completion_requested_at: string | null;
+          delivery_started_at: string | null;
+          delivery_days: number | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          sender_id: string;
+          recipient_id: string;
+          title: string;
+          description?: string | null;
+          amount_cents: number;
+          status?: string;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          sender_id?: string;
+          recipient_id?: string;
+          title?: string;
+          description?: string | null;
+          amount_cents?: number;
+          status?: string;
+          accepted_at?: string | null;
+          delivery_started_at?: string | null;
+          delivery_days?: number | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
       preference_rankings: {
         Row: {
           id: string;
@@ -458,6 +504,170 @@ export type Database = {
           updated_at?: string | null;
         };
         Relationships: [];
+      };
+      referral_codes: {
+        Row: {
+          id: string;
+          user_id: string;
+          code: string;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          code: string;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          code?: string;
+          created_at?: string | null;
+        };
+        Relationships: [];
+      };
+      referral_commissions: {
+        Row: {
+          id: string;
+          referral_id: string;
+          amount_cents: number;
+          status: string;
+          paid_at: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          referral_id: string;
+          amount_cents: number;
+          status?: string;
+          paid_at?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          referral_id?: string;
+          amount_cents?: number;
+          status?: string;
+          paid_at?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "referral_commissions_referral_id_fkey";
+            columns: ["referral_id"];
+            isOneToOne: false;
+            referencedRelation: "referrals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      referrals: {
+        Row: {
+          id: string;
+          referrer_id: string;
+          recipient_profile_id: string;
+          client_profile_id: string | null;
+          lead_id: string | null;
+          status: string;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          referrer_id: string;
+          recipient_profile_id: string;
+          client_profile_id?: string | null;
+          lead_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          client_profile_id?: string | null;
+          referrer_id?: string;
+          recipient_profile_id?: string;
+          lead_id?: string | null;
+          status?: string;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "referrals_recipient_profile_id_fkey";
+            columns: ["recipient_profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "referrals_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "leads";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      engagements: {
+        Row: {
+          id: string;
+          provider_id: string;
+          client_id: string;
+          referral_id: string | null;
+          status: string;
+          title: string | null;
+          notes: string | null;
+          created_at: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          client_id: string;
+          referral_id?: string | null;
+          status?: string;
+          title?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          client_id?: string;
+          referral_id?: string | null;
+          status?: string;
+          title?: string | null;
+          notes?: string | null;
+          created_at?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "engagements_provider_id_fkey";
+            columns: ["provider_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "engagements_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       payment_preferences: {
         Row: {
@@ -575,7 +785,7 @@ export type Database = {
           referral_fee_percentage: number | null;
           training_details: string | null;
           updated_at: string | null;
-          user_type: "customer" | "service_provider" | "business_buyer" | null;
+          user_type: "customer" | "service_provider" | "admin" | null;
           mailing_address: string | null;
           website: string | null;
           willing_to_train: boolean | null;
@@ -599,7 +809,7 @@ export type Database = {
           referral_fee_percentage?: number | null;
           training_details?: string | null;
           updated_at?: string | null;
-          user_type?: "customer" | "service_provider" | "business_buyer" | null;
+          user_type?: "customer" | "service_provider" | "admin" | null;
           mailing_address?: string | null;
           website?: string | null;
           willing_to_train?: boolean | null;
@@ -623,7 +833,7 @@ export type Database = {
           referral_fee_percentage?: number | null;
           training_details?: string | null;
           updated_at?: string | null;
-          user_type?: "customer" | "service_provider" | "business_buyer" | null;
+          user_type?: "customer" | "service_provider" | "admin" | null;
           mailing_address?: string | null;
           website?: string | null;
           willing_to_train?: boolean | null;
@@ -825,6 +1035,12 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      get_or_create_referral_code: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: string;
+      };
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["professional_role"];

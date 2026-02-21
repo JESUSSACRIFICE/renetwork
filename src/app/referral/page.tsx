@@ -47,7 +47,7 @@ export default function ReferralLandingPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-3">
-                    <Link href="/referral/register">
+                    <Link href="/register">
                       <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
                         Get Started
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -147,7 +147,7 @@ export default function ReferralLandingPage() {
                 <p className="text-lg text-gray-600 mb-6">
                   Join thousands of professionals who trust our platform for referrals, collaboration, and business growth.
                 </p>
-                <Link href="/referral/register">
+                <Link href="/register">
                   <Button size="lg" className="bg-primary hover:bg-primary-dark">
                     Register Now
                     <ArrowRight className="ml-2 h-4 w-4" />

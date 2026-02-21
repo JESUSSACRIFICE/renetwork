@@ -18,6 +18,8 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-messages";
 
 interface FreeioDashboardHeaderProps {
@@ -32,10 +34,12 @@ export function FreeioDashboardHeader({
   userType,
 }: FreeioDashboardHeaderProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    queryClient.invalidateQueries({ queryKey: AUTH_USER_QUERY_KEY });
     router.push("/auth");
   };
 

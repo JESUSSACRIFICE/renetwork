@@ -5,7 +5,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, MapPin, DollarSign, Award, Phone, Globe, Briefcase, Languages, CreditCard, Edit } from "lucide-react";
+import {
+  Star,
+  MapPin,
+  DollarSign,
+  Award,
+  Phone,
+  Globe,
+  Briefcase,
+  Languages,
+  CreditCard,
+  Edit,
+} from "lucide-react";
 import { toast } from "sonner";
 
 interface Profile {
@@ -51,13 +62,17 @@ const Profile = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [serviceAreas, setServiceAreas] = useState<ServiceArea[]>([]);
-  const [paymentPrefs, setPaymentPrefs] = useState<PaymentPreference | null>(null);
+  const [paymentPrefs, setPaymentPrefs] = useState<PaymentPreference | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const getCurrentUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setCurrentUserId(user?.id || null);
     };
     getCurrentUser();
@@ -137,7 +152,7 @@ const Profile = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-2">Profile not found</h2>
-          <Link href="/browse">
+          <Link href="/search/services">
             <Button>Browse Professionals</Button>
           </Link>
         </div>
@@ -171,7 +186,9 @@ const Profile = () => {
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h1 className="text-3xl font-bold mb-2">{profile.full_name}</h1>
+                    <h1 className="text-3xl font-bold mb-2">
+                      {profile.full_name}
+                    </h1>
                     {profile.company_name && (
                       <p className="text-lg text-muted-foreground flex items-center gap-2">
                         <Briefcase className="h-4 w-4" />
@@ -202,7 +219,9 @@ const Profile = () => {
                 {profile.experience_level && (
                   <div className="flex items-center gap-2 mb-2">
                     <Award className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm capitalize">{profile.experience_level} Level</span>
+                    <span className="text-sm capitalize">
+                      {profile.experience_level} Level
+                    </span>
                     {profile.years_of_experience && (
                       <span className="text-sm text-muted-foreground">
                         • {profile.years_of_experience} years experience
@@ -214,7 +233,10 @@ const Profile = () => {
                 {/* Contact Info */}
                 <div className="flex flex-wrap gap-4 text-sm">
                   {profile.phone && (
-                    <a href={`tel:${profile.phone}`} className="flex items-center gap-1 hover:text-primary">
+                    <a
+                      href={`tel:${profile.phone}`}
+                      className="flex items-center gap-1 hover:text-primary"
+                    >
                       <Phone className="h-4 w-4" />
                       {profile.phone}
                     </a>
@@ -259,20 +281,30 @@ const Profile = () => {
               <div className="space-y-3">
                 {profile.referral_fee_percentage !== null && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Referral Fee</p>
-                    <p className="text-2xl font-bold text-primary">{profile.referral_fee_percentage}%</p>
+                    <p className="text-sm text-muted-foreground">
+                      Referral Fee
+                    </p>
+                    <p className="text-2xl font-bold text-primary">
+                      {profile.referral_fee_percentage}%
+                    </p>
                   </div>
                 )}
                 {profile.hourly_rate !== null && (
                   <div>
                     <p className="text-sm text-muted-foreground">Hourly Rate</p>
-                    <p className="text-2xl font-bold">${profile.hourly_rate}/hr</p>
+                    <p className="text-2xl font-bold">
+                      ${profile.hourly_rate}/hr
+                    </p>
                   </div>
                 )}
                 {profile.price_per_sqft !== null && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Price per Sq Ft</p>
-                    <p className="text-2xl font-bold">${profile.price_per_sqft}/sqft</p>
+                    <p className="text-sm text-muted-foreground">
+                      Price per Sq Ft
+                    </p>
+                    <p className="text-2xl font-bold">
+                      ${profile.price_per_sqft}/sqft
+                    </p>
                   </div>
                 )}
               </div>
@@ -289,16 +321,23 @@ const Profile = () => {
               <div className="space-y-2">
                 {serviceAreas.length > 0 ? (
                   serviceAreas.map((area, idx) => (
-                    <div key={idx} className="flex items-center justify-between">
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between"
+                    >
                       <span className="font-medium">{area.zip_code}</span>
                       <span className="text-sm text-muted-foreground">
                         {area.radius_miles} mile radius
-                        {area.is_primary && <Badge className="ml-2">Primary</Badge>}
+                        {area.is_primary && (
+                          <Badge className="ml-2">Primary</Badge>
+                        )}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-sm text-muted-foreground">No service areas listed</p>
+                  <p className="text-sm text-muted-foreground">
+                    No service areas listed
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -376,7 +415,9 @@ const Profile = () => {
         {/* Contact CTA */}
         <Card className="mt-8">
           <CardContent className="p-6 text-center">
-            <h3 className="text-xl font-bold mb-2">Interested in working with {profile.full_name}?</h3>
+            <h3 className="text-xl font-bold mb-2">
+              Interested in working with {profile.full_name}?
+            </h3>
             <p className="text-muted-foreground mb-4">
               Connect directly to discuss your project needs and get started.
             </p>

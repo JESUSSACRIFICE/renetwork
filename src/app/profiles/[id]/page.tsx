@@ -32,6 +32,7 @@ import {
   type ProfessionalProfile,
 } from "@/hooks/use-professional-profiles";
 import { useAuth } from "@/hooks/use-auth";
+import { AuthModal } from "@/components/auth/AuthModal";
 import { toast } from "sonner";
 
 export default function ProfileDetail() {
@@ -48,6 +49,7 @@ export default function ProfileDetail() {
 
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
+  const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const profile = useMemo(() => {
     if (!rawProfile) return null;
@@ -99,7 +101,9 @@ export default function ProfileDetail() {
       experience_level: p.experience_level ?? undefined,
       years_of_experience: p.years_of_experience ?? undefined,
       awards: (p.awards ?? []).map((a) => ({
-        year: a.date_awarded ? new Date(a.date_awarded).getFullYear().toString() : "",
+        year: a.date_awarded
+          ? new Date(a.date_awarded).getFullYear().toString()
+          : "",
         title: a.title,
         description: a.description ?? "",
       })),
@@ -294,36 +298,36 @@ export default function ProfileDetail() {
 
               {/* Education - only show when data exists */}
               {profile.education && profile.education.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">Education</h2>
-                  <div className="space-y-6">
-                    {profile.education.map((edu, idx) => (
-                      <div key={idx} className="flex gap-4">
-                        <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <GraduationCap className="h-6 w-6 text-primary" />
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-2xl font-bold mb-6">Education</h2>
+                    <div className="space-y-6">
+                      {profile.education.map((edu, idx) => (
+                        <div key={idx} className="flex gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <GraduationCap className="h-6 w-6 text-primary" />
+                            </div>
+                            {idx < (profile.education?.length || 0) - 1 && (
+                              <div className="w-0.5 h-full bg-border mt-2" />
+                            )}
                           </div>
-                          {idx < (profile.education?.length || 0) - 1 && (
-                            <div className="w-0.5 h-full bg-border mt-2" />
-                          )}
+                          <div className="flex-1 pb-6">
+                            <div className="font-semibold text-lg mb-1">
+                              {edu.period}
+                            </div>
+                            <div className="font-medium mb-2">
+                              {edu.institution}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {edu.description}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex-1 pb-6">
-                          <div className="font-semibold text-lg mb-1">
-                            {edu.period}
-                          </div>
-                          <div className="font-medium mb-2">
-                            {edu.institution}
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {edu.description}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Work & Experience */}
@@ -331,24 +335,33 @@ export default function ProfileDetail() {
                 <CardContent className="p-6">
                   <h2 className="text-2xl font-bold mb-6">Work & Experience</h2>
                   <div className="space-y-6">
-                    {(profile.experience_level || profile.years_of_experience != null) && (profile.experience?.length ?? 0) === 0 && (
-                      <div className="flex gap-4">
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Briefcase className="h-6 w-6 text-primary" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium mb-1">
-                            {profile.experience_level && (
-                              <span>Experience level: {profile.experience_level}</span>
-                            )}
-                            {profile.experience_level && profile.years_of_experience != null && " · "}
-                            {profile.years_of_experience != null && (
-                              <span>{profile.years_of_experience} years of experience</span>
-                            )}
+                    {(profile.experience_level ||
+                      profile.years_of_experience != null) &&
+                      (profile.experience?.length ?? 0) === 0 && (
+                        <div className="flex gap-4">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <Briefcase className="h-6 w-6 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-medium mb-1">
+                              {profile.experience_level && (
+                                <span>
+                                  Experience level: {profile.experience_level}
+                                </span>
+                              )}
+                              {profile.experience_level &&
+                                profile.years_of_experience != null &&
+                                " · "}
+                              {profile.years_of_experience != null && (
+                                <span>
+                                  {profile.years_of_experience} years of
+                                  experience
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                     {profile.experience?.map((exp, idx) => (
                       <div key={idx} className="flex gap-4">
                         <div className="flex flex-col items-center">
@@ -378,81 +391,83 @@ export default function ProfileDetail() {
 
               {/* Awards - only show when data exists */}
               {profile.awards && profile.awards.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">Awards</h2>
-                  <div className="space-y-6">
-                    {profile.awards.map((award, idx) => (
-                      <div key={idx} className="flex gap-4">
-                        <div className="flex flex-col items-center">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <Trophy className="h-6 w-6 text-primary" />
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-2xl font-bold mb-6">Awards</h2>
+                    <div className="space-y-6">
+                      {profile.awards.map((award, idx) => (
+                        <div key={idx} className="flex gap-4">
+                          <div className="flex flex-col items-center">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                              <Trophy className="h-6 w-6 text-primary" />
+                            </div>
+                            {idx < (profile.awards?.length || 0) - 1 && (
+                              <div className="w-0.5 h-full bg-border mt-2" />
+                            )}
                           </div>
-                          {idx < (profile.awards?.length || 0) - 1 && (
-                            <div className="w-0.5 h-full bg-border mt-2" />
-                          )}
-                        </div>
-                        <div className="flex-1 pb-6">
-                          <div className="font-semibold text-lg mb-1">
-                            {award.year}
+                          <div className="flex-1 pb-6">
+                            <div className="font-semibold text-lg mb-1">
+                              {award.year}
+                            </div>
+                            <div className="font-medium mb-2">
+                              {award.title}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {award.description}
+                            </p>
                           </div>
-                          <div className="font-medium mb-2">{award.title}</div>
-                          <p className="text-sm text-muted-foreground">
-                            {award.description}
-                          </p>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Services - only show when data exists */}
               {profile.services && profile.services.length > 0 && (
-              <Card>
-                <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">Services</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {profile.services.map((service) => (
-                      <Card key={service.id} className="overflow-hidden">
-                        <div className="h-48 bg-primary/5 flex items-center justify-center">
-                          <Briefcase className="h-16 w-16 text-primary/20" />
-                        </div>
-                        <CardContent className="p-4">
-                          <h3 className="font-semibold mb-2 line-clamp-2">
-                            {service.title}
-                          </h3>
-                          {(service.reviews > 0 || service.rating > 0) && (
-                            <div className="flex items-center gap-2 mb-2">
-                              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm">
-                                {service.rating} ({service.reviews} Reviews)
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-primary">
-                              ${service.price}
-                            </span>
-                            <Link href={`/services/${service.id}`}>
-                              <Button size="sm" variant="outline">
-                                View
-                              </Button>
-                            </Link>
+                <Card>
+                  <CardContent className="p-6">
+                    <h2 className="text-2xl font-bold mb-6">Services</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {profile.services.map((service) => (
+                        <Card key={service.id} className="overflow-hidden">
+                          <div className="h-48 bg-primary/5 flex items-center justify-center">
+                            <Briefcase className="h-16 w-16 text-primary/20" />
                           </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                  <Link
-                    href="/search/services"
-                    className="text-primary hover:underline mt-4 inline-block"
-                  >
-                    Browse Full List
-                  </Link>
-                </CardContent>
-              </Card>
+                          <CardContent className="p-4">
+                            <h3 className="font-semibold mb-2 line-clamp-2">
+                              {service.title}
+                            </h3>
+                            {(service.reviews > 0 || service.rating > 0) && (
+                              <div className="flex items-center gap-2 mb-2">
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                <span className="text-sm">
+                                  {service.rating} ({service.reviews} Reviews)
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-primary">
+                                ${service.price}
+                              </span>
+                              <Link href={`/services/${service.id}`}>
+                                <Button size="sm" variant="outline">
+                                  View
+                                </Button>
+                              </Link>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                    <Link
+                      href="/search/services"
+                      className="text-primary hover:underline mt-4 inline-block"
+                    >
+                      Browse Full List
+                    </Link>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Reviews */}
@@ -595,7 +610,10 @@ export default function ProfileDetail() {
                             <CardContent className="p-4">
                               <div className="flex flex-col items-center text-center mb-4">
                                 <Avatar className="h-16 w-16 mb-2">
-                                  <AvatarImage src={related.avatar_url} alt={related.full_name} />
+                                  <AvatarImage
+                                    src={related.avatar_url}
+                                    alt={related.full_name}
+                                  />
                                   <AvatarFallback>
                                     {related.full_name.charAt(0)}
                                   </AvatarFallback>
@@ -697,14 +715,35 @@ export default function ProfileDetail() {
 
               {/* Contact Buttons */}
               <div className="space-y-3">
-                <Button className="w-full bg-primary hover:bg-primary/90">
+                <Button className="w-full bg-primary hover:bg-primary/90 mb-3">
                   <Download className="h-4 w-4 mr-2" />
                   Download CV
                 </Button>
-                <Button className="w-full bg-primary hover:bg-primary/90">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Message
-                </Button>
+                {user?.id !== profile.id && (
+                  user ? (
+                    <Link href={`/dashboard/messages?recipient=${profile.id}`}>
+                      <Button className="w-full bg-primary hover:bg-primary/90">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Button
+                        className="w-full bg-primary hover:bg-primary/90"
+                        onClick={() => setAuthModalOpen(true)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </Button>
+                      <AuthModal
+                        open={authModalOpen}
+                        onOpenChange={setAuthModalOpen}
+                        redirectTo={`/dashboard/messages?recipient=${profile.id}`}
+                      />
+                    </>
+                  )
+                )}
               </div>
 
               {/* Freelancer Details */}
@@ -766,11 +805,6 @@ export default function ProfileDetail() {
                   </div>
                 </CardContent>
               </Card>
-
-              {/* Contact Me Button */}
-              <Button className="w-full bg-primary hover:bg-primary/90">
-                Contact Me
-              </Button>
             </div>
           </div>
         </div>

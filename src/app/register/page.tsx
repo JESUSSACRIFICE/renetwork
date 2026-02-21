@@ -52,23 +52,23 @@ export default function RegisterPage() {
               <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Building2 className="h-12 w-12 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold">Business Buyer</h2>
+              <h2 className="text-2xl font-bold">Customer</h2>
               <p className="text-muted-foreground">
-                Register as a business looking to purchase or lease properties
+                Register as a customer looking for services and professionals
               </p>
               <ul className="text-sm text-left space-y-2 text-muted-foreground">
-                <li>• Find properties</li>
-                <li>• Connect with professionals</li>
-                <li>• Manage maintenance plans</li>
-                <li>• Get expert advice</li>
+                <li>• Find professionals</li>
+                <li>• Get referrals</li>
+                <li>• Invest in projects</li>
+                <li>• Connect with the network</li>
               </ul>
               <Button
-                onClick={() => router.push("/register/business-buyer")}
+                onClick={() => router.push("/register/customer")}
                 className="w-full mt-4"
                 size="lg"
                 variant="outline"
               >
-                Register as Business Buyer
+                Register as Customer
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

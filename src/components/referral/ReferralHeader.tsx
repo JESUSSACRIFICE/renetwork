@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Search, Bell, MessageSquare, Menu, User, LogOut } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -14,6 +16,7 @@ import { toast } from "sonner";
 
 export default function ReferralHeader() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,6 +36,7 @@ export default function ReferralHeader() {
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
+      queryClient.invalidateQueries({ queryKey: AUTH_USER_QUERY_KEY });
       toast.success("Logged out successfully");
       router.push("/referral");
     } catch (error) {

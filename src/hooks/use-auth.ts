@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
-const AUTH_USER_QUERY_KEY = ["auth", "user"] as const;
+export const AUTH_USER_QUERY_KEY = ["auth", "user"] as const;
 
 async function fetchUser(): Promise<User | null> {
   const {

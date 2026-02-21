@@ -3,10 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import { FreeioDashboardHeader } from "@/components/dashboard/FreeioDashboardHeader";
-import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Card,
@@ -322,17 +318,8 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex flex-col bg-gray-50 w-full">
-        <FreeioDashboardHeader
-          user={user}
-          profile={profile}
-          userType={userType}
-        />
-        <div className="flex flex-1 w-full">
-          <DashboardSidebar userType={userType} profile={profile} />
-          <main className="flex-1 p-8 bg-gray-50 w-full max-w-full overflow-x-hidden">
-            <div className="max-w-2xl mx-auto">
+    <div className="p-8">
+      <div className="max-w-2xl mx-auto">
               <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
                   Reset Password
@@ -544,10 +531,6 @@ export default function ResetPasswordPage() {
                 </CardContent>
               </Card>
             </div>
-          </main>
-        </div>
-        <FreeioFooter />
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }

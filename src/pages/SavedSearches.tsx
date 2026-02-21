@@ -92,7 +92,7 @@ const SavedSearches = () => {
                 <p className="text-muted-foreground mb-4">
                   No saved searches yet
                 </p>
-                <Button onClick={() => router.push("/browse")}>
+                <Button onClick={() => router.push("/search/services")}>
                   Start Searching
                 </Button>
               </Card>
@@ -115,7 +115,9 @@ const SavedSearches = () => {
                             const params = new URLSearchParams(
                               search.search_params,
                             );
-                            router.push(`/browse?${params.toString()}`);
+                            router.push(
+                              `/search/services?${params.toString()}`,
+                            );
                           }}
                         >
                           Apply Search

@@ -20,6 +20,8 @@ export const servicesKeys = {
     [...servicesKeys.lists(), options ?? {}] as const,
   myServices: (providerId: string | null) =>
     [...servicesKeys.all, "my", providerId] as const,
+  myService: (providerId: string | null, serviceId: string | null) =>
+    [...servicesKeys.all, "my", providerId, serviceId] as const,
   details: () => [...servicesKeys.all, "detail"] as const,
   detail: (id: string | null) => [...servicesKeys.details(), id] as const,
 };
@@ -227,7 +229,7 @@ export interface ServiceDetailData {
   app_types?: string[];
   design_tools?: string[];
   devices?: string[];
-  packages?: Array<{ title: string; price: number; delivery_days: number }>;
+  packages?: Array<{ title: string; description?: string | null; price: number; delivery_days: number }>;
   faqs?: Array<{ question: string; answer: string; isOpen: boolean }>;
   relatedServices?: ServiceDetailData[];
 }
@@ -296,6 +298,24 @@ async function fetchServiceDetail(id: string | null): Promise<ServiceDetailData 
     .select("zip_code, radius_miles")
     .eq("user_id", providerId);
 
+  const { data: packagesData } = await (supabase as any)
+    .from("service_packages")
+    .select("title, description, price, delivery_days")
+    .eq("service_id", id)
+    .order("sort_order", { ascending: true });
+
+  const packages =
+    packagesData && packagesData.length > 0
+      ? packagesData.map((p: any) => ({
+          title: p.title,
+          description: p.description ?? undefined,
+          price: Number(p.price),
+          delivery_days: p.delivery_days,
+        }))
+      : serviceRow.delivery_days
+        ? [{ title: "Standard", price: Number(serviceRow.price), delivery_days: serviceRow.delivery_days }]
+        : [{ title: "Standard", price: Number(serviceRow.price), delivery_days: 3 }];
+
   return {
     id: serviceRow.id,
     title: serviceRow.title,
@@ -316,9 +336,7 @@ async function fetchServiceDetail(id: string | null): Promise<ServiceDetailData 
     app_types: [],
     design_tools: [],
     devices: [],
-    packages: serviceRow.delivery_days
-      ? [{ title: "Standard", price: Number(serviceRow.price), delivery_days: serviceRow.delivery_days }]
-      : [{ title: "Standard", price: Number(serviceRow.price), delivery_days: 3 }],
+    packages,
     faqs: [
       {
         question: "What methods of payment are supported?",
@@ -351,6 +369,60 @@ export function useInvalidateServices() {
   return () => queryClient.invalidateQueries({ queryKey: servicesKeys.all });
 }
 
+const serviceCategoriesKeys = {
+  all: ["service_categories"] as const,
+  byService: (serviceId: string | null) =>
+    [...serviceCategoriesKeys.all, serviceId] as const,
+};
+
+async function fetchServiceCategoryIds(
+  serviceId: string | null
+): Promise<string[]> {
+  if (!serviceId) return [];
+  const db = supabase as any;
+  const { data, error } = await db
+    .from("service_psp_types")
+    .select("psp_type_id")
+    .eq("service_id", serviceId);
+  if (error) throw error;
+  return (data ?? []).map((r: { psp_type_id: string }) => r.psp_type_id);
+}
+
+export function useServiceCategories(serviceId: string | null) {
+  return useQuery({
+    queryKey: serviceCategoriesKeys.byService(serviceId),
+    queryFn: () => fetchServiceCategoryIds(serviceId),
+    enabled: !!serviceId,
+  });
+}
+
+export async function updateServiceCategories(
+  serviceId: string,
+  categoryIds: string[],
+  providerId: string
+): Promise<void> {
+  const db = supabase as any;
+  await db.from("service_psp_types").delete().eq("service_id", serviceId);
+  const primaryLabel =
+    categoryIds.length > 0
+      ? (await db.from("psp_types").select("label").eq("id", categoryIds[0]).single())
+          .data?.label ?? "General"
+      : "General";
+  await supabase
+    .from("services")
+    .update({ category: primaryLabel })
+    .eq("id", serviceId)
+    .eq("provider_id", providerId);
+  if (categoryIds.length > 0) {
+    await db.from("service_psp_types").insert(
+      categoryIds.map((psp_type_id: string) => ({
+        service_id: serviceId,
+        psp_type_id,
+      }))
+    );
+  }
+}
+
 async function fetchMyServices(providerId: string | null): Promise<ServiceRow[]> {
   if (!providerId) return [];
   const { data, error } = await supabase
@@ -369,6 +441,30 @@ export function useMyServices(providerId: string | null) {
     queryFn: () => fetchMyServices(providerId),
     enabled: !!providerId,
     refetchOnWindowFocus: false,
+  });
+}
+
+async function fetchMyService(
+  providerId: string | null,
+  serviceId: string | null
+): Promise<ServiceRow | null> {
+  if (!providerId || !serviceId) return null;
+  const { data, error } = await supabase
+    .from("services")
+    .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
+    .eq("id", serviceId)
+    .eq("provider_id", providerId)
+    .maybeSingle();
+  if (error) throw error;
+  return data as ServiceRow | null;
+}
+
+/** Fetch a single service for edit (provider must own it). */
+export function useMyService(providerId: string | null, serviceId: string | null) {
+  return useQuery({
+    queryKey: servicesKeys.myService(providerId, serviceId),
+    queryFn: () => fetchMyService(providerId, serviceId),
+    enabled: !!providerId && !!serviceId,
   });
 }
 
@@ -412,6 +508,98 @@ async function updateServiceRow(payload: ServiceUpdate): Promise<ServiceRow> {
 async function deleteServiceRow(id: string): Promise<void> {
   const { error } = await supabase.from("services").delete().eq("id", id);
   if (error) throw error;
+}
+
+export interface CreateServiceWithPackagesPayload {
+  title: string;
+  description?: string | null;
+  image_url?: string | null;
+  categoryIds: string[];
+  packages: Array<{
+    title: string;
+    description?: string | null;
+    price: number;
+    delivery_days: number;
+  }>;
+}
+
+async function createServiceWithPackagesRow(
+  providerId: string,
+  payload: CreateServiceWithPackagesPayload
+): Promise<ServiceRow> {
+  if (!payload.packages.length) {
+    throw new Error("At least one package is required");
+  }
+  const firstPkg = payload.packages[0];
+  const minPrice = Math.min(...payload.packages.map((p) => p.price));
+  const minDelivery = Math.min(...payload.packages.map((p) => p.delivery_days));
+
+  const { data: service, error: serviceError } = await supabase
+    .from("services")
+    .insert({
+      provider_id: providerId,
+      title: payload.title,
+      category: "General",
+      description: payload.description ?? null,
+      price: minPrice,
+      image_url: payload.image_url ?? null,
+      delivery_days: minDelivery,
+    })
+    .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
+    .single();
+  if (serviceError) throw serviceError;
+
+  const serviceId = service.id;
+
+  if (payload.categoryIds.length > 0) {
+    const db = supabase as any;
+    const { data: pspLabels } = await db
+      .from("psp_types")
+      .select("id, label")
+      .in("id", payload.categoryIds);
+    const primaryLabel = pspLabels?.[0]?.label ?? "General";
+    await supabase
+      .from("services")
+      .update({ category: primaryLabel })
+      .eq("id", serviceId);
+
+    await db.from("service_psp_types").insert(
+      payload.categoryIds.map((psp_type_id: string) => ({
+        service_id: serviceId,
+        psp_type_id,
+      }))
+    );
+  }
+
+  const db = supabase as any;
+  await db.from("service_packages").insert(
+    payload.packages.map((pkg, i) => ({
+      service_id: serviceId,
+      title: pkg.title,
+      description: pkg.description ?? null,
+      price: pkg.price,
+      delivery_days: pkg.delivery_days,
+      sort_order: i,
+    }))
+  );
+
+  return service as ServiceRow;
+}
+
+/** Create a service with packages and categories in one go (Fiverr-style). */
+export function useCreateServiceWithPackages(providerId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateServiceWithPackagesPayload) =>
+      createServiceWithPackagesRow(providerId!, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: servicesKeys.all });
+      toast.success("Service created");
+    },
+    onError: (err: Error) => {
+      toast.error(err?.message ?? "Failed to create service");
+    },
+  });
 }
 
 /** Create a service; invalidates myServices and lists. */

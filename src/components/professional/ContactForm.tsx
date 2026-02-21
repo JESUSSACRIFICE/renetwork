@@ -8,6 +8,7 @@ import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
+import { getUserIdFromReferralCode, createReferral } from "@/hooks/use-referrals";
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -19,9 +20,11 @@ const contactSchema = z.object({
 interface ContactFormProps {
   profileId: string;
   professionalName: string;
+  /** Referral code from URL (?ref=CODE) - when present, tracks who referred this contact */
+  referrerCode?: string | null;
 }
 
-const ContactForm = ({ profileId, professionalName }: ContactFormProps) => {
+const ContactForm = ({ profileId, professionalName, referrerCode }: ContactFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -45,16 +48,38 @@ const ContactForm = ({ profileId, professionalName }: ContactFormProps) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
-      const { error } = await supabase.from("leads").insert({
-        profile_id: profileId,
-        user_id: user?.id || null,
-        name: result.data.name,
-        email: result.data.email,
-        phone: result.data.phone || null,
-        message: result.data.message,
-      });
+      let referrerId: string | null = null;
+      if (referrerCode) {
+        referrerId = await getUserIdFromReferralCode(referrerCode);
+      }
+
+      const { data: lead, error } = await supabase
+        .from("leads")
+        .insert({
+          profile_id: profileId,
+          user_id: user?.id || null,
+          referrer_id: referrerId,
+          name: result.data.name,
+          email: result.data.email,
+          phone: result.data.phone || null,
+          message: result.data.message,
+        })
+        .select("id")
+        .single();
 
       if (error) throw error;
+
+      if (referrerId && lead?.id) {
+        try {
+          await createReferral({
+            referrerId,
+            recipientProfileId: profileId,
+            leadId: lead.id,
+          });
+        } catch (refErr) {
+          console.warn("Referral tracking failed:", refErr);
+        }
+      }
 
       toast.success("Message sent successfully!");
       setFormData({ name: "", email: "", phone: "", message: "" });
