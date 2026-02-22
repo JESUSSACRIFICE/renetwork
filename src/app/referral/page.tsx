@@ -5,7 +5,17 @@ import ReferralFooter from "@/components/referral/ReferralFooter";
 import { ReferralVerticalMenu } from "@/components/referral/ReferralVerticalMenu";
 import AdSpace from "@/components/referral/AdSpace";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowRight, Users, Handshake, Shield, Target, BookOpen, MapPin, Gift } from "lucide-react";
+import {
+  Search,
+  ArrowRight,
+  Users,
+  Handshake,
+  Shield,
+  Target,
+  BookOpen,
+  MapPin,
+  Gift,
+} from "lucide-react";
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import { SearchForm } from "@/components/hero/SearchForm";
@@ -41,20 +51,28 @@ export default function ReferralLandingPage() {
                       Real Estate Referral Platform
                     </h1>
                     <p className="text-lg sm:text-xl text-white/90 max-w-2xl">
-                      Connect, refer, and collaborate with verified real estate professionals. 
-                      Secure payments, referral splitting, and comprehensive support.
+                      Connect, refer, and collaborate with verified real estate
+                      professionals. Secure payments, referral splitting, and
+                      comprehensive support.
                     </p>
                   </div>
 
                   <div className="flex flex-wrap gap-3">
                     <Link href="/register">
-                      <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100">
+                      <Button
+                        size="lg"
+                        className="bg-white text-gray-900 hover:bg-gray-100"
+                      >
                         Get Started
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                     <Link href="/referral/about">
-                      <Button size="lg" variant="outline" className="border-white text-black bg-white hover:text-white hover:bg-white/10">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="border-white text-black bg-white hover:text-white hover:bg-white/10"
+                      >
                         Learn More
                       </Button>
                     </Link>
@@ -80,62 +98,90 @@ export default function ReferralLandingPage() {
                 Welcome to the Referral Platform
               </h2>
               <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                Our platform connects real estate professionals, customers, and agencies through a trusted referral network. 
-                Whether you&apos;re looking for services, referring clients, or building your business, we provide the tools and support you need.
+                Our platform connects real estate professionals, customers, and
+                agencies through a trusted referral network. Whether you&apos;re
+                looking for services, referring clients, or building your
+                business, we provide the tools and support you need.
               </p>
             </div>
 
             {/* How It Works */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">How It Works</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+                How It Works
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="text-center p-6 rounded-lg bg-gray-50">
                   <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                     <Users className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">1. Connect</h3>
-                  <p className="text-gray-600">Join our network of verified professionals and customers</p>
+                  <p className="text-gray-600">
+                    Join our network of verified professionals and customers
+                  </p>
                 </div>
                 <div className="text-center p-6 rounded-lg bg-gray-50">
                   <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                     <Handshake className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">2. Refer</h3>
-                  <p className="text-gray-600">Make referrals and collaborate with trusted partners</p>
+                  <p className="text-gray-600">
+                    Make referrals and collaborate with trusted partners
+                  </p>
                 </div>
                 <div className="text-center p-6 rounded-lg bg-gray-50">
                   <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                     <Shield className="h-8 w-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">3. Secure</h3>
-                  <p className="text-gray-600">Protected payments and escrow for peace of mind</p>
+                  <p className="text-gray-600">
+                    Protected payments and escrow for peace of mind
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Features */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Key Features</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+                Key Features
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
                   <Target className="h-8 w-8 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Referral Splitting</h3>
-                  <p className="text-gray-600 text-sm">Fair and transparent referral fee distribution</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Referral Splitting
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Fair and transparent referral fee distribution
+                  </p>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
                   <BookOpen className="h-8 w-8 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Teaching & Learning</h3>
-                  <p className="text-gray-600 text-sm">Educational resources and collaboration tools</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Teaching & Learning
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Educational resources and collaboration tools
+                  </p>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
                   <MapPin className="h-8 w-8 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">GPS Integration</h3>
-                  <p className="text-gray-600 text-sm">Location-based search and matching</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    GPS Integration
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Location-based search and matching
+                  </p>
                 </div>
                 <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
                   <Gift className="h-8 w-8 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Benefits Program</h3>
-                  <p className="text-gray-600 text-sm">Rewards for senders, recipients, and customers</p>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Benefits Program
+                  </h3>
+                  <p className="text-gray-600 text-sm">
+                    Rewards for senders, recipients, and customers
+                  </p>
                 </div>
               </div>
             </div>
@@ -143,12 +189,18 @@ export default function ReferralLandingPage() {
             {/* Refer Section */}
             <div className="mb-16 bg-gradient-to-r from-primary/10 to-primary/5 rounded-2xl p-8 lg:p-12">
               <div className="text-center max-w-3xl mx-auto">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Start Referring Today</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                  Start Referring Today
+                </h2>
                 <p className="text-lg text-gray-600 mb-6">
-                  Join thousands of professionals who trust our platform for referrals, collaboration, and business growth.
+                  Join thousands of professionals who trust our platform for
+                  referrals, collaboration, and business growth.
                 </p>
                 <Link href="/register">
-                  <Button size="lg" className="bg-primary hover:bg-primary-dark">
+                  <Button
+                    size="lg"
+                    className="bg-primary hover:bg-primary-dark"
+                  >
                     Register Now
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -158,14 +210,18 @@ export default function ReferralLandingPage() {
 
             {/* Benefits Preview */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Benefits for Everyone</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+                Benefits for Everyone
+              </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="text-center">
                   <div className="w-20 h-20 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
                     <Users className="h-10 w-10 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">For Senders</h3>
-                  <p className="text-gray-600 mb-4">Earn rewards and commissions for successful referrals</p>
+                  <p className="text-gray-600 mb-4">
+                    Earn rewards and commissions for successful referrals
+                  </p>
                   <Link href="/referral/benefits#sender">
                     <Button variant="outline">Learn More</Button>
                   </Link>
@@ -175,7 +231,9 @@ export default function ReferralLandingPage() {
                     <Handshake className="h-10 w-10 text-green-600" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">For Recipients</h3>
-                  <p className="text-gray-600 mb-4">Receive quality referrals and grow your business</p>
+                  <p className="text-gray-600 mb-4">
+                    Receive quality referrals and grow your business
+                  </p>
                   <Link href="/referral/benefits#recipient">
                     <Button variant="outline">Learn More</Button>
                   </Link>
@@ -185,7 +243,9 @@ export default function ReferralLandingPage() {
                     <Users className="h-10 w-10 text-purple-600" />
                   </div>
                   <h3 className="text-xl font-semibold mb-2">For Customers</h3>
-                  <p className="text-gray-600 mb-4">Access trusted professionals with secure transactions</p>
+                  <p className="text-gray-600 mb-4">
+                    Access trusted professionals with secure transactions
+                  </p>
                   <Link href="/referral/benefits#customer">
                     <Button variant="outline">Learn More</Button>
                   </Link>
@@ -199,4 +259,3 @@ export default function ReferralLandingPage() {
     </div>
   );
 }
-

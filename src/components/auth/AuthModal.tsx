@@ -82,7 +82,7 @@ export function AuthModal({
       } else if (userType === "admin") {
         router.push("/dashboard");
       } else {
-        router.push(`/profile/${data.user.id}`);
+        router.push("/dashboard");
       }
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");

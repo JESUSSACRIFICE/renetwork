@@ -44,6 +44,351 @@ export type Database = {
         };
         Relationships: [];
       };
+      crowdfunding_fund_allocations: {
+        Row: {
+          id: string;
+          project_id: string;
+          category: string;
+          description: string | null;
+          amount_pct: number;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          category: string;
+          description?: string | null;
+          amount_pct: number;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          category?: string;
+          description?: string | null;
+          amount_pct?: number;
+          sort_order?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      crowdfunding_notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          project_id: string | null;
+          pledge_id: string | null;
+          type: string;
+          title: string;
+          message: string | null;
+          read_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          project_id?: string | null;
+          pledge_id?: string | null;
+          type: string;
+          title: string;
+          message?: string | null;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          project_id?: string | null;
+          pledge_id?: string | null;
+          type?: string;
+          title?: string;
+          message?: string | null;
+          read_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      crowdfunding_pledges: {
+        Row: {
+          id: string;
+          project_id: string;
+          user_id: string;
+          amount_cents: number;
+          status: string;
+          return_amount_cents: number | null;
+          return_paid_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          user_id: string;
+          amount_cents: number;
+          status?: string;
+          return_amount_cents?: number | null;
+          return_paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          user_id?: string;
+          amount_cents?: number;
+          status?: string;
+          return_amount_cents?: number | null;
+          return_paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      crowdfunding_projects: {
+        Row: {
+          id: string;
+          creator_id: string | null;
+          title: string;
+          slug: string | null;
+          short_description: string | null;
+          description: string | null;
+          images: string[];
+          category: string | null;
+          location: string | null;
+          min_investment_cents: number;
+          target_amount_cents: number;
+          raised_amount_cents: number;
+          expected_roi_pct: number | null;
+          status: string;
+          fund_allocation_json: Json;
+          deadline_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          creator_id?: string | null;
+          title: string;
+          slug?: string | null;
+          short_description?: string | null;
+          description?: string | null;
+          images?: string[];
+          category?: string | null;
+          location?: string | null;
+          min_investment_cents: number;
+          target_amount_cents: number;
+          raised_amount_cents?: number;
+          expected_roi_pct?: number | null;
+          status?: string;
+          fund_allocation_json?: Json;
+          deadline_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          creator_id?: string | null;
+          title?: string;
+          slug?: string | null;
+          short_description?: string | null;
+          description?: string | null;
+          images?: string[];
+          category?: string | null;
+          location?: string | null;
+          min_investment_cents?: number;
+          target_amount_cents?: number;
+          raised_amount_cents?: number;
+          expected_roi_pct?: number | null;
+          status?: string;
+          fund_allocation_json?: Json;
+          deadline_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      crowdfunding_votes: {
+        Row: {
+          id: string;
+          project_id: string;
+          user_id: string;
+          vote_type: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          user_id: string;
+          vote_type: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          user_id?: string;
+          vote_type?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      network_post_comments: {
+        Row: {
+          id: string;
+          post_id: string;
+          author_id: string;
+          content: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          author_id: string;
+          content: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          author_id?: string;
+          content?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      network_post_likes: {
+        Row: {
+          id: string;
+          post_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          post_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          post_id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      network_posts: {
+        Row: {
+          id: string;
+          author_id: string;
+          title: string | null;
+          content: string;
+          type: string;
+          deal_details: Json;
+          group_id: string | null;
+          like_count: number;
+          comment_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          author_id: string;
+          title?: string | null;
+          content: string;
+          type?: string;
+          deal_details?: Json;
+          group_id?: string | null;
+          like_count?: number;
+          comment_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          author_id?: string;
+          title?: string | null;
+          content?: string;
+          type?: string;
+          deal_details?: Json;
+          group_id?: string | null;
+          like_count?: number;
+          comment_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      profile_deal_interests: {
+        Row: {
+          id: string;
+          profile_id: string;
+          interest_type: string;
+          title: string;
+          description: string | null;
+          property_type: string | null;
+          location: string | null;
+          budget_min_cents: number | null;
+          budget_max_cents: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          interest_type: string;
+          title: string;
+          description?: string | null;
+          property_type?: string | null;
+          location?: string | null;
+          budget_min_cents?: number | null;
+          budget_max_cents?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          profile_id?: string;
+          interest_type?: string;
+          title?: string;
+          description?: string | null;
+          property_type?: string | null;
+          location?: string | null;
+          budget_min_cents?: number | null;
+          budget_max_cents?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      profile_reputation_badges: {
+        Row: {
+          id: string;
+          profile_id: string;
+          badge_type: string;
+          title: string;
+          description: string | null;
+          awarded_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          badge_type: string;
+          title: string;
+          description?: string | null;
+          awarded_at?: string;
+        };
+        Update: {
+          id?: string;
+          profile_id?: string;
+          badge_type?: string;
+          title?: string;
+          description?: string | null;
+          awarded_at?: string;
+        };
+        Relationships: [];
+      };
       e_signatures: {
         Row: {
           id: string;

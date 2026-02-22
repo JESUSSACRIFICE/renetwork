@@ -128,7 +128,7 @@ export function ReferFromMessagesDialog({
         notes: notes.trim(),
       });
       toast.success(
-        "Referral sent! The recipient will review and accept. You'll earn commission when they create an engagement."
+        "Referral sent! The recipient will review and accept. You'll earn commission when they create an offer with the client and the client accepts."
       );
       setNotes("");
       setSelectedRecipient(null);
@@ -162,7 +162,7 @@ export function ReferFromMessagesDialog({
             Refer {clientName.split(" ")[0]} to a Professional
           </DialogTitle>
           <DialogDescription>
-            Share this client with another professional. You&apos;ll earn commission when they create an engagement.
+            Share this client with another professional. You&apos;ll earn commission when they create an offer with the client and the client accepts.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">

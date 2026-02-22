@@ -6,7 +6,6 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { FreeioDashboardHeader } from "@/components/dashboard/FreeioDashboardHeader";
 import { FreeioFooter } from "@/components/dashboard/FreeioFooter";
-import { UserTypeToggle } from "@/components/dashboard/UserTypeToggle";
 import { useAuth } from "@/hooks/use-auth";
 import { useProfile } from "@/hooks/use-professional-profiles";
 
@@ -82,7 +81,6 @@ export default function DashboardLayout({
           </main>
         </div>
         <FreeioFooter />
-        <UserTypeToggle />
       </div>
     </SidebarProvider>
   );

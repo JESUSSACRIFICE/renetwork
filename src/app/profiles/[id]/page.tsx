@@ -31,6 +31,8 @@ import {
   useSubmitReview,
   type ProfessionalProfile,
 } from "@/hooks/use-professional-profiles";
+import { ProfileDealInterests } from "@/components/profiles/ProfileDealInterests";
+import { ProfileReputationBadges } from "@/components/profiles/ProfileReputationBadges";
 import { useAuth } from "@/hooks/use-auth";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { toast } from "sonner";
@@ -295,6 +297,15 @@ export default function ProfileDetail() {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Deal Interests */}
+              <ProfileDealInterests
+                profileId={id}
+                isOwner={user?.id === id}
+              />
+
+              {/* Reputation Badges */}
+              <ProfileReputationBadges profileId={id} />
 
               {/* Education - only show when data exists */}
               {profile.education && profile.education.length > 0 && (

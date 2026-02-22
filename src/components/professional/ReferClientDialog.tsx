@@ -79,7 +79,7 @@ export function ReferClientDialog({
       });
 
       toast.success(
-        "Referral sent! The recipient will review and accept. You'll earn commission when they create an engagement."
+        "Referral sent! The recipient will review and accept. You'll earn commission when they create an offer with the client and the client accepts."
       );
       setSelectedClient(null);
       setNotes("");

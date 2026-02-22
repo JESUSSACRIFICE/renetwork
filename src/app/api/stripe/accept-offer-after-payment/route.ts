@@ -64,11 +64,48 @@ export async function POST(request: NextRequest) {
       .eq("id", offerId)
       .eq("recipient_id", user.id)
       .eq("status", "pending")
-      .select("*")
+      .select("id, sender_id, recipient_id")
       .single();
 
     if (updateError || !offer) {
       return NextResponse.json({ error: "Failed to accept offer or already accepted" }, { status: 400 });
+    }
+
+    // Create referral commission when provider (sender) sent offer to referred client (recipient)
+    // Matches: referral.recipient_profile_id = offer.sender_id, referral.client_profile_id = offer.recipient_id
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (serviceRoleKey) {
+      const admin = createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        serviceRoleKey,
+      );
+      const { data: referral } = await admin
+        .from("referrals")
+        .select("id")
+        .eq("recipient_profile_id", offer.sender_id)
+        .eq("client_profile_id", offer.recipient_id)
+        .eq("status", "accepted")
+        .maybeSingle();
+
+      if (referral) {
+        const { data: existing } = await admin
+          .from("referral_commissions")
+          .select("id")
+          .eq("referral_id", referral.id)
+          .maybeSingle();
+
+        if (!existing) {
+          await admin.from("referrals").update({
+            status: "converted",
+            updated_at: new Date().toISOString(),
+          }).eq("id", referral.id);
+          await admin.from("referral_commissions").insert({
+            referral_id: referral.id,
+            amount_cents: 2500,
+            status: "pending",
+          });
+        }
+      }
     }
 
     return NextResponse.json({ success: true });

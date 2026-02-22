@@ -25,7 +25,7 @@ const footerLinks = {
     { name: "Platform Exclusivity", href: "/referral/learn/exclusivity" },
   ],
   Account: [
-    { name: "Dashboard", href: "/referral/dashboard" },
+    { name: "Dashboard", href: "/dashboard/referral" },
     { name: "Register", href: "/register" },
     { name: "Settings", href: "/referral/settings" },
     { name: "Advertise", href: "/referral/advertise" },
@@ -40,9 +40,13 @@ export default function ReferralFooter() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-8">
           {/* Logo and Contact */}
           <div className="col-span-2 lg:col-span-1">
-            <h3 className="text-2xl font-bold text-white mb-4">Referral Platform</h3>
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Referral Platform
+            </h3>
             <p className="text-sm mb-4">Customer Care</p>
-            <p className="text-lg font-semibold text-white mb-2">+1 234 567 890</p>
+            <p className="text-lg font-semibold text-white mb-2">
+              +1 234 567 890
+            </p>
             <Link href="/referral/contact" className="text-sm hover:text-white">
               Need help?
             </Link>
@@ -55,7 +59,10 @@ export default function ReferralFooter() {
               <ul className="space-y-2">
                 {links.map((link) => (
                   <li key={link.name}>
-                    <Link href={link.href} className="text-sm hover:text-white transition-colors">
+                    <Link
+                      href={link.href}
+                      className="text-sm hover:text-white transition-colors"
+                    >
                       {link.name}
                     </Link>
                   </li>
@@ -78,7 +85,9 @@ export default function ReferralFooter() {
                 placeholder="Enter your email"
                 className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
               />
-              <Button className="bg-gray-800 hover:bg-gray-700 text-white">Send</Button>
+              <Button className="bg-gray-800 hover:bg-gray-700 text-white">
+                Send
+              </Button>
             </div>
           </div>
         </div>
@@ -116,4 +125,3 @@ export default function ReferralFooter() {
     </footer>
   );
 }
-

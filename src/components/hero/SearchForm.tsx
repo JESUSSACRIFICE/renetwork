@@ -155,9 +155,11 @@ const motiveOptions = ["Serious", "Wasting time", "Exploring", "Ready to hire"];
 interface SearchFormProps {
   onSearch?: (filters: FilterValues) => void;
   className?: string;
+  /** When set, used as default when no "Find" option is selected (e.g. "Profile" for hero search) */
+  defaultSearchType?: "Profile" | "Service" | "Agency";
 }
 
-export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
+export const SearchForm = ({ onSearch, className = "", defaultSearchType }: SearchFormProps) => {
   const router = useRouter();
   const [filters, setFilters] = useState<FilterValues>({
     find: [],
@@ -205,7 +207,7 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
       });
 
       // Determine which page to navigate to based on "find" option
-      const findOption = filters.find[0]; // Get first selected option
+      const findOption = filters.find[0] ?? defaultSearchType;
 
       if (findOption === "Profile") {
         router.push(`/search/profiles?${params.toString()}`);
@@ -214,8 +216,7 @@ export const SearchForm = ({ onSearch, className = "" }: SearchFormProps) => {
       } else if (findOption === "Agency") {
         router.push(`/search/agencies?${params.toString()}`);
       } else {
-        // Default to browse page
-        router.push(`/search/services?${params.toString()}`);
+        router.push(`/search/profiles?${params.toString()}`);
       }
     }
   };

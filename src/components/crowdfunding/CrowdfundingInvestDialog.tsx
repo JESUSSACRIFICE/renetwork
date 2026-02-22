@@ -19,26 +19,28 @@ const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ""
 );
 
-type OfferForPayment = {
-  id: string;
-  title: string;
-  amount_cents: number;
-};
-
-interface AcceptOfferPaymentDialogProps {
+interface CrowdfundingInvestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  offer: OfferForPayment | null;
-  onSuccess: () => void | Promise<void>;
+  projectId: string;
+  projectTitle: string;
+  amountCents: number;
   getAccessToken: () => Promise<string | null>;
+  onSuccess: () => void | Promise<void>;
 }
 
 function PaymentForm({
-  offer,
+  projectTitle,
+  amountCents,
+  paymentIntentId,
+  getAccessToken,
   onSuccess,
   onCancel,
 }: {
-  offer: OfferForPayment;
+  projectTitle: string;
+  amountCents: number;
+  paymentIntentId: string;
+  getAccessToken: () => Promise<string | null>;
   onSuccess: () => void | Promise<void>;
   onCancel: () => void;
 }) {
@@ -61,13 +63,15 @@ function PaymentForm({
       return;
     }
 
+    const returnUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/crowdfund/payment-return`
+        : "";
+
     const { error: confirmError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url:
-          typeof window !== "undefined"
-            ? `${window.location.origin}/dashboard/offers/payment-return`
-            : "",
+        return_url: returnUrl,
       },
     });
 
@@ -77,17 +81,32 @@ function PaymentForm({
       return;
     }
 
+    // Inline success (no redirect): confirm payment and create pledge
+    const token = await getAccessToken();
+    if (token) {
+      const res = await fetch("/api/stripe/confirm-crowdfunding-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ paymentIntentId }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setErrorMessage(data.error ?? "Failed to record investment");
+        setIsProcessing(false);
+        return;
+      }
+    }
+
     await onSuccess();
     setIsProcessing(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement
-        options={{
-          layout: "tabs",
-        }}
-      />
+      <PaymentElement options={{ layout: "tabs" }} />
       {errorMessage && (
         <p className="text-sm text-destructive">{errorMessage}</p>
       )}
@@ -104,7 +123,7 @@ function PaymentForm({
           ) : (
             <>
               <CreditCard className="h-4 w-4 mr-2" />
-              Pay ${(offer.amount_cents / 100).toFixed(2)} & Accept
+              Invest ${(amountCents / 100).toFixed(2)}
             </>
           )}
         </Button>
@@ -113,20 +132,24 @@ function PaymentForm({
   );
 }
 
-export function AcceptOfferPaymentDialog({
+export function CrowdfundingInvestDialog({
   open,
   onOpenChange,
-  offer,
-  onSuccess,
+  projectId,
+  projectTitle,
+  amountCents,
   getAccessToken,
-}: AcceptOfferPaymentDialogProps) {
+  onSuccess,
+}: CrowdfundingInvestDialogProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !offer) {
+    if (!open || !projectId || amountCents < 100) {
       setClientSecret(null);
+      setPaymentIntentId(null);
       setError(null);
       return;
     }
@@ -139,17 +162,17 @@ export function AcceptOfferPaymentDialog({
       try {
         const token = await getAccessToken();
         if (!token) {
-          setError("Please sign in to pay");
+          setError("Please sign in to invest");
           return;
         }
 
-        const res = await fetch("/api/stripe/create-payment-intent", {
+        const res = await fetch("/api/stripe/crowdfunding-payment-intent", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ offerId: offer.id }),
+          body: JSON.stringify({ projectId, amountCents }),
         });
 
         const data = await res.json();
@@ -161,6 +184,7 @@ export function AcceptOfferPaymentDialog({
 
         if (!cancelled && data.clientSecret) {
           setClientSecret(data.clientSecret);
+          setPaymentIntentId(data.paymentIntentId ?? null);
         }
       } catch (err) {
         if (!cancelled) {
@@ -176,19 +200,17 @@ export function AcceptOfferPaymentDialog({
     return () => {
       cancelled = true;
     };
-  }, [open, offer?.id, getAccessToken]);
+  }, [open, projectId, amountCents, getAccessToken]);
 
   const handleSuccess = async () => {
     await onSuccess();
-    toast.success("Payment successful! Offer accepted.");
+    toast.success("Investment successful!");
     onOpenChange(false);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
   };
-
-  if (!offer) return null;
 
   const options = clientSecret
     ? {
@@ -204,14 +226,14 @@ export function AcceptOfferPaymentDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CreditCard className="h-5 w-5" />
-            Pay for Offer
+            Invest in Project
           </DialogTitle>
           <DialogDescription>
-            Complete payment to accept &quot;{offer.title}&quot; — ${(offer.amount_cents / 100).toFixed(2)}
+            Complete payment to invest in &quot;{projectTitle}&quot; — ${(amountCents / 100).toFixed(2)}
           </DialogDescription>
         </DialogHeader>
 
@@ -226,10 +248,13 @@ export function AcceptOfferPaymentDialog({
               Close
             </Button>
           </div>
-        ) : clientSecret && options ? (
+        ) : clientSecret && options && paymentIntentId ? (
           <Elements stripe={stripePromise} options={options}>
             <PaymentForm
-              offer={offer}
+              projectTitle={projectTitle}
+              amountCents={amountCents}
+              paymentIntentId={paymentIntentId}
+              getAccessToken={getAccessToken}
               onSuccess={handleSuccess}
               onCancel={handleCancel}
             />

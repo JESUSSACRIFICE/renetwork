@@ -10,7 +10,13 @@ import { AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 
@@ -26,7 +32,9 @@ export default function ReferralHeader() {
       setUser(user);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
 
@@ -61,33 +69,56 @@ export default function ReferralHeader() {
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-dark text-primary-foreground font-bold text-sm">
               REF
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">Referral Platform</span>
+            <span className="text-xl font-bold text-gray-900 hidden sm:block">
+              Referral Platform
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link href="/referral" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Home
             </Link>
-            <Link href="/referral/results" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral/results"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Browse
             </Link>
-            <Link href="/referral/about" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral/about"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               About
             </Link>
-            <Link href="/referral/benefits" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral/benefits"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Benefits
             </Link>
-            <Link href="/referral/qa" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral/qa"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Q&A
             </Link>
-            <Link href="/referral/contact" className="text-gray-700 hover:text-gray-900 font-medium">
+            <Link
+              href="/referral/contact"
+              className="text-gray-700 hover:text-gray-900 font-medium"
+            >
               Contact
             </Link>
           </nav>
 
           {/* Search Bar - Desktop */}
-          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
+          <form
+            onSubmit={handleSearch}
+            className="hidden lg:flex flex-1 max-w-md mx-4"
+          >
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -103,21 +134,29 @@ export default function ReferralHeader() {
           <div className="flex items-center space-x-2">
             {user ? (
               <>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
+                <Button
+                  variant="ghost"
+                  size="icon"
                   className="hidden md:flex relative hover:bg-gray-100"
-                  onClick={() => router.push("/referral/dashboard/messages")}
+                  onClick={() => router.push("/dashboard/referral/messages")}
                 >
                   <MessageSquare className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="icon" className="hidden md:flex relative hover:bg-gray-100">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hidden md:flex relative hover:bg-gray-100"
+                >
                   <Bell className="h-5 w-5" />
                 </Button>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild className="hidden lg:flex">
-                    <Button variant="ghost" size="icon" className="rounded-full">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-full"
+                    >
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                           {user.email?.charAt(0).toUpperCase() || "U"}
@@ -130,11 +169,15 @@ export default function ReferralHeader() {
                       <p className="font-medium">{user.email}</p>
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => router.push("/referral/dashboard")}>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/dashboard/referral")}
+                    >
                       <User className="mr-2 h-4 w-4" />
                       Dashboard
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => router.push("/referral/settings")}>
+                    <DropdownMenuItem
+                      onClick={() => router.push("/referral/settings")}
+                    >
                       <User className="mr-2 h-4 w-4" />
                       Settings
                     </DropdownMenuItem>
@@ -153,7 +196,7 @@ export default function ReferralHeader() {
                 </Button>
               </Link>
             )}
-            
+
             {/* Mobile Menu */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild className="lg:hidden">
@@ -170,24 +213,48 @@ export default function ReferralHeader() {
                       </Button>
                     </Link>
                   )}
-                  
+
                   <div className="space-y-4">
-                    <Link href="/referral" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       Home
                     </Link>
-                    <Link href="/referral/results" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral/results"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       Browse
                     </Link>
-                    <Link href="/referral/about" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral/about"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       About
                     </Link>
-                    <Link href="/referral/benefits" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral/benefits"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       Benefits
                     </Link>
-                    <Link href="/referral/qa" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral/qa"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       Q&A
                     </Link>
-                    <Link href="/referral/contact" onClick={() => setMobileOpen(false)} className="block text-gray-700 hover:text-gray-900 font-medium">
+                    <Link
+                      href="/referral/contact"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-gray-700 hover:text-gray-900 font-medium"
+                    >
                       Contact
                     </Link>
                   </div>
@@ -200,4 +267,3 @@ export default function ReferralHeader() {
     </header>
   );
 }
-

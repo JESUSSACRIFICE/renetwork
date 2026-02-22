@@ -26,6 +26,8 @@ import {
   BarChart3,
   KeyRound,
   FileCheck,
+  HandCoins,
+  Network,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
@@ -49,12 +51,14 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     },
     {
       title: "Referral Earnings",
-      url: "/referral/dashboard",
+      url: "/dashboard/referral",
       icon: TrendingUp,
     },
     // { title: "My Projects", url: "/dashboard/projects", icon: Briefcase },
     // { title: "Jobs Applicants", url: "/dashboard/applicants", icon: Hourglass },
     { title: "Services", url: "/dashboard/services", icon: DollarSign },
+    { title: "Crowdfunding", url: "/dashboard/crowdfunding", icon: HandCoins },
+    { title: "Network", url: "/network/feed", icon: Network },
     { title: "Offers", url: "/dashboard/offers", icon: FileCheck },
     // { title: "Favorite", url: "/dashboard/favorites", icon: Heart },
     // { title: "Meetings", url: "/dashboard/meetings", icon: Target },
@@ -80,10 +84,12 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     },
     {
       title: "Referral Earnings",
-      url: "/referral/dashboard",
+      url: "/dashboard/referral",
       icon: TrendingUp,
     },
     { title: "Proposals", url: "/dashboard/proposals", icon: FileText },
+    { title: "Crowdfunding", url: "/dashboard/crowdfunding", icon: HandCoins },
+    { title: "Network", url: "/network/feed", icon: Network },
     { title: "Offers", url: "/dashboard/offers", icon: FileCheck },
     // { title: "Jobs Applied", url: "/dashboard/jobs-applied", icon: Hourglass },
     // { title: "Jobs Alerts", url: "/dashboard/alerts", icon: Bell },
@@ -94,7 +100,7 @@ export function DashboardSidebar({ userType, profile }: DashboardSidebarProps) {
     { title: "Earnings", url: "/dashboard/earnings", icon: TrendingUp },
     // { title: "Wallet", url: "/dashboard/wallet", icon: Wallet },
     { title: "Reviews", url: "/dashboard/reviews", icon: Star },
-    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+    // { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
     {
       title: "Reset Password",
