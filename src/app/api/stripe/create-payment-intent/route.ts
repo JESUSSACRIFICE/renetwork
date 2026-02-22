@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     const { data: offer, error: offerError } = await supabase
       .from("offers")
-      .select("id, amount_cents, recipient_id, status, title")
+      .select("id, amount_cents, recipient_id, sender_id, status, title")
       .eq("id", offerId)
       .single();
 
