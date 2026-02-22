@@ -3,9 +3,11 @@ import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 
-const stripe = new Stripe(
-  process.env.STRIPE_SECRET_KEY ?? process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY ?? ""
-);
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY ?? process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY;
+  if (!key) throw new Error("STRIPE_SECRET_KEY is not configured");
+  return new Stripe(key);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "paymentIntentId is required" }, { status: 400 });
     }
 
+    const stripe = getStripe();
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
     if (paymentIntent.status !== "succeeded") {
       return NextResponse.json({ error: "Payment not completed" }, { status: 400 });
