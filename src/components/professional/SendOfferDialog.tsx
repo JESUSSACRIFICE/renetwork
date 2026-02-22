@@ -26,7 +26,7 @@ interface SendOfferDialogProps {
     description?: string;
     amountCents: number;
     deliveryDays?: number;
-  }) => Promise<void>;
+  }) => Promise<unknown>;
   isSending?: boolean;
 }
 
