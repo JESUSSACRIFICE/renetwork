@@ -50,6 +50,7 @@ const TYPE_ICONS = {
 function FeedPostCard({
   post,
   onLike,
+  onUnlike,
   isLiked,
   userId,
 }: {
@@ -145,7 +146,11 @@ export default function NetworkFeedPage() {
   );
   const createPost = useCreateNetworkPost(user?.id ?? null);
 
-  const [newPost, setNewPost] = useState({ type: "post" as const, title: "", content: "" });
+  const [newPost, setNewPost] = useState<{
+    type: "post" | "blog" | "deal";
+    title: string;
+    content: string;
+  }>({ type: "post", title: "", content: "" });
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const handleCreate = () => {
