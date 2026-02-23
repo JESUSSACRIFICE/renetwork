@@ -12,13 +12,13 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useBrowseProfiles } from "@/hooks/use-professional-profiles";
-import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
+import { useBrowseProfiles, usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 import MapView from "@/components/browse/MapView";
 
 const Browse = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedPspTypes, setSelectedPspTypes] = useState<string[]>([]);
   const [selectedRatings, setSelectedRatings] = useState<number[]>([]);
@@ -122,7 +122,7 @@ const Browse = () => {
                     Professional Type (PSP)
                   </h3>
                   <div className="space-y-3 max-h-64 overflow-y-auto">
-                    {Object.entries(PSP_OPTIONS_BY_LETTER).map(
+                    {Object.entries(pspOptionsByLetter).map(
                       ([letter, options]) => (
                         <div key={letter} className="space-y-2">
                           <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">

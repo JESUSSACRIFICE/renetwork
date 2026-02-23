@@ -12,6 +12,7 @@ export {
   useBrowseProfiles,
   useSearchProfiles,
   usePspTypes,
+  usePspOptionsByLetter,
   useProfile,
   useProfileFavorite,
   useSubmitReview,

@@ -9,8 +9,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Loader2, ChevronDown } from "lucide-react";
-import { useProfilePspTypesUpdate } from "@/hooks/use-professional-profiles";
-import { PSP_OPTIONS_BY_LETTER } from "@/lib/psp-types";
+import { useProfilePspTypesUpdate, usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 
 interface ProfessionalRolesFormProps {
   userId: string;
@@ -29,6 +28,7 @@ export function ProfessionalRolesForm({
   onOpenChange,
   onSaveSuccess,
 }: ProfessionalRolesFormProps) {
+  const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
   const updatePspTypes = useProfilePspTypesUpdate();
 
   const handleSubmit = () => {
@@ -57,7 +57,7 @@ export function ProfessionalRolesForm({
         <CollapsibleContent>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-64 overflow-y-auto">
-              {Object.entries(PSP_OPTIONS_BY_LETTER).map(([letter, options]) => (
+              {Object.entries(pspOptionsByLetter).map(([letter, options]) => (
                 <div key={letter} className="space-y-2">
                   <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {letter}

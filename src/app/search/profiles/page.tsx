@@ -54,9 +54,15 @@ function ProfilesSearchContent() {
 
   const filters = useMemo(
     () => ({
-      psp: searchParams.get("psp"),
-      fields: searchParams.get("fields"),
-      price: searchParams.get("price"),
+      psp: searchParams.get("psp") ?? undefined,
+      agentTypes: searchParams.get("agentTypes") ?? undefined,
+      realEstateTypes: searchParams.get("realEstateTypes") ?? undefined,
+      crowdfundingTypes: searchParams.get("crowdfundingTypes") ?? undefined,
+      flooringIndoorTypes: searchParams.get("flooringIndoorTypes") ?? undefined,
+      flooringOutdoorTypes: searchParams.get("flooringOutdoorTypes") ?? undefined,
+      fields: searchParams.get("fields") ?? undefined,
+      price: searchParams.get("price") ?? undefined,
+      willingToTrain: searchParams.get("willingToTrain") ?? undefined,
     }),
     [searchParams],
   );

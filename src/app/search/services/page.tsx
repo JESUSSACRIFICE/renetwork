@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense, useEffect, useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Star,
@@ -114,6 +114,7 @@ const MOCK_SERVICES: ServiceListItem[] = [
 
 function ServicesSearchContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [hoveredServiceId, setHoveredServiceId] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<
@@ -121,14 +122,37 @@ function ServicesSearchContent() {
   >("default");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
+  const listOptions = useMemo(() => {
+    const parse = (key: string) =>
+      searchParams.get(key)?.split(",").map((s) => s.trim()).filter((s) => s && s !== "All" && s !== "All of the above") ?? [];
+    const psp = [
+      ...parse("psp"),
+      ...parse("agentTypes"),
+      ...parse("realEstateTypes"),
+      ...parse("crowdfundingTypes"),
+      ...parse("flooringIndoorTypes"),
+      ...parse("flooringOutdoorTypes"),
+    ];
+    const price = parse("price");
+    const fields = parse("fields");
+    const willingToTrainRaw = parse("willingToTrain");
+    const willingToTrain = willingToTrainRaw.includes("Yes") ? true : undefined;
+
+    return {
+      withAreas: true,
+      sortBy,
+      psp: psp.length > 0 ? [...new Set(psp)] : undefined,
+      price: price.length > 0 ? price : undefined,
+      fields: fields.length > 0 ? fields : undefined,
+      willingToTrain,
+    };
+  }, [searchParams, sortBy]);
+
   const {
     data: servicesData,
     isLoading: loading,
     isError,
-  } = useServicesList({
-    withAreas: true,
-    sortBy,
-  });
+  } = useServicesList(listOptions);
   const services: ServiceListItem[] = isError
     ? MOCK_SERVICES
     : (servicesData ?? []);

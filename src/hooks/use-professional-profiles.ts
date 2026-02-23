@@ -34,8 +34,14 @@ export interface BrowseProfilesFilters {
 
 export interface SearchProfilesFilters {
   psp?: string | null;
+  agentTypes?: string | null;
+  realEstateTypes?: string | null;
+  crowdfundingTypes?: string | null;
+  flooringIndoorTypes?: string | null;
+  flooringOutdoorTypes?: string | null;
   fields?: string | null;
   price?: string | null;
+  willingToTrain?: string | null;
 }
 
 export interface SearchProfileListing {
@@ -287,17 +293,26 @@ const ADDRESS_MAP: Record<string, string> = {
   "80202": "741 16th St, Denver, CO 80202, USA",
 };
 
+function parseCommaParam(param: string | null | undefined): string[] {
+  if (!param) return [];
+  return param
+    .split(",")
+    .map((s) => s.trim())
+    .filter((s) => s && s !== "All of the above");
+}
+
 async function fetchSearchProfiles(
   filters: SearchProfilesFilters,
 ): Promise<SearchProfileListing[]> {
   let profileIds: string[] = [];
-  const pspParam = filters.psp;
-  const pspLabels = pspParam
-    ? pspParam
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean)
-    : [];
+  const pspLabels = [
+    ...parseCommaParam(filters.psp),
+    ...parseCommaParam(filters.agentTypes),
+    ...parseCommaParam(filters.realEstateTypes),
+    ...parseCommaParam(filters.crowdfundingTypes),
+    ...parseCommaParam(filters.flooringIndoorTypes),
+    ...parseCommaParam(filters.flooringOutdoorTypes),
+  ].filter((l) => l !== "All");
 
   if (pspLabels.length > 0) {
     const { data: pspTypeRows } = await db
@@ -319,14 +334,20 @@ async function fetchSearchProfiles(
     if (profileIds.length === 0) return [];
   }
 
+  const willingToTrainLabels = parseCommaParam(filters.willingToTrain);
+  const filterWillingToTrain = willingToTrainLabels.includes("Yes");
+
   let profilesQuery = db
     .from("profiles")
     .select(
-      "id, full_name, avatar_url, bio, hourly_rate, mailing_address",
+      "id, full_name, avatar_url, bio, hourly_rate, mailing_address, willing_to_train",
     )
     .eq("user_type", "service_provider");
   if (profileIds.length > 0) {
     profilesQuery = profilesQuery.in("id", profileIds);
+  }
+  if (filterWillingToTrain) {
+    profilesQuery = profilesQuery.eq("willing_to_train", true);
   }
   const { data: profilesData, error: profilesError } = await profilesQuery;
 
@@ -451,17 +472,24 @@ async function fetchSearchProfiles(
     },
   );
 
-  const priceParam = filters.price;
-  if (priceParam) {
-    const [minStr, maxStr] = priceParam
-      .split("-")
-      .map((s) => parseInt(s.trim(), 10));
-    const priceMin = !isNaN(minStr) ? minStr : 0;
-    const priceMax = !isNaN(maxStr) ? maxStr : 5000;
-    listings = listings.filter((p) => {
-      const rate = p.hourly_rate ?? 0;
-      return rate >= priceMin && rate <= priceMax;
-    });
+  const priceLabels = parseCommaParam(filters.price);
+  if (priceLabels.length > 0) {
+    const PRICE_TIERS: Record<string, { min: number; max: number }> = {
+      Budget: { min: 0, max: 25 },
+      Economic: { min: 25, max: 50 },
+      Affordable: { min: 50, max: 100 },
+      Mid: { min: 100, max: 500 },
+      Premium: { min: 300, max: 99999 },
+      Luxury: { min: 500, max: 99999 },
+    };
+    listings = listings.filter((p) =>
+      priceLabels.some((label) => {
+        const tier = PRICE_TIERS[label];
+        if (!tier) return false;
+        const rate = p.hourly_rate ?? 0;
+        return rate >= tier.min && rate <= tier.max;
+      }),
+    );
   }
 
   return listings;
@@ -486,6 +514,30 @@ export function usePspTypes() {
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return data ?? [];
+    },
+    staleTime: 1000 * 60 * 60,
+    gcTime: 1000 * 60 * 60 * 24,
+  });
+}
+
+/** PSP options grouped by letter (A, B, C, ...) for SearchForm, Browse, etc. */
+export function usePspOptionsByLetter() {
+  return useQuery({
+    queryKey: ["psp_types", "by_letter"],
+    queryFn: async () => {
+      const { data, error } = await db
+        .from("psp_types")
+        .select("label, letter")
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      const rows = data ?? [];
+      const byLetter: Record<string, string[]> = {};
+      for (const row of rows) {
+        const letter = (row as { letter?: string | null }).letter ?? "Other";
+        if (!byLetter[letter]) byLetter[letter] = [];
+        byLetter[letter].push((row as { label: string }).label);
+      }
+      return byLetter;
     },
     staleTime: 1000 * 60 * 60,
     gcTime: 1000 * 60 * 60 * 24,

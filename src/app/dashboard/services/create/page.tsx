@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
-import { useProfile, usePspTypes } from "@/hooks/use-professional-profiles";
+import { useProfile, usePspTypes, usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 import { useCreateServiceWithPackages } from "@/hooks/use-services";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   PSPMultiSelect,
 } from "@/components/hero/PSPMultiSelect";
+import { MultiSelect } from "@/components/hero/MultiSelect";
 import {
-  PSP_OPTIONS_BY_LETTER,
   agentOptions,
   crowdfundingOptions,
   flooringIndoorOptions,
@@ -35,6 +35,15 @@ interface PackageForm {
   delivery_days: number;
 }
 
+const serviceFieldsOptions = [
+  "Commercial",
+  "Multi-Unit",
+  "Industrial",
+  "Agriculture",
+  "Residential",
+  "Other",
+];
+
 const defaultPackage = (): PackageForm => ({
   id: crypto.randomUUID(),
   title: "",
@@ -53,6 +62,7 @@ export default function CreateServicePage() {
     : "agent";
   const providerId = user?.id ?? null;
   const { data: pspTypes = [] } = usePspTypes();
+  const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
   const createService = useCreateServiceWithPackages(providerId);
 
   const [title, setTitle] = useState("");
@@ -64,6 +74,7 @@ export default function CreateServicePage() {
   const [crowdfundingLabels, setCrowdfundingLabels] = useState<string[]>([]);
   const [flooringIndoorLabels, setFlooringIndoorLabels] = useState<string[]>([]);
   const [flooringOutdoorLabels, setFlooringOutdoorLabels] = useState<string[]>([]);
+  const [serviceFields, setServiceFields] = useState<string[]>([]);
   const [packages, setPackages] = useState<PackageForm[]>([defaultPackage()]);
 
   const addPackage = () => {
@@ -120,6 +131,7 @@ export default function CreateServicePage() {
         description: description.trim() || null,
         image_url: imageUrl.trim() || null,
         categoryIds,
+        service_fields: serviceFields.length > 0 ? serviceFields : undefined,
         packages: validPackages.map((p) => ({
           title: p.title.trim(),
           description: p.description.trim() || null,
@@ -171,7 +183,7 @@ export default function CreateServicePage() {
               <PSPMultiSelect
                 label="Categories *"
                 placeholder="Ex. Architect, Agent, Builder..."
-                optionsByLetter={PSP_OPTIONS_BY_LETTER}
+                optionsByLetter={pspOptionsByLetter}
                 value={categoryLabels}
                 onChange={setCategoryLabels}
                 agentValue={agentLabels}
@@ -189,6 +201,15 @@ export default function CreateServicePage() {
                 flooringOutdoorValue={flooringOutdoorLabels}
                 onFlooringOutdoorChange={setFlooringOutdoorLabels}
                 flooringOutdoorOptions={flooringOutdoorOptions}
+              />
+            </div>
+            <div className="grid gap-2">
+              <MultiSelect
+                label="Property types (optional)"
+                placeholder="Ex. Commercial, Residential..."
+                options={serviceFieldsOptions}
+                value={serviceFields}
+                onChange={setServiceFields}
               />
             </div>
             <div className="grid gap-2">

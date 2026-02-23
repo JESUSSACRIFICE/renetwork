@@ -39,13 +39,13 @@ export interface FilterValues {
 }
 
 import {
-  PSP_OPTIONS_BY_LETTER,
   agentOptions,
   crowdfundingOptions,
   flooringIndoorOptions,
   flooringOutdoorOptions,
   realEstateOptions,
 } from "@/lib/psp-types";
+import { usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 
 // Options for dropdowns
 const findOptions = ["Service", "Profile", "Agency"];
@@ -161,6 +161,7 @@ interface SearchFormProps {
 
 export const SearchForm = ({ onSearch, className = "", defaultSearchType }: SearchFormProps) => {
   const router = useRouter();
+  const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
   const [filters, setFilters] = useState<FilterValues>({
     find: [],
     representation: [],
@@ -239,7 +240,7 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
         <PSPMultiSelect
           label="A-Z Psp"
           placeholder="Ex. Architect, Agent, Builder..."
-          optionsByLetter={PSP_OPTIONS_BY_LETTER}
+          optionsByLetter={pspOptionsByLetter}
           value={filters.psp}
           onChange={(v) => setFilters({ ...filters, psp: v })}
           agentValue={filters.agentTypes}

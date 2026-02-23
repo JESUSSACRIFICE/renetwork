@@ -5,7 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useAuth } from "@/hooks/use-auth";
-import { useProfile, usePspTypes } from "@/hooks/use-professional-profiles";
+import { useProfile, usePspTypes, usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 import {
   useMyService,
   useUpdateService,
@@ -26,8 +26,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { PSPMultiSelect } from "@/components/hero/PSPMultiSelect";
+import { MultiSelect } from "@/components/hero/MultiSelect";
 import {
-  PSP_OPTIONS_BY_LETTER,
   agentOptions,
   crowdfundingOptions,
   flooringIndoorOptions,
@@ -63,6 +63,15 @@ import { toast } from "sonner";
 
 type UserType = "service_provider" | "agent";
 
+const serviceFieldsOptions = [
+  "Commercial",
+  "Multi-Unit",
+  "Industrial",
+  "Agriculture",
+  "Residential",
+  "Other",
+];
+
 export default function EditServicePage() {
   const router = useRouter();
   const params = useParams();
@@ -76,6 +85,7 @@ export default function EditServicePage() {
     : "agent";
   const providerId = user?.id ?? null;
   const { data: pspTypes = [] } = usePspTypes();
+  const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
   const { data: categoryIds = [] } = useServiceCategories(serviceId ?? null);
   const { data: service, isLoading: serviceLoading } = useMyService(
     providerId,
@@ -99,6 +109,7 @@ export default function EditServicePage() {
   const [selectedCategoryLabels, setSelectedCategoryLabels] = useState<
     string[]
   >([]);
+  const [serviceFields, setServiceFields] = useState<string[]>([]);
   const [packageDialogOpen, setPackageDialogOpen] = useState(false);
   const [editingPackage, setEditingPackage] =
     useState<ServicePackageRow | null>(null);
@@ -238,6 +249,7 @@ export default function EditServicePage() {
         price,
         image_url: form.image_url?.trim() || null,
         delivery_days: deliveryDays,
+        service_fields: serviceFields.length > 0 ? serviceFields : [],
       });
       const categoryIdsToSave = selectedCategoryLabels
         .map((label) => pspTypes.find((pt) => pt.label === label)?.id)
@@ -313,7 +325,7 @@ export default function EditServicePage() {
                       <PSPMultiSelect
                         label="Categories *"
                         placeholder="Ex. Architect, Agent, Builder..."
-                        optionsByLetter={PSP_OPTIONS_BY_LETTER}
+                        optionsByLetter={pspOptionsByLetter}
                         value={selectedCategoryLabels}
                         onChange={(v) => setSelectedCategoryLabels(v)}
                         agentOptions={agentOptions}
@@ -321,6 +333,15 @@ export default function EditServicePage() {
                         crowdfundingOptions={crowdfundingOptions}
                         flooringIndoorOptions={flooringIndoorOptions}
                         flooringOutdoorOptions={flooringOutdoorOptions}
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <MultiSelect
+                        label="Property types (optional)"
+                        placeholder="Ex. Commercial, Residential..."
+                        options={serviceFieldsOptions}
+                        value={serviceFields}
+                        onChange={setServiceFields}
                       />
                     </div>
                     <div className="grid gap-2">

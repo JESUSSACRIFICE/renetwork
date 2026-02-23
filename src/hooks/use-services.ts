@@ -36,6 +36,7 @@ export interface ServiceRow {
   price: number;
   image_url: string | null;
   delivery_days: number | null;
+  service_fields?: string[] | null;
   created_at: string;
   updated_at: string;
 }
@@ -49,6 +50,7 @@ export interface ServiceInsert {
   price?: number;
   image_url?: string | null;
   delivery_days?: number | null;
+  service_fields?: string[] | null;
 }
 
 /** Payload to update a service (id required; provider_id immutable) */
@@ -60,12 +62,31 @@ export interface ServiceUpdate {
   price?: number;
   image_url?: string | null;
   delivery_days?: number | null;
+  service_fields?: string[] | null;
 }
+
+/** Price tier ranges in dollars (min inclusive, max inclusive) */
+const PRICE_TIERS: Record<string, { min: number; max: number }> = {
+  Budget: { min: 0, max: 25 },
+  Economic: { min: 25, max: 50 },
+  Affordable: { min: 50, max: 100 },
+  Mid: { min: 100, max: 500 },
+  Premium: { min: 300, max: 99999 },
+  Luxury: { min: 500, max: 99999 },
+};
 
 export interface ServicesListOptions {
   limit?: number;
   withAreas?: boolean;
   sortBy?: "default" | "rating" | "price-low" | "price-high";
+  /** PSP labels to filter by (e.g. ["Accountant", "Agent"]) - matches service_psp_types */
+  psp?: string[];
+  /** Price tier labels (Luxury, Mid, etc.) - service price must fall in at least one */
+  price?: string[];
+  /** Property/field types (Commercial, Residential, etc.) - matches service_fields */
+  fields?: string[];
+  /** Filter by provider willing_to_train */
+  willingToTrain?: boolean;
 }
 
 /** Preview shape for landing / cards (no service areas) */
@@ -98,9 +119,46 @@ export interface ServiceListItem extends ServicePreview {
 async function fetchServicesList(
   options: ServicesListOptions = {}
 ): Promise<ServiceListItem[]> {
-  const { limit, withAreas = false, sortBy = "default" } = options;
+  const {
+    limit,
+    withAreas = false,
+    sortBy = "default",
+    psp: pspLabels,
+    price: priceLabels,
+    fields: fieldLabels,
+    willingToTrain,
+  } = options;
 
-  const query = supabase
+  let serviceIdsFilter: string[] | null = null;
+  if (pspLabels && pspLabels.length > 0) {
+    const { data: pspRows } = await supabase
+      .from("psp_types")
+      .select("id")
+      .in("label", pspLabels);
+    const pspTypeIds = (pspRows ?? []).map((r: { id: string }) => r.id);
+    if (pspTypeIds.length > 0) {
+      const { data: junctionRows } = await supabase
+        .from("service_psp_types")
+        .select("service_id")
+        .in("psp_type_id", pspTypeIds);
+      serviceIdsFilter = [...new Set((junctionRows ?? []).map((r: { service_id: string }) => r.service_id))];
+    }
+    if (serviceIdsFilter && serviceIdsFilter.length === 0) {
+      return [];
+    }
+  }
+
+  let providerIdsFilter: string[] | null = null;
+  if (willingToTrain === true) {
+    const { data: profileRows } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("willing_to_train", true);
+    providerIdsFilter = (profileRows ?? []).map((r: { id: string }) => r.id);
+    if (providerIdsFilter.length === 0) return [];
+  }
+
+  let query = supabase
     .from("services")
     .select(
       `
@@ -112,13 +170,23 @@ async function fetchServicesList(
       price,
       image_url,
       delivery_days,
+      service_fields,
       profiles ( full_name, avatar_url )
     `
     )
     .order("created_at", { ascending: false });
 
+  if (serviceIdsFilter && serviceIdsFilter.length > 0) {
+    query = query.in("id", serviceIdsFilter);
+  }
+  if (providerIdsFilter && providerIdsFilter.length > 0) {
+    query = query.in("provider_id", providerIdsFilter);
+  }
+  if (fieldLabels && fieldLabels.length > 0) {
+    query = (query as any).overlaps("service_fields", fieldLabels);
+  }
   if (limit != null && limit > 0) {
-    query.limit(limit);
+    query = query.limit(limit);
   }
 
   const { data: servicesData, error } = await query;
@@ -182,6 +250,16 @@ async function fetchServicesList(
       })),
     };
   });
+
+  if (priceLabels && priceLabels.length > 0) {
+    list = list.filter((s) =>
+      priceLabels.some((label) => {
+        const tier = PRICE_TIERS[label];
+        if (!tier) return false;
+        return s.price >= tier.min && s.price <= tier.max;
+      })
+    );
+  }
 
   if (sortBy === "rating") {
     list = [...list].sort((a, b) => b.rating - a.rating);
@@ -427,7 +505,7 @@ async function fetchMyServices(providerId: string | null): Promise<ServiceRow[]>
   if (!providerId) return [];
   const { data, error } = await supabase
     .from("services")
-    .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
+    .select("id, provider_id, title, category, description, price, image_url, delivery_days, service_fields, created_at, updated_at")
     .eq("provider_id", providerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
@@ -451,7 +529,7 @@ async function fetchMyService(
   if (!providerId || !serviceId) return null;
   const { data, error } = await supabase
     .from("services")
-    .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
+    .select("id, provider_id, title, category, description, price, image_url, delivery_days, service_fields, created_at, updated_at")
     .eq("id", serviceId)
     .eq("provider_id", providerId)
     .maybeSingle();
@@ -479,6 +557,7 @@ async function createServiceRow(payload: ServiceInsert): Promise<ServiceRow> {
       price: payload.price ?? 0,
       image_url: payload.image_url ?? null,
       delivery_days: payload.delivery_days ?? null,
+      service_fields: payload.service_fields ?? [],
     })
     .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
     .single();
@@ -495,6 +574,7 @@ async function updateServiceRow(payload: ServiceUpdate): Promise<ServiceRow> {
   if (rest.price !== undefined) updates.price = rest.price;
   if (rest.image_url !== undefined) updates.image_url = rest.image_url;
   if (rest.delivery_days !== undefined) updates.delivery_days = rest.delivery_days;
+  if (rest.service_fields !== undefined) updates.service_fields = rest.service_fields;
   const { data, error } = await supabase
     .from("services")
     .update(updates)
@@ -515,6 +595,7 @@ export interface CreateServiceWithPackagesPayload {
   description?: string | null;
   image_url?: string | null;
   categoryIds: string[];
+  service_fields?: string[];
   packages: Array<{
     title: string;
     description?: string | null;
@@ -544,6 +625,7 @@ async function createServiceWithPackagesRow(
       price: minPrice,
       image_url: payload.image_url ?? null,
       delivery_days: minDelivery,
+      service_fields: payload.service_fields ?? [],
     })
     .select("id, provider_id, title, category, description, price, image_url, delivery_days, created_at, updated_at")
     .single();
