@@ -4,6 +4,9 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Use typed client for tables in schema; use db for psp_types, service_psp_types (not in generated types)
+const db = supabase as any;
+
 const ADDRESS_MAP: Record<string, string> = {
   "10001": "350 5th Ave, New York, NY 10001, USA",
   "90001": "123 Main St, Los Angeles, CA 90001, USA",
@@ -131,17 +134,17 @@ async function fetchServicesList(
 
   let serviceIdsFilter: string[] | null = null;
   if (pspLabels && pspLabels.length > 0) {
-    const { data: pspRows } = await supabase
+    const { data: pspRows } = await db
       .from("psp_types")
       .select("id")
       .in("label", pspLabels);
     const pspTypeIds = (pspRows ?? []).map((r: { id: string }) => r.id);
     if (pspTypeIds.length > 0) {
-      const { data: junctionRows } = await supabase
+      const { data: junctionRows } = await db
         .from("service_psp_types")
         .select("service_id")
         .in("psp_type_id", pspTypeIds);
-      serviceIdsFilter = [...new Set((junctionRows ?? []).map((r: { service_id: string }) => r.service_id))];
+      serviceIdsFilter = [...new Set((junctionRows ?? []).map((r: { service_id: string }) => r.service_id))] as string[];
     }
     if (serviceIdsFilter && serviceIdsFilter.length === 0) {
       return [];
@@ -150,11 +153,11 @@ async function fetchServicesList(
 
   let providerIdsFilter: string[] | null = null;
   if (willingToTrain === true) {
-    const { data: profileRows } = await supabase
+    const { data: profileRows } = await db
       .from("profiles")
       .select("id")
       .eq("willing_to_train", true);
-    providerIdsFilter = (profileRows ?? []).map((r: { id: string }) => r.id);
+    providerIdsFilter = (profileRows ?? []).map((r: { id: string }) => r.id) as string[];
     if (providerIdsFilter.length === 0) return [];
   }
 
@@ -509,7 +512,7 @@ async function fetchMyServices(providerId: string | null): Promise<ServiceRow[]>
     .eq("provider_id", providerId)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as ServiceRow[];
+  return (data ?? []) as unknown as ServiceRow[];
 }
 
 /** List services for the current provider (dashboard "My Services"). */
@@ -534,7 +537,7 @@ async function fetchMyService(
     .eq("provider_id", providerId)
     .maybeSingle();
   if (error) throw error;
-  return data as ServiceRow | null;
+  return data as unknown as ServiceRow | null;
 }
 
 /** Fetch a single service for edit (provider must own it). */
