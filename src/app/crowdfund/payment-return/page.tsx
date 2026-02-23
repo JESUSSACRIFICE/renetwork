@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Loader2, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
-export default function CrowdfundingPaymentReturnPage() {
+function CrowdfundingPaymentReturnContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
@@ -80,5 +80,20 @@ export default function CrowdfundingPaymentReturnPage() {
         </>
       )}
     </div>
+  );
+}
+
+export default function CrowdfundingPaymentReturnPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col items-center justify-center p-8 bg-gray-50">
+          <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      }
+    >
+      <CrowdfundingPaymentReturnContent />
+    </Suspense>
   );
 }
