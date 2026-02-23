@@ -114,7 +114,7 @@ export function useUserCrowdfundingPledges(userId: string | null) {
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as (CrowdfundingPledge & { crowdfunding_projects: { id: string; title: string; slug: string | null; status: string; expected_roi_pct: number | null } | null })[];
+      return (data ?? []) as unknown as (CrowdfundingPledge & { crowdfunding_projects: { id: string; title: string; slug: string | null; status: string; expected_roi_pct: number | null } | null })[];
     },
     enabled: !!userId,
   });
