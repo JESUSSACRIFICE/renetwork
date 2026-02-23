@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useProfileDealInterests, useAddDealInterest } from "@/hooks/use-networking";
-import type { ProfileDealInterest } from "@/lib/networking-types";
+import type { DealInterestType } from "@/lib/networking-types";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -52,8 +52,16 @@ export function ProfileDealInterests({
   const { data: interests } = useProfileDealInterests(profileId);
   const addInterest = useAddDealInterest(profileId, isOwner ? profileId : null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [form, setForm] = useState({
-    interest_type: "buy" as const,
+  const [form, setForm] = useState<{
+    interest_type: DealInterestType;
+    title: string;
+    description: string;
+    property_type: string;
+    location: string;
+    budget_min: string;
+    budget_max: string;
+  }>({
+    interest_type: "buy",
     title: "",
     description: "",
     property_type: "",
@@ -119,7 +127,7 @@ export function ProfileDealInterests({
                     <Select
                       value={form.interest_type}
                       onValueChange={(v) =>
-                        setForm((p) => ({ ...p, interest_type: v as ProfileDealInterest["interest_type"] }))
+                        setForm((p) => ({ ...p, interest_type: v as DealInterestType }))
                       }
                     >
                       <SelectTrigger>
