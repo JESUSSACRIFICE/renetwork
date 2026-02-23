@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import type { NetworkPost, NetworkPostWithAuthor, NetworkPostComment, ProfileDealInterest } from "@/lib/networking-types";
 
 function postFromRow(r: Record<string, unknown>): NetworkPost {
@@ -81,7 +82,7 @@ export function useNetworkPostComments(postId: string | null) {
         .eq("post_id", postId)
         .order("created_at", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as (NetworkPostComment & { profiles?: { id: string; full_name: string | null; avatar_url: string | null } })[];
+      return (data ?? []) as unknown as (NetworkPostComment & { profiles?: { id: string; full_name: string | null; avatar_url: string | null } })[];
     },
     enabled: !!postId,
   });
@@ -133,7 +134,7 @@ export function useCreateNetworkPost(userId: string | null) {
           title: input.title || null,
           content: input.content,
           type: input.type,
-          deal_details: input.deal_details ?? {},
+          deal_details: (input.deal_details ?? {}) as Json,
         })
         .select()
         .single();
