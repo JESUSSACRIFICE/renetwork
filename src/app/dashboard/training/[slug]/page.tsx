@@ -21,9 +21,9 @@ export default function TrainingModulePage() {
   const startModule = useStartModule(user?.id ?? null);
   const completeModule = useCompleteModule(user?.id ?? null);
 
-  const module = modules.find((m) => m.slug === slug);
+  const trainingModule = modules.find((m) => m.slug === slug);
 
-  if (!module) {
+  if (!trainingModule) {
     return (
       <div className="p-8">
         <Link
@@ -38,19 +38,19 @@ export default function TrainingModulePage() {
     );
   }
 
-  const status = module.progress?.status ?? "not_started";
+  const status = trainingModule.progress?.status ?? "not_started";
   const isCompleted = status === "completed";
   const isInProgress = status === "in_progress";
 
   const handleStart = () => {
-    startModule.mutate(module.id, {
+    startModule.mutate(trainingModule.id, {
       onSuccess: () => {},
       onError: () => {},
     });
   };
 
   const handleComplete = () => {
-    completeModule.mutate(module.id, {
+    completeModule.mutate(trainingModule.id, {
       onSuccess: () => {},
       onError: () => {},
     });
@@ -70,13 +70,17 @@ export default function TrainingModulePage() {
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl">{module.title}</CardTitle>
-              {module.description && (
-                <p className="text-gray-600 mt-2">{module.description}</p>
+              <CardTitle className="text-2xl">
+                {trainingModule.title}
+              </CardTitle>
+              {trainingModule.description && (
+                <p className="text-gray-600 mt-2">
+                  {trainingModule.description}
+                </p>
               )}
               <div className="flex items-center gap-2 mt-3 text-sm text-gray-500">
                 <Clock className="h-4 w-4" />
-                {module.duration_minutes} min
+                {trainingModule.duration_minutes} min
               </div>
             </div>
             {isCompleted && (
@@ -88,13 +92,17 @@ export default function TrainingModulePage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {module.link_url && (
+          {trainingModule.link_url && (
             <div className="rounded-lg border bg-gray-50 p-4">
               <p className="text-sm text-gray-700 mb-3">
                 Read the full content to complete this module.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Link href={module.link_url} target="_blank" rel="noopener">
+                <Link
+                  href={trainingModule.link_url}
+                  target="_blank"
+                  rel="noopener"
+                >
                   <Button variant="outline">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Open content
