@@ -231,7 +231,12 @@ export default function ProfessionalDetail() {
         <div className="container py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
-              <Tabs defaultValue="about" className="w-full">
+              <Tabs
+                defaultValue={
+                  searchParams.get("tab") === "reviews" ? "reviews" : "about"
+                }
+                className="w-full"
+              >
                 <TabsList className="w-full justify-start">
                   <TabsTrigger value="about">About</TabsTrigger>
                   <TabsTrigger value="reviews">
@@ -309,6 +314,7 @@ export default function ProfessionalDetail() {
                     profileId={id}
                     reviews={professional.reviews || []}
                     onReviewAdded={refetch}
+                    currentUserId={user?.id}
                   />
                 </TabsContent>
 

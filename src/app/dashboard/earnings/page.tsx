@@ -6,7 +6,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useReferralCommissions } from "@/hooks/use-referrals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, DollarSign, Users, FileText, Loader2 } from "lucide-react";
+import { TrendingUp, DollarSign, Users, FileText, Loader2, BarChart3 } from "lucide-react";
+import Link from "next/link";
 import { format } from "date-fns";
 
 function formatCurrency(cents: number) {
@@ -103,7 +104,15 @@ export default function EarningsPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Earnings</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Earnings</h1>
+        <Link href="/dashboard/analytics">
+          <Button variant="outline" size="sm">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Revenue reports & analytics
+          </Button>
+        </Link>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3 mb-8">
         <Card>

@@ -32,10 +32,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CrowdfundingInvestDialog } from "@/components/crowdfunding/CrowdfundingInvestDialog";
+import { InvestorComplianceDialog } from "@/components/compliance/InvestorComplianceDialog";
+import { RiskAcknowledgmentDialog } from "@/components/compliance/RiskAcknowledgmentDialog";
 import type { CrowdfundingProject, FundAllocationItem } from "@/lib/crowdfunding-types";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useInvestmentEligibility } from "@/hooks/use-compliance";
+import { useUserCrowdfundingPledges } from "@/hooks/use-crowdfunding";
 
 const CATEGORY_LABELS: Record<string, string> = {
   real_estate: "Real Estate",
@@ -127,6 +131,15 @@ export default function CrowdfundingProjectDetailPage() {
   const [pledgeAmount, setPledgeAmount] = useState("");
   const [showPledgeForm, setShowPledgeForm] = useState(false);
   const [investDialogOpen, setInvestDialogOpen] = useState(false);
+  const [complianceDialogOpen, setComplianceDialogOpen] = useState(false);
+  const [riskDialogOpen, setRiskDialogOpen] = useState(false);
+
+  const { data: pledges = [] } = useUserCrowdfundingPledges(user?.id ?? null);
+  const totalPledgedCents = pledges
+    .filter((p) => p.status === "pledged" || p.status === "confirmed")
+    .reduce((s, p) => s + p.amount_cents, 0);
+  const amountCents = Math.round(parseFloat(pledgeAmount || "0") * 100);
+  const eligibility = useInvestmentEligibility(user?.id ?? null, amountCents, totalPledgedCents);
 
   const handleVote = (type: "up" | "down" | "interested") => {
     if (!user) {
@@ -146,6 +159,12 @@ export default function CrowdfundingProjectDetailPage() {
     }
   };
 
+  const proceedToInvest = () => {
+    if (eligibility.canInvest) {
+      setInvestDialogOpen(true);
+    }
+  };
+
   const handleInvestWithStripe = () => {
     if (!user) {
       toast.error("Sign in to invest");
@@ -154,6 +173,20 @@ export default function CrowdfundingProjectDetailPage() {
     const cents = Math.round(parseFloat(pledgeAmount || "0") * 100);
     if (cents < (project?.min_investment_cents ?? 0)) {
       toast.error(`Minimum investment is ${formatCurrency(project!.min_investment_cents)}`);
+      return;
+    }
+    if (!eligibility.hasCompliance) {
+      setComplianceDialogOpen(true);
+      return;
+    }
+    if (!eligibility.riskAcknowledged) {
+      setRiskDialogOpen(true);
+      return;
+    }
+    if (!eligibility.withinLimit) {
+      toast.error(
+        `Investment limit exceeded. Your limit is ${formatCurrency(eligibility.limitCents)}. You have already pledged ${formatCurrency(totalPledgedCents)}.`
+      );
       return;
     }
     setInvestDialogOpen(true);
@@ -418,8 +451,30 @@ export default function CrowdfundingProjectDetailPage() {
           queryClient.invalidateQueries({ queryKey: ["crowdfunding", "project", id] });
           queryClient.invalidateQueries({ queryKey: ["crowdfunding", "pledge", id, user?.id] });
           queryClient.invalidateQueries({ queryKey: ["crowdfunding", "pledges", user?.id] });
+          queryClient.invalidateQueries({ queryKey: ["compliance", "investor"] });
           setShowPledgeForm(false);
           setPledgeAmount("");
+        }}
+      />
+
+      <InvestorComplianceDialog
+        open={complianceDialogOpen}
+        onOpenChange={setComplianceDialogOpen}
+        userId={user?.id ?? null}
+        onComplete={() => {
+          setComplianceDialogOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["compliance", "investor"] });
+          setRiskDialogOpen(true);
+        }}
+      />
+
+      <RiskAcknowledgmentDialog
+        open={riskDialogOpen}
+        onOpenChange={setRiskDialogOpen}
+        userId={user?.id ?? null}
+        onAcknowledged={() => {
+          setRiskDialogOpen(false);
+          proceedToInvest();
         }}
       />
     </div>

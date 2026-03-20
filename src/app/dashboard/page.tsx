@@ -7,6 +7,7 @@ import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { PageViewsChart } from "@/components/dashboard/PageViewsChart";
 import { DashboardNotifications } from "@/components/dashboard/DashboardNotifications";
 import { RecentProposals } from "@/components/dashboard/RecentProposals";
+import { SuggestedPartners } from "@/components/dashboard/SuggestedPartners";
 
 type UserType = "service_provider" | "agent";
 
@@ -45,8 +46,9 @@ export default function Dashboard() {
         <div className="lg:col-span-2">
           <PageViewsChart userType={userType} />
         </div>
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-6">
           <DashboardNotifications userType={userType} />
+          <SuggestedPartners />
         </div>
       </div>
 

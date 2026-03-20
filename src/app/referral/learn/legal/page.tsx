@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import ReferralHeader from "@/components/referral/ReferralHeader";
 import ReferralFooter from "@/components/referral/ReferralFooter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +30,18 @@ export default function LegalPage() {
                   <p className="text-gray-700">
                     Professional service providers must maintain valid licenses and certifications. 
                     The platform is not responsible for verifying all professional credentials.
+                  </p>
+                </section>
+                <section>
+                  <h2 className="text-2xl font-semibold mb-4">Escrow & Payment Protection</h2>
+                  <p className="text-gray-700">
+                    Payments are processed through secure systems. Funds may be
+                    held in escrow until work is completed to your satisfaction.
+                    See our{" "}
+                    <Link href="/referral/learn/escrow" className="text-primary hover:underline">
+                      Escrow (When You Get Paid)
+                    </Link>{" "}
+                    page for details.
                   </p>
                 </section>
                 <section>

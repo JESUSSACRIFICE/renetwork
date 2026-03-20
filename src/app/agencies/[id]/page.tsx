@@ -3,7 +3,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Star, MapPin, Building2, Mail, Phone, Calendar, Share2, Heart, MessageSquare, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import {
+  Star,
+  MapPin,
+  Building2,
+  Mail,
+  Phone,
+  Calendar,
+  Share2,
+  Heart,
+  MessageSquare,
+  ChevronLeft,
+  ChevronRight,
+  Send,
+} from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,7 +34,7 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { toast } from "sonner";
 import Image from "next/image";
 
-interface Agency {
+interface Office {
   id: string;
   name: string;
   company_name?: string;
@@ -78,7 +91,7 @@ export default function AgencyDetail() {
   const router = useRouter();
   const id = params.id as string;
   const { user } = useAuth();
-  const [agency, setAgency] = useState<Agency | null>(null);
+  const [office, setAgency] = useState<Office | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -99,11 +112,11 @@ export default function AgencyDetail() {
 
   const fetchAgency = async () => {
     if (!id) return;
-    
+
     try {
       setLoading(true);
-      
-      // Query profile as agency
+
+      // Query profile as office
       const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("*")
@@ -148,9 +161,11 @@ export default function AgencyDetail() {
         reviewer_name: reviewerNames[r.reviewer_id] || "Anonymous",
       }));
 
-      const avgRating = reviews.length > 0
-        ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) / reviews.length
-        : 0;
+      const avgRating =
+        reviews.length > 0
+          ? reviews.reduce((sum: number, r: any) => sum + r.rating, 0) /
+            reviews.length
+          : 0;
 
       // Calculate review breakdown
       const breakdown = {
@@ -187,7 +202,8 @@ export default function AgencyDetail() {
           posted_date: "Posted 3 years ago",
           proposals: 2,
           price: "$29 - $59 Fixed",
-          description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit...",
           tags: ["Artist", "Computer", "Front end Developer"],
         },
       ];
@@ -196,7 +212,7 @@ export default function AgencyDetail() {
         {
           id: "1",
           title: "Finance Manager & Health",
-          company: companyName || profileData.full_name || "Agency",
+          company: companyName || profileData.full_name || "Office",
           salary: "$350 - $380 / month",
           tags: ["Music & Audio", "Temporary", "New York"],
           location: "New York",
@@ -204,26 +220,30 @@ export default function AgencyDetail() {
         {
           id: "2",
           title: "Data Privacy Support",
-          company: companyName || profileData.full_name || "Agency",
+          company: companyName || profileData.full_name || "Office",
           salary: "$400 - $450 / month",
           tags: ["Digital Marketing", "Temporary", "New York"],
           location: "New York",
         },
       ];
 
-      const processedAgency: Agency = {
+      const processedAgency: Office = {
         id: profileData.id,
-        name: companyName || profileData.full_name || "Agency",
+        name: companyName || profileData.full_name || "Office",
         company_name: companyName ?? undefined,
-        tagline: profileData.bio ? profileData.bio.substring(0, 50) + "..." : "Professional agency services",
+        tagline: profileData.bio
+          ? profileData.bio.substring(0, 50) + "..."
+          : "Professional office services",
         rating: parseFloat(avgRating.toFixed(1)) || 4.0,
         reviews: totalReviews || 1,
         location: "Los Angeles",
-        email: `contact@${(companyName || profileData.full_name || "agency").toLowerCase().replace(/\s+/g, "")}.com`,
+        email: `contact@${(companyName || profileData.full_name || "office").toLowerCase().replace(/\s+/g, "")}.com`,
         phone: "(+88)123-456-789",
         logo_url: profileData.avatar_url,
         avatar_url: profileData.avatar_url,
-        bio: profileData.bio || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        bio:
+          profileData.bio ||
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         employees: "30-50",
         founded_date: "1990",
         categories: ["Digital Marketing", "Lifestyle"],
@@ -235,15 +255,21 @@ export default function AgencyDetail() {
           id: r.id,
           author: r.reviewer_name,
           rating: r.rating,
-          date: new Date(r.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
-          comment: r.comment || "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam...",
+          date: new Date(r.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }),
+          comment:
+            r.comment ||
+            "Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam...",
         })),
       };
 
       setAgency(processedAgency);
     } catch (error: any) {
-      console.error("Error fetching agency:", error);
-      toast.error("Failed to load agency");
+      console.error("Error fetching office:", error);
+      toast.error("Failed to load office");
       // Set mock data on error
       setAgency({
         id: id,
@@ -270,12 +296,12 @@ export default function AgencyDetail() {
   };
 
   const checkSaved = async () => {
-    // Check if agency is saved (favorites logic)
+    // Check if office is saved (favorites logic)
     // Implementation similar to profile/service pages
   };
 
   const handleSave = async () => {
-    // Save/unsave agency logic
+    // Save/unsave office logic
     setIsSaved(!isSaved);
     toast.success(isSaved ? "Removed from saved" : "Saved to favorites");
   };
@@ -296,14 +322,16 @@ export default function AgencyDetail() {
   };
 
   const nextImage = () => {
-    if (agency?.images) {
-      setCurrentImageIndex((prev) => (prev + 1) % agency.images!.length);
+    if (office?.images) {
+      setCurrentImageIndex((prev) => (prev + 1) % office.images!.length);
     }
   };
 
   const prevImage = () => {
-    if (agency?.images) {
-      setCurrentImageIndex((prev) => (prev - 1 + agency.images!.length) % agency.images!.length);
+    if (office?.images) {
+      setCurrentImageIndex(
+        (prev) => (prev - 1 + office.images!.length) % office.images!.length,
+      );
     }
   };
 
@@ -315,7 +343,7 @@ export default function AgencyDetail() {
           <div className="flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-muted-foreground">Loading agency...</p>
+              <p className="text-muted-foreground">Loading Office...</p>
             </div>
           </div>
         </div>
@@ -324,14 +352,16 @@ export default function AgencyDetail() {
     );
   }
 
-  if (!agency) {
+  if (!office) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Agency not found</h1>
-            <Button onClick={() => router.push("/search/agencies")}>Back to Agencies</Button>
+            <h1 className="text-2xl font-bold mb-4">Office not found</h1>
+            <Button onClick={() => router.push("/search/agencies")}>
+              Back to Office
+            </Button>
           </div>
         </div>
         <Footer />
@@ -345,77 +375,93 @@ export default function AgencyDetail() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <div className="mb-6 text-sm text-muted-foreground">
-          <Link href="/" className="hover:text-foreground">Home</Link>
+          <Link href="/" className="hover:text-foreground">
+            Home
+          </Link>
           <span className="mx-2">/</span>
-          <Link href="/search/agencies" className="hover:text-foreground">Agencies</Link>
+          <Link href="/search/agencies" className="hover:text-foreground">
+            Office
+          </Link>
           <span className="mx-2">/</span>
-          <span className="text-foreground">{agency.name}</span>
+          <span className="text-foreground">{office.name}</span>
         </div>
 
         <div className="grid lg:grid-cols-[2fr,1fr] gap-8">
           {/* Main Content */}
           <div className="space-y-8">
             {/* Company Overview */}
-            <div className="flex items-start gap-6">
-              <Avatar className="h-24 w-24 rounded-full border-4 border-primary/20">
-                <AvatarImage src={agency.logo_url || agency.avatar_url} alt={agency.name} />
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                  {(agency.name || "A").charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">{agency.name}</h1>
-                <p className="text-muted-foreground mb-4">{agency.tagline}</p>
-                <div className="flex items-center gap-6 mb-4">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{agency.rating}</span>
-                    <span className="text-muted-foreground">({agency.reviews} {agency.reviews === 1 ? "Review" : "Reviews"})</span>
+            <Card>
+              <CardContent className="p-6 flex items-center gap-6">
+                <Avatar className="h-32 w-32 rounded-full border-4 border-primary/20">
+                  <AvatarImage
+                    src={office.logo_url || office.avatar_url}
+                    alt={office.name}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                    {(office.name || "A").charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold mb-2">{office.name}</h1>
+                  <p className="text-muted-foreground mb-4">{office.tagline}</p>
+                  <div className="flex items-center gap-6 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold">{office.rating}</span>
+                      <span className="text-muted-foreground">
+                        ({office.reviews}{" "}
+                        {office.reviews === 1 ? "Review" : "Reviews"})
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="h-4 w-4" />
+                      <span>{office.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="h-4 w-4" />
+                      <span>{office.email}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{agency.location}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <span>{agency.email}</span>
-                  </div>
+                  {user ? (
+                    <Link href={`/dashboard/messages?recipient=${id}`}>
+                      <Button className="bg-primary hover:bg-primary/90">
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Message
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Button
+                        className="bg-primary hover:bg-primary/90"
+                        onClick={() => setAuthModalOpen(true)}
+                      >
+                        <MessageSquare className="mr-2 h-4 w-4" />
+                        Message
+                      </Button>
+                      <AuthModal
+                        open={authModalOpen}
+                        onOpenChange={setAuthModalOpen}
+                        redirectTo={`/dashboard/messages?recipient=${id}`}
+                      />
+                    </>
+                  )}
                 </div>
-                {user ? (
-                  <Link href={`/dashboard/messages?recipient=${id}`}>
-                    <Button className="bg-primary hover:bg-primary/90">
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Message
-                    </Button>
-                  </Link>
-                ) : (
-                  <>
-                    <Button
-                      className="bg-primary hover:bg-primary/90"
-                      onClick={() => setAuthModalOpen(true)}
-                    >
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Message
-                    </Button>
-                    <AuthModal
-                      open={authModalOpen}
-                      onOpenChange={setAuthModalOpen}
-                      redirectTo={`/dashboard/messages?recipient=${id}`}
-                    />
-                  </>
-                )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* About Company */}
             <Card>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">About Company</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  {agency.bio || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+                  {office.bio ||
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
                 </p>
                 <p className="text-muted-foreground leading-relaxed mb-4">
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                  Duis aute irure dolor in reprehenderit in voluptate velit esse
+                  cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                  occaecat cupidatat non proident, sunt in culpa qui officia
+                  deserunt mollit anim id est laborum.
                 </p>
               </CardContent>
             </Card>
@@ -425,7 +471,10 @@ export default function AgencyDetail() {
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">Who are we?</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.
                 </p>
               </CardContent>
             </Card>
@@ -435,26 +484,32 @@ export default function AgencyDetail() {
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold mb-4">What do we do?</h2>
                 <p className="text-muted-foreground leading-relaxed">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.
                 </p>
               </CardContent>
             </Card>
 
             {/* Image Gallery */}
-            {agency.images && agency.images.length > 0 && (
+            {office.images && office.images.length > 0 && (
               <Card>
                 <CardContent className="p-6">
                   <div className="relative">
                     <div className="relative h-96 w-full rounded-lg overflow-hidden bg-muted">
                       <Image
-                        src={agency.images[currentImageIndex] || "/api/placeholder/800/600"}
-                        alt={`${agency.name} - Image ${currentImageIndex + 1}`}
+                        src={
+                          office.images[currentImageIndex] ||
+                          "/api/placeholder/800/600"
+                        }
+                        alt={`${office.name} - Image ${currentImageIndex + 1}`}
                         fill
                         className="object-cover"
                         unoptimized
                       />
                     </div>
-                    {agency.images.length > 1 && (
+                    {office.images.length > 1 && (
                       <>
                         <Button
                           variant="ghost"
@@ -475,13 +530,15 @@ export default function AgencyDetail() {
                       </>
                     )}
                   </div>
-                  {agency.images.length > 1 && (
+                  {office.images.length > 1 && (
                     <div className="flex gap-2 mt-4 overflow-x-auto">
-                      {agency.images.map((img, idx) => (
+                      {office.images.map((img, idx) => (
                         <div
                           key={idx}
                           className={`relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden cursor-pointer border-2 ${
-                            idx === currentImageIndex ? "border-primary" : "border-transparent"
+                            idx === currentImageIndex
+                              ? "border-primary"
+                              : "border-transparent"
                           }`}
                           onClick={() => setCurrentImageIndex(idx)}
                         >
@@ -501,44 +558,60 @@ export default function AgencyDetail() {
             )}
 
             {/* Projects */}
-            {agency.projects && agency.projects.length > 0 && (
+            {office.projects && office.projects.length > 0 && (
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold">Projects</h2>
-                    <Link href="#" className="text-primary hover:underline text-sm">
+                    <Link
+                      href="#"
+                      className="text-primary hover:underline text-sm"
+                    >
                       Browse Full List
                     </Link>
                   </div>
                   <div className="space-y-4">
-                    {agency.projects.map((project) => (
+                    {office.projects.map((project) => (
                       <Card key={project.id} className="border">
                         <CardContent className="p-4">
                           <div className="flex gap-4">
                             <Avatar className="h-12 w-12 rounded-full">
-                              <AvatarImage src={agency.logo_url} alt={agency.name} />
+                              <AvatarImage
+                                src={office.logo_url}
+                                alt={office.name}
+                              />
                               <AvatarFallback className="bg-primary/10 text-primary">
-                                {(agency.name || "A").charAt(0).toUpperCase()}
+                                {(office.name || "A").charAt(0).toUpperCase()}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
-                              <h3 className="font-semibold mb-1">{project.title}</h3>
+                              <h3 className="font-semibold mb-1">
+                                {project.title}
+                              </h3>
                               <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                                 <span>{project.location}</span>
                                 <span>{project.posted_date}</span>
                                 <span>{project.proposals} Proposals</span>
                               </div>
-                              <p className="text-sm text-muted-foreground mb-2">{project.description}</p>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {project.description}
+                              </p>
                               <div className="flex items-center justify-between">
                                 <div className="flex flex-wrap gap-2">
                                   {project.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                    <Badge
+                                      key={idx}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
                                       {tag}
                                     </Badge>
                                   ))}
                                 </div>
                                 <div className="text-right">
-                                  <p className="font-semibold">{project.price}</p>
+                                  <p className="font-semibold">
+                                    {project.price}
+                                  </p>
                                   <Button size="sm" className="mt-2">
                                     Send Proposal
                                   </Button>
@@ -555,27 +628,40 @@ export default function AgencyDetail() {
             )}
 
             {/* Open Positions */}
-            {agency.openPositions && agency.openPositions.length > 0 && (
+            {office.openPositions && office.openPositions.length > 0 && (
               <Card>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <h2 className="text-2xl font-bold">Open Position</h2>
-                    <Link href="#" className="text-primary hover:underline text-sm">
+                    <Link
+                      href="#"
+                      className="text-primary hover:underline text-sm"
+                    >
                       Browse Full List
                     </Link>
                   </div>
                   <div className="space-y-4">
-                    {agency.openPositions.map((position) => (
+                    {office.openPositions.map((position) => (
                       <Card key={position.id} className="border">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h3 className="font-semibold mb-1">{position.title}</h3>
-                              <p className="text-sm text-muted-foreground mb-2">{position.company}</p>
-                              <p className="font-semibold text-primary mb-2">{position.salary}</p>
+                              <h3 className="font-semibold mb-1">
+                                {position.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                {position.company}
+                              </p>
+                              <p className="font-semibold text-primary mb-2">
+                                {position.salary}
+                              </p>
                               <div className="flex flex-wrap gap-2">
                                 {position.tags.map((tag, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
+                                  <Badge
+                                    key={idx}
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
                                     {tag}
                                   </Badge>
                                 ))}
@@ -593,23 +679,30 @@ export default function AgencyDetail() {
             {/* Reviews */}
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-2xl font-bold mb-6">{agency.reviews} {agency.reviews === 1 ? "Review" : "Reviews"}</h2>
+                <h2 className="text-2xl font-bold mb-6">
+                  {office.reviews} {office.reviews === 1 ? "Review" : "Reviews"}
+                </h2>
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
                   <div className="bg-pink-50 dark:bg-pink-950/20 p-6 rounded-lg text-center">
-                    <div className="text-4xl font-bold mb-2">{agency.rating}</div>
+                    <div className="text-4xl font-bold mb-2">
+                      {office.rating}
+                    </div>
                     <div className="flex items-center justify-center gap-1 mb-2">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-5 w-5 ${
-                            i < Math.floor(agency.rating)
+                            i < Math.floor(office.rating)
                               ? "fill-yellow-400 text-yellow-400"
                               : "text-gray-300"
                           }`}
                         />
                       ))}
                     </div>
-                    <p className="text-sm text-muted-foreground">{agency.reviews} {agency.reviews === 1 ? "rating" : "ratings"}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {office.reviews}{" "}
+                      {office.reviews === 1 ? "rating" : "ratings"}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     {[5, 4, 3, 2, 1].map((star) => (
@@ -618,11 +711,24 @@ export default function AgencyDetail() {
                         <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                           <div
                             className="bg-yellow-400 h-2 rounded-full"
-                            style={{ width: `${agency.reviewBreakdown?.[star === 5 ? 'five' : star === 4 ? 'four' : star === 3 ? 'three' : star === 2 ? 'two' : 'one'] || 0}%` }}
+                            style={{
+                              width: `${office.reviewBreakdown?.[star === 5 ? "five" : star === 4 ? "four" : star === 3 ? "three" : star === 2 ? "two" : "one"] || 0}%`,
+                            }}
                           />
                         </div>
                         <span className="text-sm text-muted-foreground w-12 text-right">
-                          {agency.reviewBreakdown?.[star === 5 ? 'five' : star === 4 ? 'four' : star === 3 ? 'three' : star === 2 ? 'two' : 'one'] || 0}%
+                          {office.reviewBreakdown?.[
+                            star === 5
+                              ? "five"
+                              : star === 4
+                                ? "four"
+                                : star === 3
+                                  ? "three"
+                                  : star === 2
+                                    ? "two"
+                                    : "one"
+                          ] || 0}
+                          %
                         </span>
                       </div>
                     ))}
@@ -632,19 +738,26 @@ export default function AgencyDetail() {
             </Card>
 
             {/* Comments */}
-            {agency.comments && agency.comments.length > 0 && (
+            {office.comments && office.comments.length > 0 && (
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-6">{agency.comments.length} {agency.comments.length === 1 ? "Comment" : "Comments"}</h2>
+                  <h2 className="text-2xl font-bold mb-6">
+                    {office.comments.length}{" "}
+                    {office.comments.length === 1 ? "Comment" : "Comments"}
+                  </h2>
                   <div className="space-y-6">
-                    {agency.comments.map((comment) => (
+                    {office.comments.map((comment) => (
                       <div key={comment.id} className="flex gap-4">
                         <Avatar>
-                          <AvatarFallback>{comment.author.charAt(0).toUpperCase()}</AvatarFallback>
+                          <AvatarFallback>
+                            {comment.author.charAt(0).toUpperCase()}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold">{comment.author}</span>
+                            <span className="font-semibold">
+                              {comment.author}
+                            </span>
                             <div className="flex items-center gap-1">
                               {[...Array(5)].map((_, i) => (
                                 <Star
@@ -657,9 +770,13 @@ export default function AgencyDetail() {
                                 />
                               ))}
                             </div>
-                            <span className="text-sm text-muted-foreground">{comment.date}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {comment.date}
+                            </span>
                           </div>
-                          <p className="text-muted-foreground">{comment.comment}</p>
+                          <p className="text-muted-foreground">
+                            {comment.comment}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -674,7 +791,9 @@ export default function AgencyDetail() {
                 <h2 className="text-2xl font-bold mb-6">Add a review</h2>
                 <div className="space-y-4">
                   <div>
-                    <Label className="mb-2 block">Your Rating for this listing</Label>
+                    <Label className="mb-2 block">
+                      Your Rating for this listing
+                    </Label>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
@@ -727,13 +846,22 @@ export default function AgencyDetail() {
                     <Checkbox
                       id="save-info"
                       checked={saveInfo}
-                      onCheckedChange={(checked) => setSaveInfo(checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        setSaveInfo(checked as boolean)
+                      }
                     />
-                    <Label htmlFor="save-info" className="text-sm cursor-pointer">
-                      Save my name, email, and website in this browser for the next time I comment.
+                    <Label
+                      htmlFor="save-info"
+                      className="text-sm cursor-pointer"
+                    >
+                      Save my name, email, and website in this browser for the
+                      next time I comment.
                     </Label>
                   </div>
-                  <Button onClick={handleSubmitReview} className="w-full bg-primary hover:bg-primary/90">
+                  <Button
+                    onClick={handleSubmitReview}
+                    className="w-full bg-primary hover:bg-primary/90"
+                  >
                     Submit Review
                   </Button>
                 </div>
@@ -748,9 +876,11 @@ export default function AgencyDetail() {
                 <h3 className="text-xl font-bold mb-4">About Me</h3>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Categories</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Categories
+                    </p>
                     <div className="flex flex-wrap gap-2">
-                      {agency.categories?.map((cat, idx) => (
+                      {office.categories?.map((cat, idx) => (
                         <Badge key={idx} variant="secondary">
                           {cat}
                         </Badge>
@@ -758,24 +888,32 @@ export default function AgencyDetail() {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Employees</p>
-                    <p className="font-medium">{agency.employees}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Employees
+                    </p>
+                    <p className="font-medium">{office.employees}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Founded Date</p>
-                    <p className="font-medium">{agency.founded_date}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Founded Date
+                    </p>
+                    <p className="font-medium">{office.founded_date}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Email</p>
-                    <p className="font-medium">{agency.email}</p>
+                    <p className="font-medium">{office.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Phone Number</p>
-                    <p className="font-medium">{agency.phone}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Phone Number
+                    </p>
+                    <p className="font-medium">{office.phone}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Location</p>
-                    <p className="font-medium">{agency.location}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Location
+                    </p>
+                    <p className="font-medium">{office.location}</p>
                   </div>
                   <Button className="w-full bg-primary hover:bg-primary/90">
                     Contact Me
@@ -790,4 +928,3 @@ export default function AgencyDetail() {
     </div>
   );
 }
-

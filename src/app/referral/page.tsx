@@ -156,15 +156,17 @@ export default function ReferralLandingPage() {
                     Fair and transparent referral fee distribution
                   </p>
                 </div>
-                <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
-                  <BookOpen className="h-8 w-8 text-primary mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    Teaching & Learning
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    Educational resources and collaboration tools
-                  </p>
-                </div>
+                <Link href="/referral/learn/collaboration">
+                  <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow h-full">
+                    <BookOpen className="h-8 w-8 text-primary mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      Teaching & Learning
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      Collaboration agreements, sender & recipient contracts
+                    </p>
+                  </div>
+                </Link>
                 <div className="p-6 border border-gray-200 rounded-lg hover:shadow-lg transition-shadow">
                   <MapPin className="h-8 w-8 text-primary mb-4" />
                   <h3 className="text-lg font-semibold mb-2">

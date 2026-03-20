@@ -36,7 +36,7 @@ const AppHeader = () => {
   const { user, isLoading: authLoading } = useAuth();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
   const navigationItems = [
-    { name: "For customers", href: "/customer" },
+    // { name: "For customers", href: "/customer" },
     { name: "Referral", href: "/referral" },
     { name: "Crowdfund", href: "/crowdfund" },
     { name: "Network", href: "/network" },

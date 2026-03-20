@@ -184,24 +184,45 @@ export default function ProfileDetail() {
       <Header />
       <main className="flex-1">
         <div className="container py-6">
-          {/* Breadcrumbs */}
-          <div className="mb-6 text-sm text-muted-foreground">
-            <Link href="/" className="hover:text-foreground">
-              Home
-            </Link>
-            {" / "}
-            <Link href="/search/profiles" className="hover:text-foreground">
-              Freelancers
-            </Link>
-            {" / "}
-            <span className="text-foreground">{profile.full_name}</span>
+          {/* Breadcrumbs + Actions */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="text-sm text-muted-foreground">
+              <Link href="/" className="hover:text-foreground">
+                Home
+              </Link>
+              {" / "}
+              <Link href="/search/profiles" className="hover:text-foreground">
+                Freelancers
+              </Link>
+              {" / "}
+              <span className="text-foreground">{profile.full_name}</span>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="icon" className="flex-1">
+                <Share2 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className={`flex-1 ${isFavorite ? "bg-primary text-primary-foreground" : ""}`}
+                onClick={toggleFavorite}
+                disabled={isToggling}
+              >
+                <Heart
+                  className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`}
+                />
+              </Button>
+              <Button variant="outline" size="icon" className="flex-1">
+                <Flag className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-[2fr,1fr] gap-8">
             {/* Main Content */}
             <div className="space-y-8">
               {/* Profile Header */}
-              <Card className="bg-primary/5 border-primary/20">
+              <Card className="bg-primary/5 border-primary/20 min-h-[11rem]">
                 <CardContent className="p-6">
                   <div className="flex gap-6">
                     <Avatar className="h-24 w-24 border-4 border-background">
@@ -299,10 +320,7 @@ export default function ProfileDetail() {
               </Card>
 
               {/* Deal Interests */}
-              <ProfileDealInterests
-                profileId={id}
-                isOwner={user?.id === id}
-              />
+              <ProfileDealInterests profileId={id} isOwner={user?.id === id} />
 
               {/* Reputation Badges */}
               <ProfileReputationBadges profileId={id} />
@@ -687,30 +705,9 @@ export default function ProfileDetail() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Share/Save */}
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="flex-1">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className={`flex-1 ${isFavorite ? "bg-primary text-primary-foreground" : ""}`}
-                  onClick={toggleFavorite}
-                  disabled={isToggling}
-                >
-                  <Heart
-                    className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`}
-                  />
-                </Button>
-                <Button variant="outline" size="icon" className="flex-1">
-                  <Flag className="h-4 w-4" />
-                </Button>
-              </div>
-
               {/* Rate/Pricing */}
-              <Card>
-                <CardContent className="p-6">
+              <Card className="min-h-[11rem]">
+                <CardContent className="p-6 h-full flex justify-center items-center">
                   <div className="text-center">
                     {profile.hourly_rate != null && (
                       <div className="text-3xl font-bold text-primary">
@@ -730,8 +727,8 @@ export default function ProfileDetail() {
                   <Download className="h-4 w-4 mr-2" />
                   Download CV
                 </Button>
-                {user?.id !== profile.id && (
-                  user ? (
+                {user?.id !== profile.id &&
+                  (user ? (
                     <Link href={`/dashboard/messages?recipient=${profile.id}`}>
                       <Button className="w-full bg-primary hover:bg-primary/90">
                         <MessageSquare className="h-4 w-4 mr-2" />
@@ -753,8 +750,7 @@ export default function ProfileDetail() {
                         redirectTo={`/dashboard/messages?recipient=${profile.id}`}
                       />
                     </>
-                  )
-                )}
+                  ))}
               </div>
 
               {/* Freelancer Details */}

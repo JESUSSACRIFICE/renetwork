@@ -151,6 +151,14 @@ async function fetchServicesList(
     }
   }
 
+  // Phase-1: only show services from approved PSPs (registration_status = approved)
+  const { data: approvedRows } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("user_type", "service_provider")
+    .or("registration_status.eq.approved,registration_status.is.null");
+  const approvedProviderIds = new Set((approvedRows ?? []).map((r: { id: string }) => r.id));
+
   let providerIdsFilter: string[] | null = null;
   if (willingToTrain === true) {
     const { data: profileRows } = await db
@@ -158,7 +166,12 @@ async function fetchServicesList(
       .select("id")
       .eq("willing_to_train", true);
     providerIdsFilter = (profileRows ?? []).map((r: { id: string }) => r.id) as string[];
+    providerIdsFilter = providerIdsFilter.filter((id) => approvedProviderIds.has(id));
     if (providerIdsFilter.length === 0) return [];
+  } else if (approvedProviderIds.size > 0) {
+    providerIdsFilter = [...approvedProviderIds];
+  } else {
+    return []; // No approved PSPs
   }
 
   let query = supabase

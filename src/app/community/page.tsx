@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -12,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Users, Plus, MessageSquare, Lock, Globe } from "lucide-react";
+import { Users, Plus, MessageSquare, Lock, Globe, ThumbsUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Group {
@@ -126,13 +127,19 @@ export default function Community() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-4xl font-bold mb-2">Community Groups & Forums</h1>
             <p className="text-muted-foreground">
               Connect with professionals, share knowledge, and collaborate
             </p>
           </div>
+          <Link href="/community/vote">
+            <Button variant="outline" className="w-full sm:w-auto">
+              <ThumbsUp className="mr-2 h-4 w-4" />
+              Vote on What Gets Built
+            </Button>
+          </Link>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

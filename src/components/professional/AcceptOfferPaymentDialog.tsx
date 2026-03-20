@@ -210,8 +210,13 @@ export function AcceptOfferPaymentDialog({
             <CreditCard className="h-5 w-5" />
             Pay for Offer
           </DialogTitle>
-          <DialogDescription>
-            Complete payment to accept &quot;{offer.title}&quot; — ${(offer.amount_cents / 100).toFixed(2)}
+          <DialogDescription className="space-y-2">
+            <span className="block">
+              Complete payment to accept &quot;{offer.title}&quot; — ${(offer.amount_cents / 100).toFixed(2)}
+            </span>
+            <span className="block text-primary font-medium mt-2">
+              We have your back — funds held in escrow until work is complete.
+            </span>
           </DialogDescription>
         </DialogHeader>
 

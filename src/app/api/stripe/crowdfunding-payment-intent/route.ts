@@ -63,6 +63,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { data: compliance } = await supabase
+      .from("investor_compliance")
+      .select("annual_income_cents, net_worth_cents, is_accredited, risk_acknowledged_at")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (!compliance) {
+      return NextResponse.json(
+        { error: "Complete your investor profile before investing" },
+        { status: 400 }
+      );
+    }
+    if (!compliance.risk_acknowledged_at) {
+      return NextResponse.json(
+        { error: "Acknowledge investment risks before investing" },
+        { status: 400 }
+      );
+    }
+    const hasFinancials =
+      compliance.is_accredited ||
+      (compliance.annual_income_cents != null && compliance.net_worth_cents != null);
+    if (!hasFinancials) {
+      return NextResponse.json(
+        { error: "Provide income and net worth for investment limit calculation" },
+        { status: 400 }
+      );
+    }
+
     const stripe = getStripe();
     const paymentIntent = await stripe.paymentIntents.create({
       amount,

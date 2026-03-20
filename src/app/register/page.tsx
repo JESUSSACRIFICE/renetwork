@@ -31,10 +31,10 @@ export default function RegisterPage() {
                 Consultant, Trade Professional, etc.)
               </p>
               <ul className="text-sm text-left space-y-2 text-muted-foreground">
-                <li>• Post your services</li>
-                <li>• Connect with buyers</li>
-                <li>• Build your network</li>
-                <li>• Get referrals</li>
+                <li>• Out-reach</li>
+                <li>• Crowdfund</li>
+                <li>• Network</li>
+                <li>• Commerce</li>
               </ul>
               <Button
                 onClick={() => router.push("/register/service-provider")}
@@ -52,7 +52,7 @@ export default function RegisterPage() {
               <div className="p-4 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                 <Building2 className="h-12 w-12 text-primary" />
               </div>
-              <h2 className="text-2xl font-bold">Customer</h2>
+              <h2 className="text-2xl font-bold">Client\Customer</h2>
               <p className="text-muted-foreground">
                 Register as a customer looking for services and professionals
               </p>

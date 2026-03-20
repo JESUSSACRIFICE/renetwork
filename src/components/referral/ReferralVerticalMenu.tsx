@@ -30,7 +30,7 @@ interface FilterValues {
 const typeOptions = [
   "Service",
   "Profile",
-  "Agency",
+  "Office",
 ];
 
 const professionalCategories = [
@@ -121,7 +121,7 @@ export function ReferralVerticalMenu() {
                   !filters.type && "text-muted-foreground"
                 )}
               >
-                {filters.type || "Service, Profile, or Agency"}
+                {filters.type || "Service, Profile, or Office"}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>

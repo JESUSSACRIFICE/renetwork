@@ -233,6 +233,63 @@ export type Database = {
         };
         Relationships: [];
       };
+      community_vote_items: {
+        Row: {
+          id: string;
+          title: string;
+          description: string | null;
+          item_type: string;
+          status: string;
+          vote_count: number;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description?: string | null;
+          item_type: string;
+          status?: string;
+          vote_count?: number;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string | null;
+          item_type?: string;
+          status?: string;
+          vote_count?: number;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      community_votes: {
+        Row: {
+          id: string;
+          item_id: string;
+          user_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          item_id: string;
+          user_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          item_id?: string;
+          user_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       network_post_comments: {
         Row: {
           id: string;
@@ -1190,25 +1247,31 @@ export type Database = {
           comment: string | null;
           created_at: string;
           id: string;
+          offer_id: string | null;
           profile_id: string;
           rating: number;
           reviewer_id: string;
+          seller_response: string | null;
         };
         Insert: {
           comment?: string | null;
           created_at?: string;
           id?: string;
+          offer_id?: string | null;
           profile_id: string;
           rating: number;
           reviewer_id: string;
+          seller_response?: string | null;
         };
         Update: {
           comment?: string | null;
           created_at?: string;
           id?: string;
+          offer_id?: string | null;
           profile_id?: string;
           rating?: number;
           reviewer_id?: string;
+          seller_response?: string | null;
         };
         Relationships: [
           {
@@ -1216,6 +1279,13 @@ export type Database = {
             columns: ["profile_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_offer_id_fkey";
+            columns: ["offer_id"];
+            isOneToOne: false;
+            referencedRelation: "offers";
             referencedColumns: ["id"];
           },
         ];

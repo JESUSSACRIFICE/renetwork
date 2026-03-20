@@ -75,6 +75,11 @@ export default function DashboardLayout({
           <DashboardSidebar
             userType={userType}
             profile={profile ?? undefined}
+            isAdmin={
+              profile?.user_roles?.some?.(
+                (r: { role?: string }) => r.role === "admin",
+              ) ?? false
+            }
           />
           <main className="flex-1 flex flex-col min-h-0 w-full max-w-full overflow-x-hidden overflow-y-auto bg-gray-50">
             {children}

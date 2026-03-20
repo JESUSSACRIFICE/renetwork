@@ -122,7 +122,8 @@ async function fetchBrowseProfiles(
     .select(
       "id, full_name, referral_fee_percentage, hourly_rate, price_per_sqft",
     )
-    .eq("user_type", "service_provider");
+    .eq("user_type", "service_provider")
+    .or("registration_status.eq.approved,registration_status.is.null");
   if (profileIds.length > 0) {
     profilesQuery = profilesQuery.in("id", profileIds);
   }
@@ -342,7 +343,8 @@ async function fetchSearchProfiles(
     .select(
       "id, full_name, avatar_url, bio, hourly_rate, mailing_address, willing_to_train",
     )
-    .eq("user_type", "service_provider");
+    .eq("user_type", "service_provider")
+    .or("registration_status.eq.approved,registration_status.is.null");
   if (profileIds.length > 0) {
     profilesQuery = profilesQuery.in("id", profileIds);
   }
@@ -614,7 +616,7 @@ async function fetchProfile(
 
   const { data: profileData, error } = await db
     .from("profiles")
-    .select("*, reviews(rating, comment, created_at, reviewer_id)")
+    .select("*, reviews(rating, comment, created_at, reviewer_id, seller_response, offer_id)")
     .eq("id", id)
     .single();
 

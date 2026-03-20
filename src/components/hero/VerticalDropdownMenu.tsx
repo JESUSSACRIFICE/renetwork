@@ -39,7 +39,7 @@ interface FilterValues {
 const agentOptions = [
   "Service",
   "Profile",
-  "Agency",
+  "Office",
   "Real Estate Agent",
   "Mortgage Consultant",
   "Contractor",
@@ -150,7 +150,7 @@ export function VerticalDropdownMenu() {
                   !filters.agent && "text-muted-foreground",
                 )}
               >
-                {filters.agent || "Ex. Service, Profile, Agency..."}
+                {filters.agent || "Ex. Service, Profile, Office..."}
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>

@@ -48,7 +48,7 @@ import {
 import { usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 
 // Options for dropdowns
-const findOptions = ["Service", "Profile", "Agency"];
+const findOptions = ["Service", "Profile", "Office"];
 
 const representationOptions = [
   "Selling",
@@ -156,7 +156,7 @@ interface SearchFormProps {
   onSearch?: (filters: FilterValues) => void;
   className?: string;
   /** When set, used as default when no "Find" option is selected (e.g. "Profile" for hero search) */
-  defaultSearchType?: "Profile" | "Service" | "Agency";
+  defaultSearchType?: "Profile" | "Service" | "Office";
 }
 
 export const SearchForm = ({ onSearch, className = "", defaultSearchType }: SearchFormProps) => {
@@ -214,7 +214,7 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
         router.push(`/search/profiles?${params.toString()}`);
       } else if (findOption === "Service") {
         router.push(`/search/services?${params.toString()}`);
-      } else if (findOption === "Agency") {
+      } else if (findOption === "Office") {
         router.push(`/search/agencies?${params.toString()}`);
       } else {
         router.push(`/search/profiles?${params.toString()}`);
@@ -230,7 +230,7 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
         {/* Find */}
         <MultiSelect
           label="Find"
-          placeholder="Ex. Service, Profile, Agency..."
+          placeholder="Ex. Service, Profile, Office..."
           options={findOptions}
           value={filters.find}
           onChange={(value) => setFilters({ ...filters, find: value })}

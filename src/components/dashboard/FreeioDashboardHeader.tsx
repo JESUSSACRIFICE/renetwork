@@ -21,6 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-messages";
+import { useUnreadNotificationCount } from "@/hooks/use-notifications";
 
 interface FreeioDashboardHeaderProps {
   user: any;
@@ -36,6 +37,9 @@ export function FreeioDashboardHeader({
   const router = useRouter();
   const queryClient = useQueryClient();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
+  const { data: notificationCount = 0 } = useUnreadNotificationCount(
+    user?.id ?? null
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -126,9 +130,17 @@ export function FreeioDashboardHeader({
                 </span>
               )}
             </button>
-            <button className="relative p-2 hover:bg-gray-100 rounded-full">
+            <button
+              className="relative p-2 hover:bg-gray-100 rounded-full"
+              onClick={() => router.push("/dashboard/notifications")}
+              aria-label="Notifications"
+            >
               <Bell className="w-5 h-5 text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              {notificationCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-white">
+                  {notificationCount > 99 ? "99+" : notificationCount}
+                </span>
+              )}
             </button>
 
             <DropdownMenu>

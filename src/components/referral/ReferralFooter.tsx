@@ -9,7 +9,7 @@ const footerLinks = {
   Platform: [
     { name: "Browse Services", href: "/referral/results?type=service" },
     { name: "Browse Profiles", href: "/referral/results?type=profile" },
-    { name: "Browse Agencies", href: "/referral/results?type=agency" },
+    { name: "Browse Offices", href: "/referral/results?type=agency" },
     { name: "How It Works", href: "/referral/about#how-it-works" },
   ],
   Resources: [
@@ -22,10 +22,13 @@ const footerLinks = {
     { name: "Terms of Service", href: "/referral/learn/tos" },
     { name: "Privacy Policy", href: "/referral/learn/privacy" },
     { name: "Legal Disclosures", href: "/referral/learn/legal" },
+    { name: "Escrow (When You Get Paid)", href: "/referral/learn/escrow" },
+    { name: "Collaboration Agreement", href: "/referral/learn/collaboration" },
     { name: "Platform Exclusivity", href: "/referral/learn/exclusivity" },
   ],
   Account: [
     { name: "Dashboard", href: "/dashboard/referral" },
+    { name: "Training", href: "/dashboard/training" },
     { name: "Register", href: "/register" },
     { name: "Settings", href: "/referral/settings" },
     { name: "Advertise", href: "/referral/advertise" },

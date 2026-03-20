@@ -14,8 +14,8 @@ const Footer = () => {
   const footerLinks = {
     Products: [
       { name: "Services", href: "/search/services" },
-      { name: "Freelancers", href: "/search/services?type=freelancers" },
-      { name: "Agencies", href: "/search/services?type=agencies" },
+      { name: "Profiles", href: "/search/profiles" },
+      { name: "Agencies", href: "/search/agencies" },
     ],
     "For PSPs": [
       { name: "Training", href: "/training" },
@@ -23,9 +23,10 @@ const Footer = () => {
       { name: "Benefits", href: "/benefits" },
     ],
     Resources: [
-      { name: "Help Center", href: "/help" },
-      { name: "Blog", href: "/blog" },
-      { name: "Guides", href: "/guides" },
+      { name: "Reason", href: "/reason" },
+      { name: "Stages & Phases", href: "/stages" },
+      { name: "ROI Calculator", href: "/roi" },
+      { name: "Tools", href: "/tools" },
     ],
     About: [
       { name: "Vision", href: "/about" },

@@ -33,8 +33,21 @@ import {
   useReferralsSent,
   useReferralCommissions,
 } from "@/hooks/use-referrals";
+import { useCreateDispute } from "@/hooks/use-phase1-admin";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { AlertCircle } from "lucide-react";
 
 function formatCents(cents: number) {
   return new Intl.NumberFormat("en-US", {
@@ -52,6 +65,9 @@ export default function ReferralDashboardPage() {
   const { code: referralCode } = useReferralCode(user?.id);
   const { referrals } = useReferralsSent(user?.id);
   const { commissions } = useReferralCommissions(user?.id);
+  const createDispute = useCreateDispute();
+  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeTarget, setDisputeTarget] = useState<{ referralId?: string; commissionId?: string } | null>(null);
 
   const totalReferrals = referrals.length;
   const pendingReferrals = referrals.filter(
@@ -292,7 +308,7 @@ export default function ReferralDashboardPage() {
                     </p>
                   ) : (
                     <div className="space-y-4">
-                      {commissions.map((c: any) => (
+                      {commissions.map((c: { id: string; referral_id?: string; amount_cents?: number; recipient?: { full_name?: string }; created_at?: string; status: string }) => (
                         <div
                           key={c.id}
                           className="flex items-center justify-between border-b pb-4 last:border-0"
@@ -308,17 +324,89 @@ export default function ReferralDashboardPage() {
                                 : ""}
                             </p>
                           </div>
-                          <Badge
-                            variant={
-                              c.status === "paid"
-                                ? "default"
-                                : c.status === "pending"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                          >
-                            {c.status}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={
+                                c.status === "paid"
+                                  ? "default"
+                                  : c.status === "pending"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              {c.status}
+                            </Badge>
+                            <Dialog
+                              open={disputeTarget?.commissionId === c.id}
+                              onOpenChange={(open) => {
+                                if (!open) {
+                                  setDisputeTarget(null);
+                                  setDisputeReason("");
+                                } else {
+                                  setDisputeTarget({ referralId: c.referral_id, commissionId: c.id });
+                                }
+                              }}
+                            >
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm" title="Raise dispute">
+                                  <AlertCircle className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Raise Dispute</DialogTitle>
+                                  <DialogDescription>
+                                    Report an issue with this commission. Admin will review.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                  <div>
+                                    <Label htmlFor="reason">Reason</Label>
+                                    <Input
+                                      id="reason"
+                                      placeholder="Describe the issue..."
+                                      value={disputeReason}
+                                      onChange={(e) => setDisputeReason(e.target.value)}
+                                    />
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                      setDisputeTarget(null);
+                                      setDisputeReason("");
+                                    }}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    onClick={() => {
+                                      if (!disputeReason.trim() || !disputeTarget) return;
+                                      createDispute.mutate(
+                                        {
+                                          referralId: disputeTarget.referralId,
+                                          commissionId: disputeTarget.commissionId,
+                                          reason: disputeReason.trim(),
+                                        },
+                                        {
+                                          onSuccess: () => {
+                                            toast.success("Dispute submitted. Admin will review.");
+                                            setDisputeReason("");
+                                            setDisputeTarget(null);
+                                          },
+                                          onError: () => toast.error("Failed to submit dispute"),
+                                        }
+                                      );
+                                    }}
+                                    disabled={!disputeReason.trim() || createDispute.isPending}
+                                  >
+                                    Submit
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
                         </div>
                       ))}
                     </div>

@@ -72,7 +72,7 @@ const ProfessionalDetail = () => {
           user_roles(role),
           service_areas(zip_code, radius_miles),
           payment_preferences(*),
-          reviews:reviews(rating, comment, created_at, reviewer:reviewer_id(full_name))
+          reviews:reviews(rating, comment, created_at, seller_response, reviewer:reviewer_id(full_name))
         `,
         )
         .eq("id", id)
@@ -366,6 +366,7 @@ const ProfessionalDetail = () => {
                     profileId={id!}
                     reviews={professional.reviews || []}
                     onReviewAdded={fetchProfessional}
+                    currentUserId={user?.id}
                   />
                 </TabsContent>
 

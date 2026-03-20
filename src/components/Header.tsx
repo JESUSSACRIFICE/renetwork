@@ -259,6 +259,12 @@ const Header = () => {
                       Community & Forums
                     </Link>
                     <Link
+                      href="/community/vote"
+                      className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
+                    >
+                      Vote on What Gets Built
+                    </Link>
+                    <Link
                       href="/tools"
                       className="block px-4 py-2 rounded-lg hover:bg-accent transition-colors text-sm"
                     >

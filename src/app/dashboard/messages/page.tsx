@@ -21,7 +21,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Mail, Send, UserPlus, FileText, Check, X, Clock, CheckCircle2 } from "lucide-react";
+import { Mail, Send, UserPlus, FileText, Check, X, Clock, CheckCircle2, Star } from "lucide-react";
+import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
 
 type UserType = "service_provider" | "agent";
@@ -766,6 +767,21 @@ export default function Messages() {
                                             </span>
                                           )}
                                         </div>
+                                        {offer.status === "completed" && isRecipient && (
+                                          <Link
+                                            href={`/profile/${offer.sender_id}?tab=reviews`}
+                                            className="inline-flex"
+                                          >
+                                            <Button
+                                              size="sm"
+                                              variant="outline"
+                                              className="h-6 text-xs mt-2"
+                                            >
+                                              <Star className="h-3 w-3 mr-1" />
+                                              Leave a review
+                                            </Button>
+                                          </Link>
+                                        )}
                                         {offer.status === "accepted" && isFromMe && (
                                           <Button
                                             size="sm"
@@ -1111,6 +1127,21 @@ export default function Messages() {
                                               </span>
                                             )}
                                           </div>
+                                          {offer.status === "completed" && isRecipient && (
+                                            <Link
+                                              href={`/profile/${offer.sender_id}?tab=reviews`}
+                                              className="inline-flex"
+                                            >
+                                              <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="h-6 text-xs mt-2"
+                                              >
+                                                <Star className="h-3 w-3 mr-1" />
+                                                Leave a review
+                                              </Button>
+                                            </Link>
+                                          )}
                                           {offer.status === "accepted" && isFromMe && (
                                             <Button
                                               size="sm"
