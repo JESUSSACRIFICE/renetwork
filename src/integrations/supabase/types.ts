@@ -1188,6 +1188,7 @@ export type Database = {
           training_details: string | null;
           updated_at: string | null;
           user_type: "customer" | "service_provider" | "admin" | null;
+          registration_status: string | null;
           mailing_address: string | null;
           website: string | null;
           willing_to_train: boolean | null;
@@ -1212,6 +1213,7 @@ export type Database = {
           training_details?: string | null;
           updated_at?: string | null;
           user_type?: "customer" | "service_provider" | "admin" | null;
+          registration_status?: string | null;
           mailing_address?: string | null;
           website?: string | null;
           willing_to_train?: boolean | null;
@@ -1236,6 +1238,7 @@ export type Database = {
           training_details?: string | null;
           updated_at?: string | null;
           user_type?: "customer" | "service_provider" | "admin" | null;
+          registration_status?: string | null;
           mailing_address?: string | null;
           website?: string | null;
           willing_to_train?: boolean | null;

@@ -116,7 +116,7 @@ export default function Phase1AdminPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {pendingProfiles.map((p: { id: string; full_name: string; email: string | null; created_at: string; registration_status: string }) => (
+                  {pendingProfiles.map((p) => (
                     <div
                       key={p.id}
                       className="flex items-center justify-between rounded-lg border p-4"
@@ -125,7 +125,10 @@ export default function Phase1AdminPage() {
                         <p className="font-medium">{p.full_name}</p>
                         <p className="text-sm text-muted-foreground">{p.email}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          {format(new Date(p.created_at), "MMM d, yyyy")} · {p.registration_status}
+                          {p.created_at
+                            ? format(new Date(p.created_at), "MMM d, yyyy")
+                            : "—"}{" "}
+                          · {p.registration_status ?? ""}
                         </p>
                       </div>
                       <div className="flex gap-2">
@@ -246,34 +249,54 @@ export default function Phase1AdminPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {disputes.map((d: { id: string; reason: string | null; status: string; created_at: string }) => (
-                    <div
-                      key={d.id}
-                      className="flex items-center justify-between rounded-lg border p-4"
-                    >
-                      <div>
-                        <p className="font-medium">{d.reason || "Dispute"}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(d.created_at), "MMM d, yyyy")} · {d.status}
-                        </p>
-                      </div>
-                      <Button
-                        size="sm"
-                        onClick={() =>
-                          resolveDispute.mutate(
-                            { disputeId: d.id, status: "resolved" },
-                            {
-                              onSuccess: () => toast.success("Dispute resolved"),
-                              onError: () => toast.error("Failed to resolve"),
-                            }
-                          )
-                        }
-                        disabled={resolveDispute.isPending}
+                  {disputes.map((d) => {
+                    // The Supabase query selects dispute row + joined relations.
+                    // Cast to the fields we actually render so TS doesn't fail
+                    // when relations are missing/typed as SelectQueryError.
+                    const dispute = d as unknown as {
+                      id: string;
+                      reason: string | null;
+                      status: string;
+                      created_at: string | null;
+                    };
+
+                    return (
+                      <div
+                        key={dispute.id}
+                        className="flex items-center justify-between rounded-lg border p-4"
                       >
-                        Resolve
-                      </Button>
-                    </div>
-                  ))}
+                        <div>
+                          <p className="font-medium">
+                            {dispute.reason || "Dispute"}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {dispute.created_at
+                              ? format(
+                                  new Date(dispute.created_at),
+                                  "MMM d, yyyy",
+                                )
+                              : "—"}{" "}
+                            · {dispute.status}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            resolveDispute.mutate(
+                              { disputeId: dispute.id, status: "resolved" },
+                              {
+                                onSuccess: () => toast.success("Dispute resolved"),
+                                onError: () => toast.error("Failed to resolve"),
+                              }
+                            )
+                          }
+                          disabled={resolveDispute.isPending}
+                        >
+                          Resolve
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
