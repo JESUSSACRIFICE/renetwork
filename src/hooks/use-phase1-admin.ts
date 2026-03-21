@@ -3,6 +3,12 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+/**
+ * `referral_disputes` is not in generated `Database` typings; typed `.from(...)`
+ * triggers excessive TS instantiation. Use an untyped client for that table only.
+ */
+const supabaseDisputes = supabase as any;
+
 /** Phase-1 metrics: Signup→Activation, Referral count, Profile approval, 7-14 day return */
 export function usePhase1Metrics() {
   return useQuery({
@@ -115,7 +121,7 @@ export function useOpenDisputes() {
   return useQuery({
     queryKey: ["phase1", "disputes"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseDisputes
         .from("referral_disputes")
         .select(`
           *,
@@ -147,7 +153,7 @@ export function useCreateDispute() {
         .eq("id", user.id)
         .single();
       const profileId = profileRes.data?.id ?? user.id;
-      const { data, error } = await supabase
+      const { data, error } = await supabaseDisputes
         .from("referral_disputes")
         .insert({
           referral_id: params.referralId ?? null,
@@ -177,7 +183,7 @@ export function useResolveDispute() {
       admin_notes?: string;
     }) => {
       const { data: { user } } = await supabase.auth.getUser();
-      const { error } = await supabase
+      const { error } = await supabaseDisputes
         .from("referral_disputes")
         .update({
           status: params.status,

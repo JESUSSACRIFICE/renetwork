@@ -183,7 +183,12 @@ async function fetchRevenueAnalytics(
 
 function buildChartData(
   offers: Array<{ amount_cents: number; accepted_at: string | null; created_at: string | null }>,
-  commissions: Array<{ amount_cents: number; paid_at: string | null; created_at: string | null }>,
+  commissions: Array<{
+    amount_cents: number;
+    paid_at: string | null;
+    created_at: string | null;
+    status: string;
+  }>,
   from: Date,
   to: Date,
   range: TimeRange
