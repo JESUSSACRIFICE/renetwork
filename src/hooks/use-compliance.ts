@@ -12,6 +12,14 @@ import {
   REG_CF_MAX_ANNUAL_CENTS,
 } from "@/lib/compliance-types";
 
+/**
+ * `investor_compliance` and `crowdfunding_project_compliance` are not in the generated
+ * `Database` typings. Using the typed client makes TypeScript hit "excessively deep"
+ * instantiation on `.from("…")`. Route those calls through an untyped handle.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- tables missing from Database
+const supabaseCompliance = supabase as any;
+
 function investorComplianceFromRow(row: Record<string, unknown>): InvestorCompliance {
   return {
     id: String(row.id),
@@ -54,7 +62,7 @@ export function useInvestorCompliance(userId: string | null) {
     queryKey: ["compliance", "investor", userId],
     queryFn: async () => {
       if (!userId) return null;
-      const { data, error } = await supabase
+      const { data, error } = await supabaseCompliance
         .from("investor_compliance")
         .select("*")
         .eq("user_id", userId)
@@ -86,7 +94,7 @@ export function useUpsertInvestorCompliance(userId: string | null) {
         updates.risk_acknowledged_at = new Date().toISOString();
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await supabaseCompliance
         .from("investor_compliance")
         .upsert(
           { user_id: userId, ...updates },
@@ -112,7 +120,7 @@ export function useProjectCompliance(projectId: string | null) {
     queryKey: ["compliance", "project", projectId],
     queryFn: async () => {
       if (!projectId) return null;
-      const { data, error } = await supabase
+      const { data, error } = await supabaseCompliance
         .from("crowdfunding_project_compliance")
         .select("*")
         .eq("project_id", projectId)
@@ -181,7 +189,7 @@ export function useUpdateProjectCompliance() {
       if (params.checklist_json !== undefined) updates.checklist_json = params.checklist_json;
       if (params.admin_notes !== undefined) updates.admin_notes = params.admin_notes;
 
-      const { error } = await supabase
+      const { error } = await supabaseCompliance
         .from("crowdfunding_project_compliance")
         .update(updates)
         .eq("project_id", params.projectId);
