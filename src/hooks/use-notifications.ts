@@ -4,6 +4,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { UserNotification } from "@/lib/notification-types";
 
+/**
+ * `user_notifications` and `notification_preferences` are not in generated
+ * `Database` typings; the typed client triggers excessive TS instantiation on `.from(...)`.
+ */
+const supabaseNotifications = supabase as any;
+
 const NOTIFICATIONS_QUERY_KEY = ["user-notifications"] as const;
 const PREFERENCES_QUERY_KEY = ["notification-preferences"] as const;
 
@@ -27,7 +33,7 @@ export function useUserNotifications(userId: string | null, limit = 50) {
     queryKey: [...NOTIFICATIONS_QUERY_KEY, userId, limit],
     queryFn: async () => {
       if (!userId) return [];
-      const { data, error } = await supabase
+      const { data, error } = await supabaseNotifications
         .from("user_notifications")
         .select("*")
         .eq("user_id", userId)
@@ -47,7 +53,7 @@ export function useUnreadNotificationCount(userId: string | null) {
     queryKey: [...NOTIFICATIONS_QUERY_KEY, userId, "unread-count"],
     queryFn: async () => {
       if (!userId) return 0;
-      const { count, error } = await supabase
+      const { count, error } = await supabaseNotifications
         .from("user_notifications")
         .select("*", { count: "exact", head: true })
         .eq("user_id", userId)
@@ -64,7 +70,7 @@ export function useMarkNotificationRead(userId: string | null) {
   return useMutation({
     mutationFn: async (notificationId: string) => {
       if (!userId) throw new Error("Not authenticated");
-      const { error } = await supabase
+      const { error } = await supabaseNotifications
         .from("user_notifications")
         .update({ read_at: new Date().toISOString() })
         .eq("id", notificationId)
@@ -82,7 +88,7 @@ export function useMarkAllNotificationsRead(userId: string | null) {
   return useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("Not authenticated");
-      const { error } = await supabase
+      const { error } = await supabaseNotifications
         .from("user_notifications")
         .update({ read_at: new Date().toISOString() })
         .eq("user_id", userId)
@@ -100,7 +106,7 @@ export function useNotificationPreferences(userId: string | null) {
     queryKey: [...PREFERENCES_QUERY_KEY, userId],
     queryFn: async () => {
       if (!userId) return null;
-      const { data, error } = await supabase
+      const { data, error } = await supabaseNotifications
         .from("notification_preferences")
         .select("*")
         .eq("user_id", userId)
@@ -138,7 +144,7 @@ export function useUpsertNotificationPreferences(userId: string | null) {
       crowdfunding_alerts?: boolean;
     }) => {
       if (!userId) throw new Error("Not authenticated");
-      const { data, error } = await supabase
+      const { data, error } = await supabaseNotifications
         .from("notification_preferences")
         .upsert(
           { user_id: userId, ...prefs, updated_at: new Date().toISOString() },
