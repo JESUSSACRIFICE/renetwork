@@ -103,7 +103,9 @@ async function fetchInvestorPerformance(
     created_at: string | null;
   }>;
 
-  const pledges = (pledgesRes.data ?? []) as Array<{
+  // Embed type is SelectQueryError when FK isn't in generated Database typings;
+  // assert via unknown so runtime shape still matches the select string.
+  const pledges = (pledgesRes.data ?? []) as unknown as Array<{
     amount_cents: number;
     status: string;
     crowdfunding_projects: { expected_roi_pct: number | null } | null;
