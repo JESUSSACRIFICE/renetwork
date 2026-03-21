@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useCompletedOffersForReview } from "@/hooks/use-reviews";
 import type { CompletedOfferForReview } from "@/hooks/use-reviews";
+import type { TablesInsert } from "@/integrations/supabase/types";
 
 interface ReviewsListProps {
   profileId: string;
@@ -70,15 +71,13 @@ const ReviewsList = ({
     setLoading(true);
 
     try {
-      const insertPayload: Record<string, unknown> = {
+      const insertPayload: TablesInsert<"reviews"> = {
         profile_id: profileId,
         reviewer_id: user.id,
         rating,
         comment: comment.trim(),
+        ...(selectedOfferId ? { offer_id: selectedOfferId } : {}),
       };
-      if (selectedOfferId) {
-        insertPayload.offer_id = selectedOfferId;
-      }
 
       const { error } = await supabase.from("reviews").insert(insertPayload);
 
