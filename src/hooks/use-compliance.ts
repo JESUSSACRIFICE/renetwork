@@ -17,7 +17,6 @@ import {
  * `Database` typings. Using the typed client makes TypeScript hit "excessively deep"
  * instantiation on `.from("…")`. Route those calls through an untyped handle.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- tables missing from Database
 const supabaseCompliance = supabase as any;
 
 function investorComplianceFromRow(row: Record<string, unknown>): InvestorCompliance {
