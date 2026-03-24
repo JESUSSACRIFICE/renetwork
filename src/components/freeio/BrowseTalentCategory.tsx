@@ -14,52 +14,40 @@ import {
 
 const categories = [
   {
-    title: "Development & IT",
+    title: "Commercial",
     count: "1,476",
     icon: "💻",
     gradient: "from-blue-500 to-blue-700",
   },
   {
-    title: "Design & Creative",
+    title: "Multi-Unit",
     count: "892",
     icon: "🎨",
     gradient: "from-purple-500 to-pink-600",
   },
   {
-    title: "Digital & Marketing",
+    title: "Industrial",
     count: "634",
     icon: "📱",
     gradient: "from-green-500 to-teal-600",
   },
   {
-    title: "Writing & Translation",
+    title: "Agriculture",
     count: "445",
     icon: "✍️",
     gradient: "from-orange-500 to-red-600",
   },
   {
-    title: "Music & Audio",
+    title: "Residential",
     count: "321",
     icon: "🎵",
     gradient: "from-indigo-500 to-purple-600",
   },
   {
-    title: "Video & Animation",
+    title: "Other",
     count: "278",
     icon: "🎬",
     gradient: "from-red-500 to-pink-600",
-  },
-  {
-    title: "Business",
-    count: "195",
-    icon: "💼",
-    gradient: "from-gray-600 to-gray-800",
-  },
-  {
-    title: "Photography",
-    count: "142",
-    icon: "📷",
-    gradient: "from-cyan-500 to-blue-600",
   },
 ];
 
@@ -85,12 +73,20 @@ export default function BrowseTalentCategory() {
   }, [api]);
 
   return (
-    <section className="w-full bg-white py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Browse talent by category</h2>
-          <Button variant="outline" className="hidden md:inline-flex">
-            All Category
+    <section className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8 lg:py-10">
+      <div className="mx-auto w-full max-w-none">
+        <div className="mb-8 flex items-center justify-between">
+          <div className="space-y-2">
+            <h3 className="flex flex-wrap items-baseline gap-x-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+              <span className="text-amber-900/90 dark:text-amber-200/95">1B</span>
+              <span>Fields</span>
+            </h3>
+            <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
+              Browse property types and specializations that match your deal
+            </p>
+          </div>
+          <Button variant="outline" className="hidden md:inline-flex shrink-0">
+            All fields
           </Button>
         </div>
 

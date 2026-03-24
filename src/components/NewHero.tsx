@@ -103,6 +103,16 @@ const SALES_BANNERS = [
   },
 ] as const;
 
+/** Side ad blocks: business attire (top row) vs trades / industrial labour (bottom row). */
+const AD_BUSINESS_LEFT =
+  "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80";
+const AD_BUSINESS_RIGHT =
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80";
+const AD_LABOUR_LEFT =
+  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=400&q=80";
+const AD_LABOUR_RIGHT =
+  "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=400&q=80";
+
 function thumbSrc(fullSizeUrl: string) {
   return fullSizeUrl.replace("w=1920", "w=280").replace("q=80", "q=70");
 }
@@ -170,20 +180,14 @@ const NewHero = () => {
           {/* First Column - Advertisement Blocks */}
           <div className="hidden lg:flex flex-col space-y-4 w-full lg:w-[180px] shrink-0">
             <AdBlock
-              gradientFrom="from-blue-600"
-              gradientVia="via-indigo-600"
-              gradientTo="to-purple-600"
               badgeText="Advertise Here"
-              badgeColor="text-indigo-700"
-              icon="📊"
+              backgroundImage={AD_BUSINESS_LEFT}
+              imageAlt="Business professional in formal attire"
             />
             <AdBlock
-              gradientFrom="from-purple-600"
-              gradientVia="via-pink-600"
-              gradientTo="to-rose-600"
               badgeText="Advertise Here"
-              badgeColor="text-purple-700"
-              icon="💼"
+              backgroundImage={AD_LABOUR_LEFT}
+              imageAlt="Skilled labour professional at work"
             />
           </div>
 
@@ -215,8 +219,8 @@ const NewHero = () => {
                     className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/40 to-transparent"
                     aria-hidden
                   />
-                  <div className="absolute inset-x-0 bottom-0 px-0.5 pb-0.5 pt-2">
-                    <p className="text-center text-[0.5rem] font-bold uppercase leading-tight tracking-wide text-white drop-shadow-sm">
+                  <div className="absolute inset-x-0 top-0 px-0.5 pb-0.5 pt-2">
+                    <p className="text-center text-[0.5rem] font-bold uppercase leading-tight tracking-wide text-white drop-shadow-sm underline">
                       {banner.title}
                     </p>
                   </div>
@@ -225,20 +229,14 @@ const NewHero = () => {
             </div>
             <div className="flex h-full min-h-0 flex-col space-y-4 w-[180px] shrink-0">
               <AdBlock
-                gradientFrom="from-emerald-600"
-                gradientVia="via-teal-600"
-                gradientTo="to-cyan-600"
                 badgeText="Advertise Here"
-                badgeColor="text-emerald-700"
-                icon="📊"
+                backgroundImage={AD_BUSINESS_RIGHT}
+                imageAlt="Business professional in office setting"
               />
               <AdBlock
-                gradientFrom="from-amber-600"
-                gradientVia="via-orange-600"
-                gradientTo="to-red-600"
                 badgeText="Advertise Here"
-                badgeColor="text-orange-700"
-                icon="💼"
+                backgroundImage={AD_LABOUR_RIGHT}
+                imageAlt="Industrial and warehouse labour professional"
               />
             </div>
           </div>
