@@ -26,6 +26,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-messages";
+import { useUnreadNotificationCount } from "@/hooks/use-notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,6 +36,9 @@ const AppHeader = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, isLoading: authLoading } = useAuth();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
+  const { data: unreadNotificationCount = 0 } = useUnreadNotificationCount(
+    user?.id ?? null
+  );
   const navigationItems = [
     // { name: "For customers", href: "/customer" },
     { name: "Referral", href: "/referral" },
@@ -42,6 +46,14 @@ const AppHeader = () => {
     { name: "Network", href: "/network" },
     { name: "Commerce", href: "/commerce" },
   ];
+
+  const getNavigationHref = (itemName: string, itemHref: string) => {
+    if (itemName === "Crowdfund" && !authLoading && !user) {
+      return "/register/crowdfund";
+    }
+
+    return itemHref;
+  };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -68,7 +80,10 @@ const AppHeader = () => {
         {/* Main Navigation - Desktop */}
         <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
           {navigationItems.map((item) => (
-            <Link key={item.name} href={item.href}>
+            <Link
+              key={item.name}
+              href={getNavigationHref(item.name, item.href)}
+            >
               <Button
                 variant="ghost"
                 className="h-10 px-4 text-base hover:bg-primary/10 hover:text-primary transition-colors"
@@ -81,79 +96,38 @@ const AppHeader = () => {
 
         {/* Right Side Actions */}
         <div className="flex items-center gap-2">
-          {/* Message Icon - when logged in */}
-          {!authLoading && user && (
-            <Link href="/dashboard/messages" className="hidden sm:block">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative hover:bg-accent"
-              >
-                <MessageSquare className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-          )}
-
-          {/* Notification Bell - dropdown with unread count */}
-          {!authLoading && user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative hover:bg-accent hidden sm:flex"
-                >
-                  <Bell className="h-5 w-5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-72">
-                <DropdownMenuLabel className="flex items-center justify-between">
-                  <span>Notifications</span>
-                  {unreadCount > 0 && (
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {unreadCount} unread
-                    </span>
-                  )}
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {unreadCount > 0 ? (
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="/dashboard/messages"
-                      className="flex items-center gap-2 cursor-pointer"
-                    >
-                      <MessageSquare className="h-4 w-4" />
-                      You have {unreadCount} unread message
-                      {unreadCount !== 1 ? "s" : ""}
-                    </Link>
-                  </DropdownMenuItem>
-                ) : (
-                  <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                    No new notifications
-                  </div>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link
-                    href="/notifications"
-                    className="flex items-center justify-center cursor-pointer"
-                  >
-                    View all notifications
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex relative hover:bg-accent"
+            onClick={() =>
+              router.push(user ? "/dashboard/messages" : "/auth")
+            }
+          >
+            <MessageSquare className="h-5 w-5" />
+            {user && unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:flex relative hover:bg-accent"
+            onClick={() =>
+              router.push(user ? "/dashboard/notifications" : "/auth")
+            }
+          >
+            <Bell className="h-5 w-5" />
+            {user && unreadNotificationCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {unreadNotificationCount > 99
+                  ? "99+"
+                  : unreadNotificationCount}
+              </span>
+            )}
+          </Button>
 
           {/* Logged out: Login + Join Now */}
           {!authLoading && !user && (
@@ -257,7 +231,7 @@ const AppHeader = () => {
                   {navigationItems.map((item) => (
                     <Link
                       key={item.name}
-                      href={item.href}
+                      href={getNavigationHref(item.name, item.href)}
                       onClick={() => setMobileOpen(false)}
                       className="block px-4 py-3 rounded-lg hover:bg-accent transition-colors text-base font-medium"
                     >
@@ -267,37 +241,39 @@ const AppHeader = () => {
                 </div>
 
                 <div className="border-t pt-6 space-y-3">
-                  {user && (
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => {
-                        router.push("/dashboard/messages");
-                        setMobileOpen(false);
-                      }}
-                    >
-                      <MessageSquare className="h-5 w-5 mr-2" />
-                      Messages
-                      {unreadCount > 0 && (
-                        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
-                          {unreadCount > 99 ? "99+" : unreadCount}
-                        </span>
-                      )}
-                    </Button>
-                  )}
                   <Button
                     variant="ghost"
                     className="w-full justify-start"
                     onClick={() => {
-                      router.push("/notifications");
+                      router.push(user ? "/dashboard/messages" : "/auth");
                       setMobileOpen(false);
                     }}
                   >
-                    <Bell className="h-5 w-5 mr-2" />
-                    Notifications
+                    <MessageSquare className="h-5 w-5 mr-2 shrink-0" />
+                    Messages
                     {user && unreadCount > 0 && (
                       <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
                         {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => {
+                      router.push(
+                        user ? "/dashboard/notifications" : "/auth"
+                      );
+                      setMobileOpen(false);
+                    }}
+                  >
+                    <Bell className="h-5 w-5 mr-2 shrink-0" />
+                    Notifications
+                    {user && unreadNotificationCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                        {unreadNotificationCount > 99
+                          ? "99+"
+                          : unreadNotificationCount}
                       </span>
                     )}
                   </Button>

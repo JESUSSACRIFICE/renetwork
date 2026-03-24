@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, DollarSign, Map, Grid } from "lucide-react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -110,7 +110,7 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <AppHeader />
       <main className="flex-1 bg-background">
         <div className="container py-8">
           <div className="flex flex-col lg:flex-row gap-8">

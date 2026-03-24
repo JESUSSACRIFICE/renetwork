@@ -9,6 +9,8 @@ export interface NetworkPost {
   content: string;
   type: NetworkPostType;
   deal_details: Record<string, unknown>;
+  /** Public image URLs (same order as uploaded) */
+  image_urls: string[];
   group_id: string | null;
   like_count: number;
   comment_count: number;
@@ -49,4 +51,22 @@ export interface ProfileReputationBadge {
   title: string;
   description: string | null;
   awarded_at: string;
+}
+
+export interface NetworkAuthorPreview {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  bio: string | null;
+  lastActiveAt: string;
+}
+
+export interface NetworkHighlightPost {
+  id: string;
+  type: NetworkPostType;
+  title: string | null;
+  excerpt: string;
+  image_urls: string[];
+  created_at: string;
+  authorName: string | null;
 }

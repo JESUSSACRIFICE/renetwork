@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -92,7 +92,7 @@ const DashboardLeads = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
-        <Header />
+        <AppHeader />
         <div className="flex flex-1 w-full">
           <DashboardSidebar userType="agent" profile={profile} />
           <main className="flex-1 p-8 bg-background">

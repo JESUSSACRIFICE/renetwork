@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Send,
 } from "lucide-react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -338,7 +338,7 @@ export default function AgencyDetail() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <AppHeader />
         <div className="container mx-auto px-4 py-20">
           <div className="flex items-center justify-center">
             <div className="text-center">
@@ -355,7 +355,7 @@ export default function AgencyDetail() {
   if (!office) {
     return (
       <div className="min-h-screen bg-background">
-        <Header />
+        <AppHeader />
         <div className="container mx-auto px-4 py-20">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-4">Office not found</h1>
@@ -371,7 +371,7 @@ export default function AgencyDetail() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
+      <AppHeader />
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumbs */}
         <div className="mb-6 text-sm text-muted-foreground">

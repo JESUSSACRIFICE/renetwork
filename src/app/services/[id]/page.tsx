@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Star, MapPin, Clock, BarChart3, Share2, Heart, ChevronLeft, ChevronRight, Plus, Minus, MessageSquare } from "lucide-react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -152,7 +152,7 @@ export default function ServiceDetail() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 bg-background flex items-center justify-center">
           <p className="text-muted-foreground">Loading...</p>
         </main>
@@ -164,7 +164,7 @@ export default function ServiceDetail() {
   if (!service) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 bg-background flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">Service Not Found</h1>
@@ -188,7 +188,7 @@ export default function ServiceDetail() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <AppHeader />
       <main className="flex-1">
         <div className="container py-6">
           {/* Breadcrumbs */}

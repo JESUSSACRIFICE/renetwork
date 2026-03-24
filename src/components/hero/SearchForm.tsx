@@ -224,7 +224,7 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
 
   return (
     <div
-      className={`bg-white text-black overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[330px] border-2 border-white rounded-lg shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px] ${className}`}
+      className={`bg-white/75 backdrop-blur-sm text-black overflow-y-auto w-full sm:w-[100%] md:w-[100%] lg:w-[300px] xl:w-[320px] 2xl:w-[330px] border-2 border-black shadow-lg px-3 sm:px-4 py-2 space-y-3 max-h-[600px] sm:max-h-[520px] lg:h-[520px] ${className}`}
     >
       <div className="space-y-1 text-black">
         {/* Find */}

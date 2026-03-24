@@ -79,6 +79,40 @@ export function useCrowdfundingProject(id: string | null) {
   });
 }
 
+export type CrowdfundingCreatorProfile = {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  bio: string | null;
+  license_number: string | null;
+  phone: string | null;
+};
+
+export function useCrowdfundingCreatorProfile(userId: string | null) {
+  return useQuery({
+    queryKey: ["crowdfunding", "creator", userId],
+    queryFn: async (): Promise<CrowdfundingCreatorProfile | null> => {
+      if (!userId) return null;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, bio, license_number, phone")
+        .eq("id", userId)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return {
+        id: String(data.id),
+        full_name: String(data.full_name ?? "Member"),
+        avatar_url: data.avatar_url ? String(data.avatar_url) : null,
+        bio: data.bio != null ? String(data.bio) : null,
+        license_number: data.license_number != null ? String(data.license_number).trim() || null : null,
+        phone: data.phone != null ? String(data.phone).trim() || null : null,
+      };
+    },
+    enabled: !!userId,
+  });
+}
+
 export function useCrowdfundingVotes(projectId: string | null) {
   return useQuery({
     queryKey: ["crowdfunding", "votes", projectId],

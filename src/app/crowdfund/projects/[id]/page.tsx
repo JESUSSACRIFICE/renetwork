@@ -1,21 +1,23 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   MapPin,
   DollarSign,
-  TrendingUp,
-  Calendar,
   PieChart,
   ArrowLeft,
   ThumbsUp,
   ThumbsDown,
   Heart,
+  ChevronRight,
 } from "lucide-react";
 import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
@@ -27,6 +29,7 @@ import {
   useVoteProject,
   useRemoveVote,
   useCancelPledge,
+  useCrowdfundingCreatorProfile,
 } from "@/hooks/use-crowdfunding";
 import { useAuth } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,10 +39,36 @@ import { InvestorComplianceDialog } from "@/components/compliance/InvestorCompli
 import { RiskAcknowledgmentDialog } from "@/components/compliance/RiskAcknowledgmentDialog";
 import type { CrowdfundingProject, FundAllocationItem } from "@/lib/crowdfunding-types";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
+import { useState, useMemo, useEffect } from "react";
 import { toast } from "sonner";
 import { useInvestmentEligibility } from "@/hooks/use-compliance";
 import { useUserCrowdfundingPledges } from "@/hooks/use-crowdfunding";
+
+const ProjectLocationMap = dynamic(() => import("@/components/crowdfunding/ProjectLocationMap"), {
+  ssr: false,
+  loading: () => (
+    <Card>
+      <CardHeader>
+        <h3 className="flex items-center gap-2 font-semibold">
+          <MapPin className="w-5 h-5" />
+          Project location
+        </h3>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="h-[220px] animate-pulse rounded-lg bg-muted" />
+      </CardContent>
+    </Card>
+  ),
+});
 
 const CATEGORY_LABELS: Record<string, string> = {
   real_estate: "Real Estate",
@@ -63,6 +92,113 @@ function formatDate(iso: string) {
     month: "long",
     day: "numeric",
   });
+}
+
+function CreatorPhoneLink({ phone }: { phone: string }) {
+  const tel = phone.replace(/[^\d+]/g, "");
+  if (tel.length === 0) {
+    return <span className="text-foreground break-all">{phone}</span>;
+  }
+  return (
+    <a href={`tel:${tel}`} className="text-sky-600 font-medium hover:underline break-all">
+      {phone}
+    </a>
+  );
+}
+
+function HeroSlideImage({
+  src,
+  alt,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  priority?: boolean;
+}) {
+  const isRemote = /^https?:\/\//i.test(src);
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      className="object-cover"
+      sizes="(max-width: 1024px) 100vw, min(896px, 66vw)"
+      unoptimized={isRemote}
+      priority={priority}
+    />
+  );
+}
+
+function ProjectHeroMedia({ images, title }: { images: string[]; title: string }) {
+  const urls = useMemo(
+    () => images.map((s) => s.trim()).filter(Boolean),
+    [images],
+  );
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) return;
+    const onSelect = () => setCurrent(api.selectedScrollSnap());
+    onSelect();
+    api.on("select", onSelect);
+    return () => {
+      api.off?.("select", onSelect);
+    };
+  }, [api]);
+
+  if (urls.length === 0) {
+    return (
+      <div className="aspect-video rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+        <DollarSign className="w-24 h-24 text-slate-600" />
+      </div>
+    );
+  }
+
+  if (urls.length === 1) {
+    return (
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-900">
+        <HeroSlideImage src={urls[0]} alt={title} priority />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full overflow-hidden rounded-xl bg-slate-900 shadow-sm">
+      <Carousel setApi={setApi} opts={{ loop: true }}>
+        <CarouselContent className="-ml-0">
+          {urls.map((src, i) => (
+            <CarouselItem key={`${src}-${i}`} className="basis-full pl-0">
+              <div className="relative aspect-video w-full">
+                <HeroSlideImage
+                  src={src}
+                  alt={`${title} — image ${i + 1} of ${urls.length}`}
+                  priority={i === 0}
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious className="left-2 top-1/2 z-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/60 hover:text-white" />
+        <CarouselNext className="right-2 top-1/2 z-10 -translate-y-1/2 border-white/30 bg-black/40 text-white hover:bg-black/60 hover:text-white" />
+      </Carousel>
+      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-10 flex justify-center gap-1.5">
+        {urls.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            aria-label={`Go to image ${i + 1}`}
+            aria-current={i === current ? true : undefined}
+            className={cn(
+              "pointer-events-auto h-1.5 rounded-full transition-all",
+              i === current ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/70",
+            )}
+            onClick={() => api?.scrollTo(i)}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function FundAllocationSection({
@@ -120,6 +256,9 @@ export default function CrowdfundingProjectDetailPage() {
   const id = (params?.id as string) ?? null;
   const { user } = useAuth();
   const { data: project, isLoading, error } = useCrowdfundingProject(id);
+  const { data: creator, isLoading: creatorLoading } = useCrowdfundingCreatorProfile(
+    project?.creator_id ?? null,
+  );
   const { data: votes } = useCrowdfundingVotes(id);
   const { data: userVote } = useUserVoteForProject(id, user?.id ?? null);
   const { data: userPledge } = useUserPledgeForProject(id, user?.id ?? null);
@@ -244,20 +383,18 @@ export default function CrowdfundingProjectDetailPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <AppHeader />
       <main className="flex-1">
-        <div className="mx-auto max-w-4xl px-4 py-8">
-          <Link
+        <div className="w-full px-4 lg:px-20 py-8">
+          {/* <Link
             href="/crowdfund/projects"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to projects
-          </Link>
+          </Link> */}
 
           <div className="grid gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2 space-y-6">
-              <div className="aspect-video rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                <DollarSign className="w-24 h-24 text-slate-600" />
-              </div>
+              <ProjectHeroMedia images={project.images ?? []} title={project.title} />
 
               <div>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -277,6 +414,7 @@ export default function CrowdfundingProjectDetailPage() {
                     <span>{project.location}</span>
                   </div>
                 )}
+
                 <div className="prose prose-slate max-w-none">
                   <p className="text-muted-foreground">
                     {project.short_description || project.description || "Faith-based investment opportunity."}
@@ -293,6 +431,81 @@ export default function CrowdfundingProjectDetailPage() {
             </div>
 
             <div className="space-y-6">
+              {project.creator_id && (
+                <Card className="border-border/80 shadow-sm">
+                  <CardHeader className="pb-2">
+                    <h3 className="text-sm font-medium text-muted-foreground">Project creator</h3>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    {creatorLoading ? (
+                      <div className="flex items-center gap-3 animate-pulse">
+                        <div className="h-12 w-12 rounded-full bg-muted" />
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div className="h-4 w-36 max-w-full rounded bg-muted" />
+                          <div className="h-3 w-full rounded bg-muted" />
+                        </div>
+                      </div>
+                    ) : creator ? (
+                      <div className="flex gap-3 rounded-lg -m-2 p-2 text-left transition-colors hover:bg-muted/70">
+                        <Link
+                          href={`/profiles/${creator.id}`}
+                          className="shrink-0 outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-full"
+                          aria-label={`${creator.full_name} profile`}
+                        >
+                          <Avatar className="h-12 w-12 border border-border/50">
+                            <AvatarImage src={creator.avatar_url ?? undefined} alt="" />
+                            <AvatarFallback className="text-base font-semibold">
+                              {(creator.full_name?.charAt(0) ?? "?").toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                        </Link>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 space-y-1">
+                              <Link
+                                href={`/profiles/${creator.id}`}
+                                className="font-semibold text-foreground hover:underline block"
+                              >
+                                {creator.full_name}
+                              </Link>
+                              {creator.license_number && (
+                                <p className="text-sm text-foreground break-words">
+                                  <span className="text-muted-foreground">License </span>
+                                  {creator.license_number}
+                                </p>
+                              )}
+                              {creator.phone && (
+                                <p className="text-sm">
+                                  <span className="text-muted-foreground">Contact </span>
+                                  <CreatorPhoneLink phone={creator.phone} />
+                                </p>
+                              )}
+                              <Link
+                                href={`/profiles/${creator.id}`}
+                                className="text-sm text-muted-foreground line-clamp-2 hover:underline inline-block mt-0.5"
+                              >
+                                {creator.bio?.trim() ? creator.bio : "View full profile"}
+                              </Link>
+                            </div>
+                            <Link
+                              href={`/profiles/${creator.id}`}
+                              className="shrink-0 p-0.5 text-muted-foreground hover:text-foreground rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              aria-label="View full profile"
+                            >
+                              <ChevronRight className="h-5 w-5" aria-hidden />
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        This creator&apos;s profile isn&apos;t available.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               <Card>
                 <CardHeader>
                   <h3 className="font-semibold">Funding progress</h3>
@@ -434,6 +647,7 @@ export default function CrowdfundingProjectDetailPage() {
               </Card>
 
               <SecNotice />
+              <ProjectLocationMap location={project.location} title={project.title} />
             </div>
           </div>
         </div>

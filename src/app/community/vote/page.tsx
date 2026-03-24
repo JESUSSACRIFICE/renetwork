@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -139,7 +139,7 @@ export default function CommunityVotePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <AppHeader />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">

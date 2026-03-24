@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -122,7 +122,7 @@ const Community = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <AppHeader />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>

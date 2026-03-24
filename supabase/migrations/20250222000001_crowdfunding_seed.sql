@@ -2,6 +2,7 @@
 -- These are for display only; no real investments
 
 INSERT INTO public.crowdfunding_projects (
+  creator_id,
   id,
   title,
   slug,
@@ -19,6 +20,7 @@ INSERT INTO public.crowdfunding_projects (
   deadline_at
 ) VALUES
 (
+  '309ca392-0378-4981-a1ca-49329ad17a1e'::uuid,
   'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d',
   'Family Faith Bowling Center',
   'family-faith-bowling',
@@ -36,6 +38,7 @@ INSERT INTO public.crowdfunding_projects (
   now() + interval '90 days'
 ),
 (
+  '309ca392-0378-4981-a1ca-49329ad17a1e'::uuid,
   'b2c3d4e5-f6a7-5b6c-9d0e-1f2a3b4c5d6e',
   'Ice Rink & Community Center',
   'ice-rink-community',
@@ -53,6 +56,7 @@ INSERT INTO public.crowdfunding_projects (
   now() + interval '120 days'
 ),
 (
+  '309ca392-0378-4981-a1ca-49329ad17a1e'::uuid,
   'c3d4e5f6-a7b8-6c7d-0e1f-2a3b4c5d6e7f',
   'Water Park & Campground',
   'water-park-campground',

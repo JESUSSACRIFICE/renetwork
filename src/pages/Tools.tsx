@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,7 +62,7 @@ const Tools = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <AppHeader />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Real Estate Tools</h1>

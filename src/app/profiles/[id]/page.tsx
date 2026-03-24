@@ -16,8 +16,10 @@ import {
   Briefcase,
   GraduationCap,
   Trophy,
+  UserCheck,
+  UserPlus,
 } from "lucide-react";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,6 +33,11 @@ import {
   useSubmitReview,
   type ProfessionalProfile,
 } from "@/hooks/use-professional-profiles";
+import {
+  useFollowProfile,
+  useProfileFollowStatus,
+  useUnfollowProfile,
+} from "@/hooks/use-networking";
 import { ProfileDealInterests } from "@/components/profiles/ProfileDealInterests";
 import { ProfileReputationBadges } from "@/components/profiles/ProfileReputationBadges";
 import { useAuth } from "@/hooks/use-auth";
@@ -42,12 +49,24 @@ export default function ProfileDetail() {
   const router = useRouter();
   const id = (params as { id: string }).id;
   const { user } = useAuth();
+  const viewerId = user?.id ?? null;
   const { data: rawProfile, isLoading, error } = useProfile(id);
   const { isFavorite, toggleFavorite, isToggling } = useProfileFavorite(
     id,
     user?.id ?? null,
   );
   const submitReview = useSubmitReview(id);
+
+  const { data: followStatus, isLoading: followStatusLoading } = useProfileFollowStatus(
+    viewerId,
+    id
+  );
+  const followMutation = useFollowProfile(id, viewerId);
+  const unfollowMutation = useUnfollowProfile(id, viewerId);
+
+  const isFollowing = !!followStatus?.isFollowing;
+  const isFriend = !!followStatus?.isFriend;
+  const isFollowedBy = !!followStatus?.isFollower && !isFollowing;
 
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
@@ -143,7 +162,7 @@ export default function ProfileDetail() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 bg-background flex items-center justify-center">
           <p className="text-muted-foreground">Loading...</p>
         </main>
@@ -155,7 +174,7 @@ export default function ProfileDetail() {
   if (error || !profile) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 bg-background flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold mb-2">Profile Not Found</h1>
@@ -181,7 +200,7 @@ export default function ProfileDetail() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <AppHeader />
       <main className="flex-1">
         <div className="container py-6">
           {/* Breadcrumbs + Actions */}
@@ -192,7 +211,7 @@ export default function ProfileDetail() {
               </Link>
               {" / "}
               <Link href="/search/profiles" className="hover:text-foreground">
-                Freelancers
+                Profiles
               </Link>
               {" / "}
               <span className="text-foreground">{profile.full_name}</span>
@@ -215,6 +234,52 @@ export default function ProfileDetail() {
               <Button variant="outline" size="icon" className="flex-1">
                 <Flag className="h-4 w-4" />
               </Button>
+
+              {user && user.id !== id ? (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className={`flex-1 ${isFriend || isFollowing ? "bg-primary text-primary-foreground" : ""}`}
+                  disabled={followStatusLoading || followMutation.isPending || unfollowMutation.isPending}
+                  title={
+                    isFriend
+                      ? "Friends"
+                      : isFollowing
+                        ? "Following"
+                        : isFollowedBy
+                          ? "Follow back"
+                          : "Follow"
+                  }
+                  aria-label={
+                    isFriend
+                      ? "Friends"
+                      : isFollowing
+                        ? "Following"
+                        : isFollowedBy
+                          ? "Follow back"
+                          : "Follow"
+                  }
+                  onClick={() => {
+                    if (isFollowing) {
+                      unfollowMutation.mutate(undefined, {
+                        onSuccess: () => toast.success("Unfollowed"),
+                        onError: () => toast.error("Failed to unfollow"),
+                      });
+                      return;
+                    }
+                    followMutation.mutate(undefined, {
+                      onSuccess: () => toast.success(isFollowedBy ? "You’re now friends" : "Following"),
+                      onError: () => toast.error("Failed to follow"),
+                    });
+                  }}
+                >
+                  {isFollowing ? (
+                    <UserCheck className="h-4 w-4" />
+                  ) : (
+                    <UserPlus className="h-4 w-4" />
+                  )}
+                </Button>
+              ) : null}
             </div>
           </div>
 
@@ -222,7 +287,7 @@ export default function ProfileDetail() {
             {/* Main Content */}
             <div className="space-y-8">
               {/* Profile Header */}
-              <Card className="bg-primary/5 border-primary/20 min-h-[11rem]">
+              <Card className="bg-primary/5 border-primary/20 min-h-[60vh]">
                 <CardContent className="p-6">
                   <div className="flex gap-6">
                     <Avatar className="h-24 w-24 border-4 border-background">
@@ -312,7 +377,7 @@ export default function ProfileDetail() {
               {/* About */}
               <Card>
                 <CardContent className="p-6">
-                  <h2 className="text-2xl font-bold mb-4">About Freelancer</h2>
+                  <h2 className="text-2xl font-bold mb-4">About {profile.full_name}</h2>
                   <div className="space-y-4 text-muted-foreground">
                     <p>{profile.bio}</p>
                   </div>
@@ -705,54 +770,6 @@ export default function ProfileDetail() {
 
             {/* Sidebar */}
             <div className="space-y-6">
-              {/* Rate/Pricing */}
-              <Card className="min-h-[11rem]">
-                <CardContent className="p-6 h-full flex justify-center items-center">
-                  <div className="text-center">
-                    {profile.hourly_rate != null && (
-                      <div className="text-3xl font-bold text-primary">
-                        ${profile.hourly_rate} / hr
-                      </div>
-                    )}
-                    {profile.hourly_rate == null && (
-                      <div className="text-muted-foreground">Rate not set</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Contact Buttons */}
-              <div className="space-y-3">
-                <Button className="w-full bg-primary hover:bg-primary/90 mb-3">
-                  <Download className="h-4 w-4 mr-2" />
-                  Download CV
-                </Button>
-                {user?.id !== profile.id &&
-                  (user ? (
-                    <Link href={`/dashboard/messages?recipient=${profile.id}`}>
-                      <Button className="w-full bg-primary hover:bg-primary/90">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Message
-                      </Button>
-                    </Link>
-                  ) : (
-                    <>
-                      <Button
-                        className="w-full bg-primary hover:bg-primary/90"
-                        onClick={() => setAuthModalOpen(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Message
-                      </Button>
-                      <AuthModal
-                        open={authModalOpen}
-                        onOpenChange={setAuthModalOpen}
-                        redirectTo={`/dashboard/messages?recipient=${profile.id}`}
-                      />
-                    </>
-                  ))}
-              </div>
-
               {/* Freelancer Details */}
               <Card>
                 <CardContent className="p-6 space-y-4">
@@ -792,6 +809,54 @@ export default function ProfileDetail() {
                       <span>{profile.phone}</span>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+
+              {/* Contact Buttons */}
+              <div className="space-y-3">
+                <Button className="w-full bg-primary hover:bg-primary/90 mb-3">
+                  <Download className="h-4 w-4 mr-2" />
+                  Download CV
+                </Button>
+                {user?.id !== profile.id &&
+                  (user ? (
+                    <Link href={`/dashboard/messages?recipient=${profile.id}`}>
+                      <Button className="w-full bg-primary hover:bg-primary/90">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Button
+                        className="w-full bg-primary hover:bg-primary/90"
+                        onClick={() => setAuthModalOpen(true)}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Message
+                      </Button>
+                      <AuthModal
+                        open={authModalOpen}
+                        onOpenChange={setAuthModalOpen}
+                        redirectTo={`/dashboard/messages?recipient=${profile.id}`}
+                      />
+                    </>
+                  ))}
+              </div>
+
+              {/* Rate/Pricing */}
+              <Card className="min-h-[11rem]">
+                <CardContent className="p-6 h-full flex justify-center items-center">
+                  <div className="text-center">
+                    {profile.hourly_rate != null && (
+                      <div className="text-3xl font-bold text-primary">
+                        ${profile.hourly_rate} / hr
+                      </div>
+                    )}
+                    {profile.hourly_rate == null && (
+                      <div className="text-muted-foreground">Rate not set</div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 

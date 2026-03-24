@@ -1,4 +1,12 @@
 /** @type {import('next').NextConfig} */
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+let supabaseHost = "";
+try {
+  if (supabaseUrl) supabaseHost = new URL(supabaseUrl).hostname;
+} catch {
+  supabaseHost = "";
+}
+
 const nextConfig = {
   reactStrictMode: true,
   images: {
@@ -8,6 +16,15 @@ const nextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      ...(supabaseHost
+        ? [
+            {
+              protocol: "https",
+              hostname: supabaseHost,
+              pathname: "/**",
+            },
+          ]
+        : []),
     ],
     unoptimized: false,
   },

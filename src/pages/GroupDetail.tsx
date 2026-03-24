@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -219,7 +219,7 @@ const GroupDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 container mx-auto px-4 py-8">
           <p>Loading...</p>
         </main>
@@ -231,7 +231,7 @@ const GroupDetail = () => {
   if (!group) {
     return (
       <div className="min-h-screen flex flex-col">
-        <Header />
+        <AppHeader />
         <main className="flex-1 container mx-auto px-4 py-8">
           <p>Group not found</p>
         </main>
@@ -242,7 +242,7 @@ const GroupDetail = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      <AppHeader />
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button variant="ghost" onClick={() => router.push('/community')} className="mb-4">
           <ArrowLeft className="mr-2 h-4 w-4" />

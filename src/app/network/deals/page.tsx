@@ -1,28 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { Briefcase, MapPin, ArrowRight } from "lucide-react";
+import { useMemo } from "react";
+import { Briefcase, MapPin, ArrowRight, TrendingUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useNetworkFeed } from "@/hooks/use-networking";
-import type { NetworkPostWithAuthor } from "@/lib/networking-types";
 import { formatDistanceToNow } from "date-fns";
 
 export default function NetworkDealsPage() {
-  const { data: posts, isLoading } = useNetworkFeed("deal");
+  const { data: posts, isLoading, dataUpdatedAt } = useNetworkFeed("deal", {
+    refetchInterval: 90_000,
+  });
+
+  const dealStats = useMemo(() => {
+    if (!posts?.length) return { count: 0, newestLabel: null as string | null };
+    const newest = posts[0];
+    return {
+      count: posts.length,
+      newestLabel: formatDistanceToNow(new Date(newest.created_at), {
+        addSuffix: true,
+      }),
+    };
+  }, [posts]);
+
+  const updatedLabel = useMemo(() => {
+    if (!dataUpdatedAt) return null;
+    return formatDistanceToNow(new Date(dataUpdatedAt), { addSuffix: true });
+  }, [dataUpdatedAt]);
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold">Deal Opportunities</h1>
-          <p className="text-muted-foreground mt-1">
-            JV partnerships, off-market deals, and investment opportunities from the community
-          </p>
+    <div className="w-full max-w-5xl mx-auto space-y-8">
+        <div className="rounded-3xl border border-slate-100 bg-gradient-to-br from-sky-50/80 via-white to-emerald-50/50 p-6 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Deal opportunities</h1>
+              <p className="text-muted-foreground mt-1 max-w-2xl">
+                JV partnerships, off-market deals, and investment opportunities from the community.
+              </p>
+            </div>
+            {!isLoading && posts && posts.length > 0 && (
+              <div className="flex flex-wrap gap-2 justify-end">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1.5 text-sm font-medium shadow-sm">
+                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  {dealStats.count} open
+                </span>
+                {dealStats.newestLabel && (
+                  <span className="inline-flex items-center rounded-full bg-white/80 px-3 py-1.5 text-xs text-muted-foreground border border-slate-100">
+                    Latest {dealStats.newestLabel}
+                  </span>
+                )}
+                {updatedLabel && (
+                  <span className="inline-flex items-center rounded-full bg-slate-50 px-3 py-1.5 text-xs text-muted-foreground">
+                    Refreshed {updatedLabel}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {isLoading ? (
           <div className="grid md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <Card key={i}>
+              <Card key={i} className="rounded-3xl border-slate-100">
                 <CardContent className="p-6">
                   <div className="h-5 bg-muted rounded w-2/3 animate-pulse mb-3" />
                   <div className="h-16 bg-muted rounded animate-pulse" />
@@ -31,7 +71,7 @@ export default function NetworkDealsPage() {
             ))}
           </div>
         ) : !posts || posts.length === 0 ? (
-          <Card>
+          <Card className="rounded-3xl border-dashed border-slate-200">
             <CardContent className="py-16 text-center">
               <Briefcase className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">No deal opportunities yet.</p>
@@ -44,7 +84,7 @@ export default function NetworkDealsPage() {
           <div className="grid md:grid-cols-2 gap-4">
             {posts.map((post) => (
               <Link key={post.id} href={`/network/posts/${post.id}`}>
-                <Card className="hover:shadow-lg transition-shadow h-full">
+                <Card className="hover:shadow-lg transition-shadow h-full rounded-3xl border-slate-100">
                   <CardContent className="p-6">
                     <h3 className="font-semibold line-clamp-2">{post.title || post.content.slice(0, 60)}</h3>
                     <p className="text-sm text-muted-foreground mt-2 line-clamp-2">

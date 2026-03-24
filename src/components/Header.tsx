@@ -22,6 +22,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth, AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUnreadCount } from "@/hooks/use-messages";
+import { useUnreadNotificationCount } from "@/hooks/use-notifications";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,6 +48,9 @@ const Header = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const { unreadCount } = useUnreadCount(user?.id ?? null);
+  const { data: unreadNotificationCount = 0 } = useUnreadNotificationCount(
+    user?.id ?? null
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -328,29 +332,41 @@ const Header = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex relative hover:bg-accent"
+            onClick={() =>
+              router.push(user ? "/dashboard/messages" : "/auth")
+            }
+          >
+            <MessageSquare className="h-5 w-5" />
+            {user && unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden md:flex relative hover:bg-accent"
+            onClick={() =>
+              router.push(user ? "/dashboard/notifications" : "/auth")
+            }
+          >
+            <Bell className="h-5 w-5" />
+            {user && unreadNotificationCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
+                {unreadNotificationCount > 99
+                  ? "99+"
+                  : unreadNotificationCount}
+              </span>
+            )}
+          </Button>
+
           {user ? (
             <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden md:flex relative hover:bg-accent"
-                onClick={() => router.push("/dashboard/messages")}
-              >
-                <MessageSquare className="h-5 w-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium text-primary-foreground">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hidden md:flex relative hover:bg-accent"
-              >
-                <Bell className="h-5 w-5" />
-              </Button>
-
               {/* User Menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="hidden lg:flex">
@@ -431,6 +447,37 @@ const Header = () => {
                     Join Network
                   </Button>
                 </Link>
+
+                <div className="flex flex-col gap-1">
+                  <Link
+                    href={user ? "/dashboard/messages" : "/auth"}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                  >
+                    <MessageSquare className="h-5 w-5 text-primary shrink-0" />
+                    <span className="font-medium">Messages</span>
+                    {user && unreadCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                        {unreadCount > 99 ? "99+" : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    href={user ? "/dashboard/notifications" : "/auth"}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
+                  >
+                    <Bell className="h-5 w-5 text-primary shrink-0" />
+                    <span className="font-medium">Notifications</span>
+                    {user && unreadNotificationCount > 0 && (
+                      <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs font-medium text-primary-foreground">
+                        {unreadNotificationCount > 99
+                          ? "99+"
+                          : unreadNotificationCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
 
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg">

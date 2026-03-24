@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import Footer from "@/components/Footer";
 import { BasicInfoForm } from "@/components/profiles/BasicInfoForm";
 import { ProfessionalRolesForm } from "@/components/profiles/ProfessionalRolesForm";
@@ -61,7 +61,7 @@ export default function ProfileSetup() {
   if (authLoading || (!user && !id)) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
-        <Header />
+        <AppHeader />
         <main className="flex-1 flex items-center justify-center py-12">
           <p className="text-muted-foreground">Loading...</p>
         </main>
@@ -76,7 +76,7 @@ export default function ProfileSetup() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Header />
+      <AppHeader />
       <main className="flex-1 py-12">
         <div className="container max-w-4xl">
           <div className="mb-8">

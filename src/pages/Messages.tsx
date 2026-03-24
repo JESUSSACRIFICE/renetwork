@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -163,7 +163,7 @@ const Messages = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex flex-col w-full">
-        <Header />
+        <AppHeader />
         <div className="flex flex-1 w-full">
           <DashboardSidebar userType={userType} profile={profile} />
           <main className="flex-1 flex flex-col min-h-0">

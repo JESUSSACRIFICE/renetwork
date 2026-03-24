@@ -343,6 +343,7 @@ export type Database = {
           content: string;
           type: string;
           deal_details: Json;
+          image_urls: Json;
           group_id: string | null;
           like_count: number;
           comment_count: number;
@@ -356,6 +357,7 @@ export type Database = {
           content: string;
           type?: string;
           deal_details?: Json;
+          image_urls?: Json;
           group_id?: string | null;
           like_count?: number;
           comment_count?: number;
@@ -369,6 +371,7 @@ export type Database = {
           content?: string;
           type?: string;
           deal_details?: Json;
+          image_urls?: Json;
           group_id?: string | null;
           like_count?: number;
           comment_count?: number;

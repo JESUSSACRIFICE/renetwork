@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Header from "@/components/Header";
+// import AppHeader from "@/components/AppHeader";
 import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
 import TalentedFreelancers from "@/components/TalentedFreelancers";
@@ -18,7 +18,7 @@ import AppHeader from "@/components/AppHeader";
 export default function LandingPage() {
   return (
     <div className="min-h-screen flex flex-col overflow-hidden">
-      {/* <Header /> */}
+      {/* <AppHeader /> */}
       <AppHeader />
       <main className="flex-1">
         <NewHero />
