@@ -73,12 +73,14 @@ export default function BrowseTalentCategory() {
   }, [api]);
 
   return (
-    <section className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8 lg:py-10">
+    <section className="w-full bg-transparent px-4 py-4 sm:px-6 md:px-8">
       <div className="mx-auto w-full max-w-none">
         <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
             <h3 className="flex flex-wrap items-baseline gap-x-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              <span className="text-amber-900/90 dark:text-amber-200/95">1B</span>
+              <span className="text-amber-900/90 dark:text-amber-200/95">
+                1B
+              </span>
               <span>Fields</span>
             </h3>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
@@ -101,10 +103,15 @@ export default function BrowseTalentCategory() {
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {categories.map((category, index) => (
-                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/5">
+                <CarouselItem
+                  key={index}
+                  className="pl-2 md:pl-4 md:basis-1/3 lg:basis-1/5"
+                >
                   <div className="relative rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-48">
                     {/* Background Image/Gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-90`}>
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-90`}
+                    >
                       {/* Pattern overlay for texture */}
                       <div className="absolute inset-0 bg-black/10"></div>
                       {/* Large icon as background element */}
@@ -112,12 +119,18 @@ export default function BrowseTalentCategory() {
                         <span className="text-8xl">{category.icon}</span>
                       </div>
                     </div>
-                    
+
                     {/* Text Overlay */}
                     <div className="relative h-full flex flex-col justify-end p-6 text-white">
-                      <div className="text-4xl mb-3 drop-shadow-lg">{category.icon}</div>
-                      <h3 className="text-lg font-bold mb-1 drop-shadow-md">{category.title}</h3>
-                      <p className="text-sm opacity-90 drop-shadow-sm">{category.count} services</p>
+                      <div className="text-4xl mb-3 drop-shadow-lg">
+                        {category.icon}
+                      </div>
+                      <h3 className="text-lg font-bold mb-1 drop-shadow-md">
+                        {category.title}
+                      </h3>
+                      <p className="text-sm opacity-90 drop-shadow-sm">
+                        {category.count} services
+                      </p>
                     </div>
                   </div>
                 </CarouselItem>
@@ -131,4 +144,3 @@ export default function BrowseTalentCategory() {
     </section>
   );
 }
-

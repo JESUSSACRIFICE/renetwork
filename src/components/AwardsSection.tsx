@@ -16,13 +16,13 @@ const AWARD_CARDS = [
 export default function AwardsSection() {
   return (
     <section
-      className="border-t border-border/60 bg-background py-14 md:py-20"
+      className="w-full border-t border-border/50 bg-transparent px-4 py-10 sm:px-6 md:px-8 md:py-12 lg:py-14"
       aria-labelledby="awards-heading"
     >
-      <div className="container">
+      <div className="mx-auto w-full max-w-none">
         <h2
           id="awards-heading"
-          className="mb-10 text-center text-3xl font-bold tracking-tight md:mb-12 md:text-4xl"
+          className="mb-8 text-center text-3xl font-bold tracking-tight text-foreground md:mb-10 md:text-4xl"
         >
           Awards
         </h2>

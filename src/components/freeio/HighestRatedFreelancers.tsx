@@ -152,12 +152,14 @@ export default function HighestRatedFreelancers() {
   const totalDots = count > 0 ? count : Math.ceil(freelancers.length / 4);
 
   return (
-    <section className="w-full bg-transparent px-4 py-8 sm:px-6 md:px-8 lg:py-10">
+    <section className="w-full bg-transparent px-4 py-4 sm:px-6 md:px-8">
       <div className="mx-auto w-full max-w-none">
         <div className="mb-8 flex items-center justify-between">
           <div className="space-y-2">
             <h3 className="flex flex-wrap items-baseline gap-x-2 text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-              <span className="text-amber-900/90 dark:text-amber-200/95">1C</span>
+              <span className="text-amber-900/90 dark:text-amber-200/95">
+                1C
+              </span>
               <span>Highest-rated PSPs</span>
             </h3>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
@@ -180,22 +182,37 @@ export default function HighestRatedFreelancers() {
           >
             <CarouselContent className="-ml-2 md:-ml-4">
               {freelancers.map((freelancer, index) => (
-                <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/4">
+                <CarouselItem
+                  key={index}
+                  className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/4"
+                >
                   <div className="rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex flex-col items-center text-center space-y-4">
                       <Avatar className="h-20 w-20 border border-border">
-                        <AvatarFallback className="text-2xl bg-muted">{freelancer.avatar}</AvatarFallback>
+                        <AvatarFallback className="text-2xl bg-muted">
+                          {freelancer.avatar}
+                        </AvatarFallback>
                       </Avatar>
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground">{freelancer.name}</h3>
-                        <p className="text-sm text-muted-foreground">{freelancer.role}</p>
+                        <h3 className="text-lg font-semibold text-foreground">
+                          {freelancer.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {freelancer.role}
+                        </p>
                       </div>
                       <div className="flex items-center gap-1">
                         <Star className="h-4 w-4 fill-amber-400 text-amber-500" />
-                        <span className="text-sm font-medium text-foreground">{freelancer.rating}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {freelancer.rating}
+                        </span>
                       </div>
-                      <div className="text-sm text-muted-foreground">{freelancer.location}</div>
-                      <div className="text-sm font-semibold text-foreground">{freelancer.rate}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {freelancer.location}
+                      </div>
+                      <div className="text-sm font-semibold text-foreground">
+                        {freelancer.rate}
+                      </div>
                       <Button variant="outline" className="w-full">
                         View Profile
                       </Button>
@@ -233,4 +250,3 @@ export default function HighestRatedFreelancers() {
     </section>
   );
 }
-

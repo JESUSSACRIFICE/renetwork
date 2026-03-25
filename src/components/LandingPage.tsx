@@ -17,6 +17,9 @@ import AppHeader from "@/components/AppHeader";
 import HighestRatedFreelancers from "./freeio/HighestRatedFreelancers";
 import BrowseTalentCategory from "./freeio/BrowseTalentCategory";
 import AwardsSection from "@/components/AwardsSection";
+import EngagementCards from "@/components/EngagementCards";
+import CrowdfundingSection from "@/components/CrowdfundingSection";
+import NetworkingSection from "@/components/NetworkingSection";
 
 export default function LandingPage() {
   return (
@@ -56,38 +59,46 @@ export default function LandingPage() {
         </section> */}
         {/* <He/ro /> */}
         <section
-          className="border-t border-border/70 bg-gradient-to-b from-amber-950/[0.04] via-background to-muted/35"
+          className="border-t border-border/70 bg-blue-900"
           aria-label="Outreach — discover professionals and fields"
         >
           <div className="container pt-14 pb-6 md:pt-16 md:pb-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-900/80 dark:text-amber-200/90">
-              1. Out-reach
-            </p>
-            <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Outreach</h2>
-            <p className="mt-2 max-w-3xl text-lg text-muted-foreground">
+            <h2 className="text-3xl font-bold tracking-tight text-white underline md:text-4xl">
+              <span className="mr-2" aria-hidden>
+                🤝
+              </span>
+              Outreach
+            </h2>
+            <p className="mt-2 max-w-3xl text-lg text-white">
               One flow in three beats: who you need&nbsp;
-              <span className="font-semibold text-foreground">1A</span>, which fields fit your deal&nbsp;
-              <span className="font-semibold text-foreground">1B</span>, and rated PSPs to shortlist&nbsp;
-              <span className="font-semibold text-foreground">1C</span>.
+              <span className="font-semibold text-white">1A</span>, which fields
+              fit your deal&nbsp;
+              <span className="font-semibold text-white">1B</span>, and rated
+              PSPs to shortlist&nbsp;
+              <span className="font-semibold text-white">1C</span>.
             </p>
           </div>
           <div className="container pb-16 md:pb-20">
-            <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/70 bg-card/45 shadow-sm ring-1 ring-border/30">
-              <Categories />
+            <div className="overflow-hidden rounded-2xl border border-border/70 bg-card/45 shadow-sm ring-1 ring-border/30">
               <BrowseTalentCategory />
+              <EngagementCards />
+              <Categories />
               <HighestRatedFreelancers />
+              <AwardsSection />
             </div>
           </div>
         </section>
 
-        <AwardsSection />
+        <CrowdfundingSection />
 
-        <TalentedFreelancers />
-        <TopRatedFreelancers />
-        <TrendingServices />
-        <Sponsors />
-        <HotTopics />
-        <HowItWorks />
+        <NetworkingSection />
+
+        {/* <TalentedFreelancers /> */}
+        {/* <TopRatedFreelancers /> */}
+        {/* <TrendingServices /> */}
+        {/* <Sponsors /> */}
+        {/* <HotTopics /> */}
+        {/* <HowItWorks /> */}
         <Features />
         <StatsAndAwards />
         <Testimonials />
@@ -96,4 +107,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
