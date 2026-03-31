@@ -564,6 +564,14 @@ interface SearchFormProps {
 export const SearchForm = ({ onSearch, className = "", defaultSearchType }: SearchFormProps) => {
   const router = useRouter();
   const { data: pspOptionsByLetter = {} } = usePspOptionsByLetter();
+  const [saveAsDefaultByKey, setSaveAsDefaultByKey] = useState<
+    Record<string, boolean>
+  >({});
+
+  const setSaveDefaultKey = (key: string, checked: boolean) => {
+    setSaveAsDefaultByKey((prev) => ({ ...prev, [key]: checked }));
+  };
+
   const [filters, setFilters] = useState<FilterValues>({
     find: [],
     representation: [],
@@ -665,6 +673,8 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
             setFilters({ ...filters, flooringOutdoorTypes: v })
           }
           flooringOutdoorOptions={flooringOutdoorOptions}
+          saveAsDefaultByKey={saveAsDefaultByKey}
+          onSaveAsDefaultChange={setSaveDefaultKey}
         />
 
         {isMortgageRelatedPsp && (
@@ -685,6 +695,12 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
                 value={filters[row.key] as string[]}
                 onChange={(value) =>
                   setFilters((prev) => ({ ...prev, [row.key]: value }))
+                }
+                saveAsDefaultChecked={
+                  saveAsDefaultByKey[`mortgage:${row.key}`] ?? false
+                }
+                onSaveAsDefaultChange={(c) =>
+                  setSaveDefaultKey(`mortgage:${row.key}`, c)
                 }
               />
             ))}
@@ -715,6 +731,12 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
               setFilters({ ...filters, creditTypes: value })
             }
             creditOptions={creditOptions}
+            saveAsDefaultChecked={
+              saveAsDefaultByKey["field:representation"] ?? false
+            }
+            onSaveAsDefaultChange={(c) =>
+              setSaveDefaultKey("field:representation", c)
+            }
           />
         )}
 
@@ -778,6 +800,8 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
             setFilters({ ...filters, otherTypes: value })
           }
           otherOptions={otherOptions}
+          saveAsDefaultChecked={saveAsDefaultByKey["field:fields"] ?? false}
+          onSaveAsDefaultChange={(c) => setSaveDefaultKey("field:fields", c)}
         />
 
         <MultiSelect
@@ -786,6 +810,8 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
           options={priceOptions}
           value={filters.price}
           onChange={(value) => setFilters({ ...filters, price: value })}
+          saveAsDefaultChecked={saveAsDefaultByKey["field:price"] ?? false}
+          onSaveAsDefaultChange={(c) => setSaveDefaultKey("field:price", c)}
         />
 
         <MultiSelect
@@ -795,6 +821,12 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
           value={filters.percentageShare}
           onChange={(value) =>
             setFilters({ ...filters, percentageShare: value })
+          }
+          saveAsDefaultChecked={
+            saveAsDefaultByKey["field:percentageShare"] ?? false
+          }
+          onSaveAsDefaultChange={(c) =>
+            setSaveDefaultKey("field:percentageShare", c)
           }
         />
 
@@ -806,6 +838,12 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
           onChange={(value) =>
             setFilters({ ...filters, willingToTrain: value })
           }
+          saveAsDefaultChecked={
+            saveAsDefaultByKey["field:willingToTrain"] ?? false
+          }
+          onSaveAsDefaultChange={(c) =>
+            setSaveDefaultKey("field:willingToTrain", c)
+          }
         />
 
         <MultiSelect
@@ -814,6 +852,8 @@ export const SearchForm = ({ onSearch, className = "", defaultSearchType }: Sear
           options={motiveOptions}
           value={filters.motive}
           onChange={(value) => setFilters({ ...filters, motive: value })}
+          saveAsDefaultChecked={saveAsDefaultByKey["field:motive"] ?? false}
+          onSaveAsDefaultChange={(c) => setSaveDefaultKey("field:motive", c)}
         />
       </div>
       <Button

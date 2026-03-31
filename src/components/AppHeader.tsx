@@ -23,12 +23,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth, AUTH_USER_QUERY_KEY } from "@/hooks/use-auth";
 import { useUnreadCount } from "@/hooks/use-messages";
 import { useUnreadNotificationCount } from "@/hooks/use-notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+
+type NavChild = { name: string; href: string };
+
+type NavItem =
+  | { name: string; href: string; children?: never }
+  | { name: string; href: string; children: NavChild[] };
+
+function hasNavChildren(
+  item: NavItem
+): item is { name: string; href: string; children: NavChild[] } {
+  return "children" in item;
+}
 
 const AppHeader = () => {
   const router = useRouter();
@@ -39,12 +56,20 @@ const AppHeader = () => {
   const { data: unreadNotificationCount = 0 } = useUnreadNotificationCount(
     user?.id ?? null
   );
-  const navigationItems = [
-    // { name: "For customers", href: "/customer" },
+  const navigationItems: NavItem[] = [
     { name: "Referral", href: "/referral" },
     { name: "Crowdfund", href: "/crowdfund" },
     { name: "Network", href: "/network" },
     { name: "Commerce", href: "/commerce" },
+    {
+      name: "BENEFITS",
+      href: "/referral/benefits",
+      children: [
+        { name: "CUSTOMER", href: "/referral/benefits#customer" },
+        { name: "SENDER", href: "/referral/benefits#sender" },
+        { name: "RECEIVER", href: "/referral/benefits#recipient" },
+      ],
+    },
   ];
 
   const getNavigationHref = (itemName: string, itemHref: string) => {
@@ -68,7 +93,7 @@ const AppHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/90 shadow-sm">
-      <div className="container flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="flex h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-3 shrink-0">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary-dark text-primary-foreground font-bold text-lg shadow-lg">
@@ -79,19 +104,50 @@ const AppHeader = () => {
 
         {/* Main Navigation - Desktop */}
         <nav className="hidden md:flex items-center gap-1 flex-1 justify-center">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.name}
-              href={getNavigationHref(item.name, item.href)}
-            >
-              <Button
-                variant="ghost"
-                className="h-10 px-4 text-base hover:bg-primary/10 hover:text-primary transition-colors"
+          {navigationItems.map((item, index) => {
+            const n = index + 1;
+            if (hasNavChildren(item)) {
+              return (
+                <DropdownMenu key={item.name}>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="h-10 gap-1 px-4 text-base hover:bg-primary/10 hover:text-primary transition-colors"
+                    >
+                      <span className="mr-1.5 tabular-nums text-muted-foreground font-medium">
+                        {n}.
+                      </span>
+                      {item.name}
+                      <ChevronDown className="h-4 w-4 opacity-60 shrink-0" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="min-w-[12rem]">
+                    {item.children.map((child) => (
+                      <DropdownMenuItem key={child.name} asChild>
+                        <Link href={child.href}>{child.name}</Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            }
+            return (
+              <Link
+                key={item.name}
+                href={getNavigationHref(item.name, item.href)}
               >
-                {item.name}
-              </Button>
-            </Link>
-          ))}
+                <Button
+                  variant="ghost"
+                  className="h-10 px-4 text-base hover:bg-primary/10 hover:text-primary transition-colors"
+                >
+                  <span className="mr-1.5 tabular-nums text-muted-foreground font-medium">
+                    {n}.
+                  </span>
+                  {item.name}
+                </Button>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right Side Actions */}
@@ -228,16 +284,49 @@ const AppHeader = () => {
               <div className="flex flex-col gap-6 py-6">
                 {/* Mobile Navigation Items */}
                 <div className="space-y-2">
-                  {navigationItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={getNavigationHref(item.name, item.href)}
-                      onClick={() => setMobileOpen(false)}
-                      className="block px-4 py-3 rounded-lg hover:bg-accent transition-colors text-base font-medium"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  {navigationItems.map((item, index) => {
+                    const n = index + 1;
+                    if (hasNavChildren(item)) {
+                      return (
+                        <Collapsible key={item.name}>
+                          <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-4 py-3 rounded-lg hover:bg-accent transition-colors text-base font-medium text-left [&[data-state=open]>svg]:rotate-180">
+                            <span>
+                              <span className="mr-2 tabular-nums text-muted-foreground font-medium">
+                                {n}.
+                              </span>
+                              {item.name}
+                            </span>
+                            <ChevronDown className="h-4 w-4 shrink-0 opacity-60 transition-transform" />
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="space-y-1 pl-3 pt-1">
+                            {item.children.map((child) => (
+                              <Link
+                                key={child.name}
+                                href={child.href}
+                                onClick={() => setMobileOpen(false)}
+                                className="block px-4 py-2.5 rounded-lg hover:bg-accent transition-colors text-sm font-medium"
+                              >
+                                {child.name}
+                              </Link>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      );
+                    }
+                    return (
+                      <Link
+                        key={item.name}
+                        href={getNavigationHref(item.name, item.href)}
+                        onClick={() => setMobileOpen(false)}
+                        className="block px-4 py-3 rounded-lg hover:bg-accent transition-colors text-base font-medium"
+                      >
+                        <span className="mr-2 tabular-nums text-muted-foreground font-medium">
+                          {n}.
+                        </span>
+                        {item.name}
+                      </Link>
+                    );
+                  })}
                 </div>
 
                 <div className="border-t pt-6 space-y-3">
