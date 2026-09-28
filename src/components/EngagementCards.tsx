@@ -13,7 +13,8 @@ import { cn } from "@/lib/utils";
 const CARDS = [
   {
     title: "Referral",
-    description: "Send and track referrals across your trusted network.",
+    description:
+      "Demo. Potentially soon, refer new customers to other property service providers. Mortgage, title, and escrow payouts are not enabled.",
     href: "/referral",
     icon: Share2,
   },

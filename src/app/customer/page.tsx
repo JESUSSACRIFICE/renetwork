@@ -23,6 +23,7 @@ import {
   Briefcase,
 } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
+import { DemoHiringSection } from "@/components/customer/DemoHiringSection";
 import { useServicesList } from "@/hooks/use-services";
 
 const SERVICES_PREVIEW_LIMIT = 6;
@@ -332,6 +333,12 @@ export default function CustomerLandingPage() {
                 </ul>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-24 border-b">
+          <div className="container px-4 sm:px-6 lg:px-8">
+            <DemoHiringSection />
           </div>
         </section>
 

@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import AppHeader from "@/components/AppHeader";
 import { SearchForm } from "@/components/hero/SearchForm";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 
 export default function ReferralLandingPage() {
   return (
@@ -52,8 +53,9 @@ export default function ReferralLandingPage() {
                     </h1>
                     <p className="text-lg sm:text-xl text-white/90 max-w-2xl">
                       Connect, refer, and collaborate with verified real estate
-                      professionals. Secure payments, referral splitting, and
-                      comprehensive support.
+                      professionals. Referral splits on this page are demo
+                      framing. Mortgage, title, and escrow pay-for-referral
+                      payouts are not enabled.
                     </p>
                   </div>
 
@@ -103,6 +105,7 @@ export default function ReferralLandingPage() {
                 looking for services, referring clients, or building your
                 business, we provide the tools and support you need.
               </p>
+              <DemoEconomicsNote className="mx-auto mt-4 max-w-3xl" />
             </div>
 
             {/* How It Works */}
@@ -135,7 +138,8 @@ export default function ReferralLandingPage() {
                   </div>
                   <h3 className="text-xl font-semibold mb-2">3. Secure</h3>
                   <p className="text-gray-600">
-                    Protected payments and escrow for peace of mind
+                    Payment-protection copy is demo framing. Settlement-adjacent
+                    referral payouts are not enabled.
                   </p>
                 </div>
               </div>
@@ -153,7 +157,8 @@ export default function ReferralLandingPage() {
                     Referral Splitting
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    Fair and transparent referral fee distribution
+                    Demo fee splits for layout review. Not a live mortgage,
+                    title, or escrow referral product.
                   </p>
                 </div>
                 <Link href="/referral/learn/collaboration">

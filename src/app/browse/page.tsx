@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useBrowseProfiles, usePspOptionsByLetter } from "@/hooks/use-professional-profiles";
 import MapView from "@/components/browse/MapView";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 
 function BrowseContent() {
   const searchParams = useSearchParams();
@@ -290,6 +291,8 @@ function BrowseContent() {
                 </div>
               </div>
 
+              <DemoEconomicsNote className="mb-4" />
+
               {loading ? (
                 <div className="text-center py-12">
                   <p className="text-muted-foreground">
@@ -374,7 +377,7 @@ function BrowseContent() {
                                 ? "Starting at"
                                 : service.pricePerSqft
                                   ? "Price/sqft"
-                                  : "Referral Fee"}
+                                  : "Demo referral %"}
                             </span>
                             <span className="text-lg font-bold text-primary">
                               {service.price > 0

@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import ContactForm from "@/components/professional/ContactForm";
 import { ReferClientDialog } from "@/components/professional/ReferClientDialog";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 import ReviewsList from "@/components/professional/ReviewsList";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -196,7 +197,7 @@ export default function ProfessionalDetail() {
                         ? "Starting at"
                         : professional.price_per_sqft
                           ? "Price per sqft"
-                          : "Referral Fee"}
+                          : "Demo referral %"}
                     </p>
                     <p className="text-2xl font-bold text-primary">
                       {professional.hourly_rate
@@ -207,6 +208,9 @@ export default function ProfessionalDetail() {
                             ? `${professional.referral_fee_percentage}%`
                             : "Contact for quote"}
                     </p>
+                    {!professional.hourly_rate && !professional.price_per_sqft ? (
+                      <DemoEconomicsNote className="mt-3" />
+                    ) : null}
                   </div>
                   <Separator />
                   <div className="flex items-center gap-2 text-sm">

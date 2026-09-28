@@ -84,7 +84,8 @@ export default function BrowseTalentCategory() {
               <span>Fields</span>
             </h3>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
-              Browse property types and specializations that match your deal
+              Browse property types and specializations that match your deal.
+              Service counts on these cards are Demo figures, not live inventory.
             </p>
           </div>
           <Button variant="outline" className="hidden md:inline-flex shrink-0">

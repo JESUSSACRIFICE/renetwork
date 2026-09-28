@@ -36,6 +36,7 @@ import {
 import { useCreateDispute } from "@/hooks/use-phase1-admin";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 import {
   Dialog,
   DialogContent,
@@ -132,6 +133,7 @@ export default function ReferralDashboardPage() {
             <p className="text-gray-600">
               Welcome back, {profile?.full_name || user.email}
             </p>
+            <DemoEconomicsNote className="mt-3 max-w-3xl" />
           </div>
 
           <Tabs
@@ -155,7 +157,8 @@ export default function ReferralDashboardPage() {
                     </CardTitle>
                     <CardDescription>
                       Share this link when referring customers to professionals.
-                      You earn commission when the lead converts.
+                      Conversion figures here are demo framing, not a live
+                      mortgage, title, or escrow referral payout.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -297,14 +300,14 @@ export default function ReferralDashboardPage() {
                 <CardHeader>
                   <CardTitle>Commissions</CardTitle>
                   <CardDescription>
-                    Earnings when your referrals convert
+                    Demo earnings when a referral is marked converted
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {commissions.length === 0 ? (
                     <p className="text-muted-foreground py-8 text-center">
-                      No commissions yet. Referrals earn $25 when the lead
-                      converts.
+                      No commissions yet. The $25 figure sometimes shown in
+                      older copy is a Demo amount, not an enabled payout.
                     </p>
                   ) : (
                     <div className="space-y-4">

@@ -94,7 +94,8 @@ const Categories = () => {
               <span>Professional roles</span>
             </h3>
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
-              Connect with verified professionals across all property types
+              Connect with verified professionals across all property types.
+              Headcounts on these cards are Demo, not a live directory.
             </p>
           </div>
           <Link href="/search/services">

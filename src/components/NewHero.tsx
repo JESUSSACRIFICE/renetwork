@@ -6,26 +6,29 @@ import { useCallback, useEffect, useState } from "react";
 import { AdBlock } from "@/components/hero/AdBlock";
 import { SearchForm } from "@/components/hero/SearchForm";
 
-/** Warehouse & real-estate themed backgrounds (Unsplash, optimized width). */
-const HERO_SLIDE_IMAGES = [
-  "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1920&q=80",
-  "https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1920&q=80",
+/**
+ * Owner Drive folder (public images copied into public/hero).
+ * https://drive.google.com/drive/folders/1RfTS5E_OB4sK2FdGsgEL1pBjAwpYv998
+ * The subfolder titled "NOT:" is excluded on purpose.
+ */
+const HERO_SLIDES = [
+  { src: "/hero/01.jpg", alt: "RE Network wordmark on a commercial building" },
+  { src: "/hero/02.jpg", alt: "Aerial view of a residential neighborhood" },
+  { src: "/hero/03.jpg", alt: "LCRE Network concept page preview" },
+  { src: "/hero/04.jpg", alt: "RE Network logo on a glass office tower" },
+  {
+    src: "/hero/05.jpg",
+    alt: "Property fields from commercial through residential",
+  },
+  { src: "/hero/06.jpg", alt: "Sample house floor plan" },
+  { src: "/hero/07.jpg", alt: "RE Network logo" },
+  { src: "/hero/08.jpg", alt: "RE Network logo over a modern glass building" },
+  { src: "/hero/09.jpg", alt: "RE Network mark on a sunset city skyline" },
+  { src: "/hero/10.jpg", alt: "II LCRE Network logo" },
 ] as const;
 
 const SLIDE_INTERVAL_MS = 7000;
-const FADE_MS = 1100;
+const SLIDE_MS = 900;
 
 /** Side column: promotional banner links (not tied to background slideshow). */
 const SALES_BANNERS = [
@@ -113,10 +116,6 @@ const AD_LABOUR_LEFT =
 const AD_LABOUR_RIGHT =
   "https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=400&q=80";
 
-function thumbSrc(fullSizeUrl: string) {
-  return fullSizeUrl.replace("w=1920", "w=280").replace("q=80", "q=70");
-}
-
 const NewHero = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   /** Bumping this restarts the autoplay interval after a manual thumbnail pick. */
@@ -134,38 +133,49 @@ const NewHero = () => {
     if (reduced) return;
 
     const id = window.setInterval(() => {
-      setActiveIndex((i) => (i + 1) % HERO_SLIDE_IMAGES.length);
+      setActiveIndex((i) => (i + 1) % HERO_SLIDES.length);
     }, SLIDE_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [autoplayEpoch]);
 
   return (
     <section className="relative overflow-hidden w-full py-4 sm:py-6">
-      {/* Background slideshow */}
+      {/* Background slideshow — track moves left, one slide at a time. */}
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
         aria-hidden
       >
-        {HERO_SLIDE_IMAGES.map((src, i) => (
-          <Image
-            key={src}
-            src={src}
-            alt=""
-            fill
-            className="object-cover transition-opacity ease-in-out"
-            style={{
-              opacity: i === activeIndex ? 1 : 0,
-              transitionDuration: `${FADE_MS}ms`,
-            }}
-            sizes="100vw"
-            priority={i === 0}
-          />
-        ))}
+        <div
+          className="flex h-full ease-in-out motion-reduce:transition-none"
+          style={{
+            width: `${HERO_SLIDES.length * 100}%`,
+            transform: `translate3d(-${(activeIndex * 100) / HERO_SLIDES.length}%, 0, 0)`,
+            transitionProperty: "transform",
+            transitionDuration: `${SLIDE_MS}ms`,
+          }}
+        >
+          {HERO_SLIDES.map((slide, i) => (
+            <div
+              key={slide.src}
+              className="relative h-full shrink-0"
+              style={{ width: `${100 / HERO_SLIDES.length}%` }}
+            >
+              <Image
+                src={slide.src}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority={i === 0}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Brand tint + readability over photos */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-r from-[#8B4513]/88 via-[#A0522D]/82 to-[#DEB887]/75"
+        className="absolute inset-0 z-[1] pointer-events-none bg-gradient-to-r from-[#8B4513]/55 via-black/25 to-black/40"
         aria-hidden
       />
 
@@ -242,39 +252,29 @@ const NewHero = () => {
           </div>
         </div>
 
-        {/* Background slideshow previews — one row, equal flex widths, no horizontal scroll */}
-        <div className="mt-4 w-full min-w-0 px-2 sm:px-4 pb-1">
+        {/* Dots sit under the slides, not beside or above them. */}
+        <div className="mt-4 flex w-full justify-center px-2 pb-2 sm:px-4">
           <div
-            className="flex w-full min-w-0 flex-nowrap gap-1 sm:gap-1.5 md:gap-2"
+            className="flex items-center gap-2 rounded-full bg-black/35 px-3 py-2 backdrop-blur-sm"
             role="tablist"
-            aria-label="Hero background slides"
+            aria-label="Hero slideshow. Slides move left."
           >
-            {HERO_SLIDE_IMAGES.map((src, i) => {
+            {HERO_SLIDES.map((slide, i) => {
               const selected = i === activeIndex;
               return (
                 <button
-                  key={src}
+                  key={slide.src}
                   type="button"
                   role="tab"
                   aria-selected={selected}
-                  aria-label={`Background ${i + 1} of ${HERO_SLIDE_IMAGES.length}`}
+                  aria-label={`${slide.alt}. Slide ${i + 1} of ${HERO_SLIDES.length}`}
                   onClick={() => goToSlide(i)}
                   className={[
-                    "relative h-10 min-w-0 flex-1 overflow-hidden border-2 border-black rounded-sm shadow-sm transition-opacity duration-200 sm:h-11 md:h-12",
-                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/90",
-                    selected
-                      ? "z-[1] opacity-100 ring-2 ring-amber-400/90 ring-offset-1 ring-offset-transparent md:ring-offset-2"
-                      : "opacity-[0.7] hover:opacity-100",
+                    "h-2.5 rounded-full transition-all duration-200",
+                    "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
+                    selected ? "w-6 bg-white" : "w-2.5 bg-white/55 hover:bg-white/80",
                   ].join(" ")}
-                >
-                  <Image
-                    src={thumbSrc(src)}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 8vw, (max-width: 1024px) 6vw, 5vw"
-                  />
-                </button>
+                />
               );
             })}
           </div>

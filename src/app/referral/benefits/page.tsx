@@ -22,6 +22,8 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
+import { DemoHiringSection } from "@/components/customer/DemoHiringSection";
 
 const customerRows = [
   {
@@ -31,8 +33,9 @@ const customerRows = [
   },
   {
     title: "Secure escrow-style payments",
-    detail: "Pay milestones through the platform with dispute-friendly holds.",
-    badge: "PCI-ready flow",
+    detail:
+      "Milestone holds are a product story only. Mortgage, title, and escrow referral payouts are not enabled.",
+    badge: "Demo story",
   },
   {
     title: "Referral transparency",
@@ -45,7 +48,7 @@ const senderRows = [
   {
     title: "Tiered commission pools",
     detail: "Dummy tiers: Bronze 4%, Silver 6%, Gold 8% on closed deals.",
-    badge: "Up to 8%",
+    badge: "Demo · up to 8%",
   },
   {
     title: "Instant lead routing",
@@ -68,7 +71,7 @@ const recipientRows = [
   {
     title: "Revenue share on close",
     detail: "Illustrative split: 70% receiver firm / 20% sender / 10% platform.",
-    badge: "Configurable",
+    badge: "Demo split",
   },
   {
     title: "Exclusivity windows",
@@ -119,9 +122,13 @@ export default function ReferralBenefitsPage() {
                 the network. Figures below are illustrative placeholders for
                 demos and UX reviews.
               </p>
+              <DemoEconomicsNote />
               <div className="flex flex-wrap gap-2 pt-2">
                 <Button asChild variant="outline" size="sm">
                   <a href="#customer">CUSTOMER</a>
+                </Button>
+                <Button asChild variant="outline" size="sm">
+                  <a href="#hiring">HIRING</a>
                 </Button>
                 <Button asChild variant="outline" size="sm">
                   <a href="#sender">SENDER</a>
@@ -187,6 +194,9 @@ export default function ReferralBenefitsPage() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+            <div className="mt-10">
+              <DemoHiringSection id="hiring" className="scroll-mt-24" />
             </div>
           </div>
         </section>

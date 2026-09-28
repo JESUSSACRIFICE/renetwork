@@ -1,3 +1,9 @@
+# RE Network (owned parallel track)
+
+This repository is the owner’s Next.js app (`src/app`, App Router) and the track behind [renetwork-blue.vercel.app](https://renetwork-blue.vercel.app). It is separate from Aliha’s unpaid Vite app in `alihaatheroff-stack/Real-Estate-Frontend-1`. Do not treat that repo as the source of truth for this deploy.
+
+Hero photos in `public/hero` come from the owner’s Drive folder. The subfolder named `NOT:` was left out. Marketplace percentages and the customer Hiring cards in this slice are labeled Demo. Mortgage, title, and escrow pay-for-referral payouts are not enabled.
+
 # Welcome to your Lovable project
 
 ## Project info

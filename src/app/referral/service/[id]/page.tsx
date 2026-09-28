@@ -7,6 +7,7 @@ import ReferralFooter from "@/components/referral/ReferralFooter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Star, MapPin, Clock, CheckCircle, Share2, Heart, MessageSquare, Calendar } from "lucide-react";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 
 export default function ServicePage() {
   const params = useParams();
@@ -158,8 +159,11 @@ export default function ServicePage() {
                   <div className="text-4xl font-bold text-gray-900 mb-1">${service.pricing.base}</div>
                   <div className="text-gray-600">per {service.pricing.unit}</div>
                   {service.pricing.referralFee && (
-                    <div className="text-sm text-gray-500 mt-2">
-                      Referral Fee: {service.pricing.referralFee}
+                    <div className="mt-3 space-y-2 text-left">
+                      <div className="text-sm text-gray-500">
+                        Demo referral %: {service.pricing.referralFee}
+                      </div>
+                      <DemoEconomicsNote />
                     </div>
                   )}
                 </div>

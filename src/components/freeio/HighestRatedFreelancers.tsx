@@ -12,6 +12,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DemoEconomicsNote } from "@/components/compliance/DemoEconomicsNote";
 
 const freelancers = [
   {
@@ -165,6 +166,7 @@ export default function HighestRatedFreelancers() {
             <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
               Trusted professional service providers your network loves
             </p>
+            <DemoEconomicsNote />
           </div>
           <Button variant="outline" className="hidden md:inline-flex shrink-0">
             Browse all
@@ -211,6 +213,9 @@ export default function HighestRatedFreelancers() {
                         {freelancer.location}
                       </div>
                       <div className="text-sm font-semibold text-foreground">
+                        <span className="mr-1.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-950">
+                          Demo
+                        </span>
                         {freelancer.rate}
                       </div>
                       <Button variant="outline" className="w-full">
